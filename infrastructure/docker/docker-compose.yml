@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: ../infrastructure/docker/Dockerfile.backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./medicinal_plants.db
+      - DEBUG=True
+      - ALLOWED_ORIGINS=http://localhost:3000
+    volumes:
+      - ../../backend:/app
+      - backend_uploads:/app/uploads
+      - backend_models:/app/ml_models
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: ../infrastructure/docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - API_URL=http://backend:8000
+    volumes:
+      - ../../frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  backend_uploads:
+  backend_models:
+
+networks:
+  app-network:
+    driver: bridge
