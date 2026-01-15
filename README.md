@@ -235,11 +235,56 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 👥 Team
-Madhura Wankhade Exam No: 24167
-Ravindra Ahire Exam No: 24101
-Samruddhi Gholap Exam No: 24116
-Pranali Ghugarkar Exam No: 24117
+## 👥 Team & Guidance
+
+### 👩‍🎓 Project Team (Group G14)
+- **Madhura Wankhade** (Exam No: 24167)
+- **Ravindra Ahire** (Exam No: 24101)
+- **Samruddhi Gholap** (Exam No: 24116)
+- **Pranali Ghugarkar** (Exam No: 24117)
+
+### 👩‍🏫 Project Guide
+- **Ms. Sneha Bankar**
+  *Department of Artificial Intelligence and Data Science*
+  *Dr. D. Y. Patil College of Engineering & Innovation*
+
+---
+
+## 📈 Implementation Progress & History
+
+We have systematically developed this project from conceptualization to a fully functional multi-platform system. Here is our journey:
+
+### **Step 1: Planning & Foundation**
+- Defined the project scope focusing on Indian medicinal plants.
+- Established a robust repository structure supporting Backend, Frontend, and Mobile modules.
+- Selected a high-performance stack: FastAPI (Backend), Next.js (Web), and React Native (Mobile).
+
+### **Step 2: Machine Learning & Data Pipeline**
+- Curated and preprocessed the Indian Medicinal Leaves dataset.
+- Implemented a training pipeline using **MobileNetV2** with transfer learning for efficient identification.
+- Integrated **Vision Transformer (ViT)** components to boost accuracy.
+- Added **Explainable AI** features using Grad-CAM to visualize model focus.
+
+### **Step 3: Backend API Development**
+- Built a modular REST API using **FastAPI**.
+- Implemented core services: `ml_service` for predictions and `gemini_service` for natural language descriptions.
+- Set up **PostgreSQL** for storing detailed plant information and user history.
+- Integrated **Google Gemini Vision API** for rich, descriptive plant analysis.
+
+### **Step 4: Web Application (Frontend)**
+- Developed a "Neo-Minimalist" responsive web interface using **Next.js 14**.
+- Implemented a real-time prediction dashboard with image upload and analysis results.
+- Built a comprehensive "Plant Encyclopedia" to browse the medicinal database.
+
+### **Step 5: Mobile App Development**
+- Created a cross-platform mobile app using **React Native** and **Expo**.
+- Integrated native camera features for instant leaf scanning.
+- Connected the mobile app to the central API for consistent identification across platforms.
+
+### **Step 6: Integration & Optimization**
+- Optimized model inference for near-instant responses (<2 seconds).
+- Conducted end-to-end testing to ensure system stability.
+- Finalized documentation and deployment configurations.
 
 ---
 
@@ -262,13 +307,13 @@ Pranali Ghugarkar Exam No: 24117
 ## 🗺️ Roadmap
 
 - [x] Phase 1: Planning & Architecture
-- [ ] Phase 2: Backend Development
-- [ ] Phase 3: ML Pipeline
-- [ ] Phase 4: Frontend Development
-- [ ] Phase 5: Mobile App
-- [ ] Phase 6: Testing & Optimization
+- [x] Phase 2: Backend Development
+- [x] Phase 3: ML Pipeline
+- [x] Phase 4: Frontend Development
+- [x] Phase 5: Mobile App
+- [x] Phase 6: Testing & Optimization
 - [ ] Phase 7: Deployment
-- [ ] Phase 8: Documentation & Launch
+- [ ] Phase 8: Final Documentation
 
 ---
 
