@@ -61,9 +61,9 @@ uvicorn app.main:app --reload
 
 ## 📖 Essential Guides
 
-- [**Quick Start Guide**](docs/QUICKSTART.md) - Get up and running in minutes.
-- [**Testing Guide**](TESTING_GUIDE.md) - How to verify each module.
-- [**Project Report**](docs/original_report.pdf) - Detailed research and implementation details.
+- [**Quick Start Guide**](docs/QUICKSTART.md) - *(Coming Soon)* Complete setup instructions.
+- [**Testing Guide**](TESTING_GUIDE.md) - *(In Progress)* Module verification steps.
+- [**Project Report**](docs/original_report.pdf) - *(Under Review)* Research and final report.
 
 ---
 
