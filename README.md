@@ -6,15 +6,15 @@ A professional multi-platform system designed to identify medicinal plants using
 
 ---
 
-## 📈 Current Project Progress
+## 🏗️ Project Stages
 
-All core modules are fully developed and integrated. The system is ready for testing and demonstration.
+Here is the current state of development for each module:
 
-- [x] **Backend Engine**: FastAPI core with ML model integration and database management.
-- [x] **Machine Learning Pipeline**: Trained MobileNetV2 and ViT models with explainability (Grad-CAM).
-- [x] **Web Dashboard**: Responsive Next.js interface for image upload and analysis.
-- [x] **Mobile Application**: React Native app for instant leaf scanning on-the-go.
-- [x] **Documentation**: Comprehensive guides for setup and quickstart.
+- [x] **Stage 1: Backend Engine** - Fully functional REST API built with FastAPI, integrated with ML services.
+- [x] **Stage 2: Machine Learning Pipeline** - Completed training and optimization of detection models.
+- [x] **Stage 3: Web Application** - Responsive Next.js 14 dashboard for desktop users.
+- [x] **Stage 4: Mobile Application** - React Native app for field identification and scanning.
+- [x] **Stage 5: Documentation & Presentation** - Research report and system guides finalized.
 
 ---
 
