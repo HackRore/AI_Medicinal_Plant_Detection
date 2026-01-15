@@ -2,232 +2,68 @@
 
 > **AI-Based Medicinal Plant Detection Via Leaf Image Recognition**
 
-An intelligent, production-ready system that identifies medicinal plants from leaf images using state-of-the-art deep learning, explainable AI, and vision-language models.
-
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/python-3.10+-green)
-![License](https://img.shields.io/badge/license-MIT-orange)
+A professional multi-platform system designed to identify medicinal plants using advanced leaf recognition technology. This project focuses on delivering high-accuracy results through both **Web** and **Mobile** interfaces.
 
 ---
 
-## ✨ Features
+## 📈 Current Project Progress
 
-### 🤖 **AI-Powered Identification**
-- **Dual Model Architecture**: MobileNetV2 + Vision Transformer ensemble
-- **90%+ Accuracy**: Trained on Indian Medicinal Leaves dataset
-- **Real-time Detection**: Live camera feed processing
-- **Batch Processing**: Multiple image analysis
+All core modules are fully developed and integrated. The system is ready for testing and demonstration.
 
-### 🔍 **Explainable AI**
-- **Grad-CAM Visualizations**: See what the AI focuses on
-- **LIME Explanations**: Understand prediction breakdown
-- **Confidence Scores**: Transparency in predictions
-
-### 🌐 **Multi-Platform**
-- **Web Application**: Responsive Next.js frontend
-- **Mobile App**: React Native (iOS + Android)
-- **REST API**: FastAPI backend with auto-documentation
-
-### 🧠 **Vision-Language Integration**
-- **Gemini Vision API**: Natural language plant descriptions
-- **Multi-language Support**: Hindi, Tamil, Telugu, Bengali
-- **Interactive Chat**: Ask questions about plants
-
-### 📚 **Rich Information Database**
-- **Medicinal Properties**: Traditional uses and benefits
-- **Dosage Guidelines**: Safe usage recommendations
-- **Preparation Methods**: How to prepare remedies
-- **Precautions**: Safety warnings
-
-### 🎯 **Smart Recommendations**
-- **Similar Plants**: Based on medicinal properties
-- **Ailment-based Search**: Find plants for specific conditions
-- **Geolocation Aware**: Region-specific recommendations
+- [x] **Backend Engine**: FastAPI core with ML model integration and database management.
+- [x] **Machine Learning Pipeline**: Trained MobileNetV2 and ViT models with explainability (Grad-CAM).
+- [x] **Web Dashboard**: Responsive Next.js interface for image upload and analysis.
+- [x] **Mobile Application**: React Native app for instant leaf scanning on-the-go.
+- [x] **Documentation**: Comprehensive guides for setup and quickstart.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Project Structure
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Web App   │     │  Mobile App │     │   API Docs  │
-│  (Next.js)  │     │(React Native│     │  (Swagger)  │
-└──────┬──────┘     └──────┬──────┘     └──────┬──────┘
-       │                   │                   │
-       └───────────────────┴───────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │   FastAPI   │
-                    │   Backend   │
-                    └──────┬──────┘
-                           │
-       ┌───────────────────┼───────────────────┐
-       │                   │                   │
-┌──────▼──────┐    ┌──────▼──────┐    ┌──────▼──────┐
-│  ML Models  │    │  PostgreSQL │    │   Gemini    │
-│   (ONNX)    │    │   Database  │    │  Vision API │
-└─────────────┘    └─────────────┘    └─────────────┘
-```
+Explore the codebase directly through these functional links:
+
+- [**backend/**](backend/) - The API engine and ML services.
+- [**frontend/**](frontend/) - The Next.js 14 Web application.
+- [**mobile/**](mobile/) - The React Native Expo mobile app.
+- [**ml_pipeline/**](ml_pipeline/) - Research, training scripts, and model exports.
+- [**docs/**](docs/) - System documentation and research report.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
-### Prerequisites
-- Python 3.10+
-- Node.js 18+
-- Docker & Docker Compose
-- Git
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/HackRore/AI_Medicinal_Plant_Detection.git
-cd medicinal-plant-ai
-```
-
-### 2. Download Dataset
-Download the [Indian Medicinal Leaves Dataset](https://www.kaggle.com/datasets/aryashah2k/indian-medicinal-leaves-dataset) and extract to `ml_pipeline/data/raw/`
-
-### 3. Start with Docker (Recommended)
-```bash
-cd infrastructure/docker
-docker-compose up -d
-```
-
-Access:
-- **Web App**: http://localhost:3000
-- **API Docs**: http://localhost:8000/docs
-- **API**: http://localhost:8000/api/v1
-
-### 4. Manual Setup
-
-#### Backend
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-#### Frontend
+### 1. Web Application
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+*Access via http://localhost:3000*
 
-#### Mobile
+### 2. Mobile Application
 ```bash
 cd mobile
 npm install
 npx expo start
 ```
+*Scan the QR code with the Expo Go app.*
 
----
-
-## 📖 Documentation
-
-- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running in minutes
-- **[API Reference](docs/api-reference.md)** - Detailed backend API documentation
-- **[Deployment Guide](docs/DEPLOYMENT.md)** - How to deploy to production
-- **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing instructions
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
-
----
-
-## 🛠️ Technology Stack
-
-### Backend
-- **FastAPI** - Modern, high-performance API framework
-- **PostgreSQL** - Relational database
-- **Redis** - Caching layer
-- **SQLAlchemy** - ORM
-- **JWT** - Authentication
-
-### Frontend
-- **Next.js 14** - React framework with App Router
-- **shadcn/ui** - Beautiful UI components
-- **Tailwind CSS** - Utility-first styling
-- **Zustand** - State management
-- **React Query** - Server state management
-
-### Mobile
-- **React Native** - Cross-platform mobile framework
-- **Expo** - Development platform
-- **AsyncStorage** - Local storage
-- **React Navigation** - Navigation library
-
-### AI/ML
-- **PyTorch** - Deep learning framework
-- **TensorFlow** - Model training
-- **ONNX Runtime** - Cross-platform inference
-- **MobileNetV2** - Lightweight CNN
-- **Vision Transformer (ViT)** - State-of-the-art model
-- **Grad-CAM, LIME, SHAP** - Explainability
-- **Google Gemini Vision** - Vision-language model
-
-## 📊 Project Structure
-
-```
-medicinal-plant-ai/
-├── [backend/](backend/)          # FastAPI server (The Brain)
-├── [frontend/](frontend/)         # Web App (The Face)
-├── [mobile/](mobile/)           # Mobile App (The Handheld)
-├── [ml_pipeline/](ml_pipeline/)      # Model training & Data pipeline
-└── [scripts/](scripts/)          # Setup and utility tools
-```
-
----
-
-## 🧪 Testing
-
-### Backend Tests
+### 3. Backend (Local Setup)
 ```bash
 cd backend
-pytest app/tests/ -v --cov=app
-```
-
-### Frontend Tests
-```bash
-cd frontend
-npm test
-npm run test:e2e
-```
-
-### ML Pipeline Tests
-```bash
-cd ml_pipeline
-pytest tests/ -v
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 ```
 
 ---
 
-## 📈 Performance
+## 📖 Essential Guides
 
-- **Model Accuracy**: 92.5% on test set
-- **API Response Time**: <2 seconds
-- **Mobile App Size**: 45MB
-- **Offline Capability**: Full core features
-- **Supported Plants**: 40+ species
-
----
-
-## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md).
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [**Quick Start Guide**](docs/QUICKSTART.md) - Get up and running in minutes.
+- [**Testing Guide**](TESTING_GUIDE.md) - How to verify each module.
+- [**Project Report**](docs/original_report.pdf) - Detailed research and implementation details.
 
 ---
 
@@ -246,71 +82,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## 📈 Implementation Progress & History
-
-We have systematically developed this project from conceptualization to a fully functional multi-platform system. Here is our journey:
-
-### **Step 1: Planning & Foundation**
-- Defined the project scope focusing on Indian medicinal plants.
-- Established a robust repository structure supporting Backend, Frontend, and Mobile modules.
-- Selected a high-performance stack: FastAPI (Backend), Next.js (Web), and React Native (Mobile).
-
-### **Step 2: Machine Learning & Data Pipeline ([ml_pipeline/](ml_pipeline/))**
-- Curated and preprocessed the Indian Medicinal Leaves dataset.
-- Implemented a training pipeline using **MobileNetV2** with transfer learning for efficient identification.
-- Integrated **Vision Transformer (ViT)** components to boost accuracy.
-- Added **Explainable AI** features using Grad-CAM to visualize model focus.
-
-### **Step 3: Backend API Development ([backend/](backend/))**
-- Built a modular REST API using **FastAPI**.
-- Implemented core services: `ml_service` for predictions and `gemini_service` for natural language descriptions.
-- Set up **PostgreSQL** for storing detailed plant information and user history.
-- Integrated **Google Gemini Vision API** for rich, descriptive plant analysis.
-
-### **Step 4: Web Application (Frontend) ([frontend/](frontend/))**
-- Developed a "Neo-Minimalist" responsive web interface using **Next.js 14**.
-- Implemented a real-time prediction dashboard with image upload and analysis results.
-- Built a comprehensive "Plant Encyclopedia" to browse the medicinal database.
-
-### **Step 5: Mobile App Development ([mobile/](mobile/))**
-- Created a cross-platform mobile app using **React Native** and **Expo**.
-- Integrated native camera features for instant leaf scanning.
-- Connected the mobile app to the central API for consistent identification across platforms.
-
-### **Step 6: Integration & Optimization**
-- Optimized model inference for near-instant responses (<2 seconds).
-- Conducted end-to-end testing to ensure system stability.
-- Finalized documentation and deployment configurations.
-
----
-
-## 🙏 Acknowledgments
-
-- Indian Medicinal Leaves Dataset by Arya Shah
-- Google Gemini Vision API
-- Open source community
-
----
-
-## 📧 Contact
-
-- **Email**: hackrore@gmail.com
-- **GitHub**: [@HackRore](https://github.com/HackRore)
-- **LinkedIn**: [Ravindra Pandit Ahire](https://linkedin.com/in/ravindra-ahire-256b61326)
-
----
-
-## 🗺️ Roadmap
-
-- [x] Phase 1: Planning & Architecture
-- [x] Phase 2: Backend Development
-- [x] Phase 3: ML Pipeline
-- [x] Phase 4: Frontend Development
-- [x] Phase 5: Mobile App
-- [x] Phase 6: Testing & Optimization
-- [ ] Phase 7: Deployment
-- [ ] Phase 8: Final Documentation
-
----
-
-**Made with ❤️ for healthcare accessibility and traditional botanical knowledge preservation**
+**Made with ❤️ for healthcare accessibility and botanical preservation**
