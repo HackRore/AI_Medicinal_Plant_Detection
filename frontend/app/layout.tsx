@@ -35,7 +35,7 @@ export default function RootLayout({
                 </main>
                 <footer className="bg-gray-800 text-white py-8 mt-16">
                     <div className="container mx-auto px-4 text-center">
-                        <p>© 2024 AI Medicinal Plant Detection System</p>
+                        <p>© 2025-2026 AI Medicinal Plant Detection System</p>
                         <p className="text-sm text-gray-400 mt-2">
                             Made with ❤️ for healthcare accessibility
                         </p>
