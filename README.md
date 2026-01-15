@@ -1,4 +1,4 @@
-# 🌿 AI Medicinal Plant Detection System - Ravindra Pandit Ahire (ravinwebtech.web.app)
+# 🌿 AI Medicinal Plant Detection System
 
 > **AI-Based Medicinal Plant Detection Via Leaf Image Recognition**
 
@@ -128,12 +128,11 @@ npx expo start
 
 ## 📖 Documentation
 
-- **[Architecture Guide](docs/architecture.md)** - System design and components
-- **[API Reference](docs/api-reference.md)** - Complete API documentation
-- **[ML Pipeline](docs/ml-pipeline.md)** - Model training and evaluation
-- **[Deployment Guide](docs/deployment.md)** - Production deployment
-- **[User Guide](docs/user-guide.md)** - End-user documentation
-- **[Developer Guide](docs/developer-guide.md)** - Contributing guidelines
+- **[Quick Start Guide](docs/QUICKSTART.md)** - Get up and running in minutes
+- **[API Reference](docs/api-reference.md)** - Detailed backend API documentation
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - How to deploy to production
+- **[Testing Guide](TESTING_GUIDE.md)** - Comprehensive testing instructions
+- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute to the project
 
 ---
 
@@ -168,19 +167,16 @@ npx expo start
 - **Grad-CAM, LIME, SHAP** - Explainability
 - **Google Gemini Vision** - Vision-language model
 
----
-
 ## 📊 Project Structure
 
 ```
 medicinal-plant-ai/
-├── backend/          # FastAPI server (The Brain)
-├── frontend/         # Web App (The Face)
-├── mobile/           # Mobile App (The Handheld)
-└── scripts/          # Setup tools
+├── [backend/](backend/)          # FastAPI server (The Brain)
+├── [frontend/](frontend/)         # Web App (The Face)
+├── [mobile/](mobile/)           # Mobile App (The Handheld)
+├── [ml_pipeline/](ml_pipeline/)      # Model training & Data pipeline
+└── [scripts/](scripts/)          # Setup and utility tools
 ```
-
-See [Project Structure](docs/project_structure.md) for detailed breakdown.
 
 ---
 
@@ -259,24 +255,24 @@ We have systematically developed this project from conceptualization to a fully 
 - Established a robust repository structure supporting Backend, Frontend, and Mobile modules.
 - Selected a high-performance stack: FastAPI (Backend), Next.js (Web), and React Native (Mobile).
 
-### **Step 2: Machine Learning & Data Pipeline**
+### **Step 2: Machine Learning & Data Pipeline ([ml_pipeline/](ml_pipeline/))**
 - Curated and preprocessed the Indian Medicinal Leaves dataset.
 - Implemented a training pipeline using **MobileNetV2** with transfer learning for efficient identification.
 - Integrated **Vision Transformer (ViT)** components to boost accuracy.
 - Added **Explainable AI** features using Grad-CAM to visualize model focus.
 
-### **Step 3: Backend API Development**
+### **Step 3: Backend API Development ([backend/](backend/))**
 - Built a modular REST API using **FastAPI**.
 - Implemented core services: `ml_service` for predictions and `gemini_service` for natural language descriptions.
 - Set up **PostgreSQL** for storing detailed plant information and user history.
 - Integrated **Google Gemini Vision API** for rich, descriptive plant analysis.
 
-### **Step 4: Web Application (Frontend)**
+### **Step 4: Web Application (Frontend) ([frontend/](frontend/))**
 - Developed a "Neo-Minimalist" responsive web interface using **Next.js 14**.
 - Implemented a real-time prediction dashboard with image upload and analysis results.
 - Built a comprehensive "Plant Encyclopedia" to browse the medicinal database.
 
-### **Step 5: Mobile App Development**
+### **Step 5: Mobile App Development ([mobile/](mobile/))**
 - Created a cross-platform mobile app using **React Native** and **Expo**.
 - Integrated native camera features for instant leaf scanning.
 - Connected the mobile app to the central API for consistent identification across platforms.
