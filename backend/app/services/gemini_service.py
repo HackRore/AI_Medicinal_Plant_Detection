@@ -29,7 +29,7 @@ class GeminiService:
         if GEMINI_AVAILABLE and settings.GEMINI_API_KEY:
             try:
                 genai.configure(api_key=settings.GEMINI_API_KEY)
-                self.model = genai.GenerativeModel('gemini-pro')
+                self.model = genai.GenerativeModel(settings.GEMINI_MODEL)
                 self.initialized = True
                 logger.info("Gemini service initialized successfully")
             except Exception as e:

@@ -17,7 +17,7 @@ const BASE_URL = IS_PRODUCTION
     ? PROD_API_URL
     : (Platform.OS === 'android' ? DEV_API_URL_ANDROID : DEV_API_URL_IOS);
 
-export const API_URL = `${BASE_URL}/api/v1/predict`;
+export const API_URL = `${BASE_URL}/api/v1/predict/`;
 
 export const CONFIG = {
     IS_PRODUCTION,

@@ -51,6 +51,21 @@ export default function AboutPage() {
                     </div>
                 </section>
 
+                <section className="mb-20 bg-primary-50 p-8 rounded-2xl border border-primary-100">
+                    <h2 className="text-3xl font-bold text-center mb-8 text-primary-800">Project Guidance</h2>
+                    <div className="flex flex-col items-center">
+                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary-600 font-bold text-3xl shadow-md mb-4 ring-4 ring-primary-100">
+                            SB
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-800">Ms. Sneha Bankar</h3>
+                        <p className="text-primary-600 font-semibold mb-2">Project Guide</p>
+                        <p className="text-gray-500 text-center max-w-lg">
+                            Department of Computer Engineering, Matoshri College of Engineering and Research Centre, Nashik.
+                            Providing invaluable technical oversight and project direction.
+                        </p>
+                    </div>
+                </section>
+
                 <section className="bg-gray-900 text-white p-12 rounded-3xl text-center">
                     <h2 className="text-3xl font-bold mb-6">Contact Us</h2>
                     <p className="text-lg opacity-80 mb-8">

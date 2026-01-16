@@ -1,12 +1,26 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Inter, Outfit } from 'next/font/google'
 import './globals.css'
+import { Navbar } from '@/components/layout/Navbar'
+import { Footer } from '@/components/layout/Footer'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' })
+
+export const viewport: Viewport = {
+    themeColor: '#166534',
+    width: 'device-width',
+    initialScale: 1,
+}
 
 export const metadata: Metadata = {
-    title: 'AI Medicinal Plant Detection',
-    description: 'Identify medicinal plants from leaf images using AI',
+    title: {
+        default: 'AI Medicinal Plant Detection | Group G14',
+        template: '%s | Medicinal Plant AI'
+    },
+    description: 'Advanced deep learning system for high-accuracy botanical identification and medicinal insight extraction.',
+    keywords: ['AI', 'Medicinal Plants', 'Leaf Recognition', 'MobileNetV2', 'Vision Transformer', 'Ayurveda', 'Botanical AI'],
+    authors: [{ name: 'Group G14' }],
 }
 
 export default function RootLayout({
@@ -15,32 +29,13 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en">
-            <body className={inter.className}>
-                <nav className="bg-primary-600 text-white shadow-lg">
-                    <div className="container mx-auto px-4 py-4">
-                        <div className="flex items-center justify-between">
-                            <h1 className="text-2xl font-bold">🌿 Medicinal Plant AI</h1>
-                            <div className="flex gap-6">
-                                <a href="/" className="hover:text-primary-200">Home</a>
-                                <a href="/predict" className="hover:text-primary-200">Predict</a>
-                                <a href="/plants" className="hover:text-primary-200">Plants</a>
-                                <a href="/about" className="hover:text-primary-200">About</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-                <main className="min-h-screen">
+        <html lang="en" className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
+            <body className="font-sans bg-gray-50 text-gray-900 antialiased selection:bg-primary-500/30 selection:text-primary-900">
+                <Navbar />
+                <main>
                     {children}
                 </main>
-                <footer className="bg-gray-800 text-white py-8 mt-16">
-                    <div className="container mx-auto px-4 text-center">
-                        <p>© 2025-2026 AI Medicinal Plant Detection System</p>
-                        <p className="text-sm text-gray-400 mt-2">
-                            Made with ❤️ for healthcare accessibility
-                        </p>
-                    </div>
-                </footer>
+                <Footer />
             </body>
         </html>
     )

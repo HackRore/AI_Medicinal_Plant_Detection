@@ -18,25 +18,56 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const pickImage = async () => {
-    // Request permission
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'We need camera roll permissions to make this work!');
-      return;
+  const takePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need camera access to take a photo of the leaf.');
+        return;
+      }
+
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+        setResult(null);
+        analyzeImage(result.assets[0]);
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Camera Error', `Details: ${e.message || 'Unknown error'}`);
     }
+  };
 
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.8,
-    });
+  const pickImage = async () => {
+    try {
+      // Request media library permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need gallery permission to select a photo.');
+        return;
+      }
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setResult(null); // Reset previous result
-      analyzeImage(result.assets[0]);
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
+        setResult(null);
+        analyzeImage(result.assets[0]);
+      }
+    } catch (e) {
+      console.error(e);
+      Alert.alert('Gallery Error', `Details: ${e.message || 'Unknown error'}`);
     }
   };
 
@@ -97,16 +128,24 @@ export default function App() {
           )}
         </View>
 
-        {/* Action Button */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={pickImage}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {image ? 'Scan Another' : 'Select Image'}
-          </Text>
-        </TouchableOpacity>
+        {/* Action Buttons */}
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={[styles.button, styles.cameraButton]}
+            onPress={takePhoto}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>📸 Take Photo</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.button, styles.galleryButton]}
+            onPress={pickImage}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>🖼 Gallery</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Results */}
         {result && (
@@ -219,21 +258,32 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 20,
+  },
   button: {
-    backgroundColor: '#16a34a',
+    flex: 1,
     paddingVertical: 18,
     borderRadius: 15,
     alignItems: 'center',
-    shadowColor: '#16a34a',
+    elevation: 6,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    elevation: 6,
-    marginBottom: 20,
+  },
+  cameraButton: {
+    backgroundColor: '#166534',
+    shadowColor: '#166534',
+  },
+  galleryButton: {
+    backgroundColor: '#16a34a',
+    shadowColor: '#16a34a',
   },
   buttonText: {
     color: '#ffffff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   resultCard: {
