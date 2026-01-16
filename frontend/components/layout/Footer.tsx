@@ -55,8 +55,8 @@ export const Footer = () => {
                         <h4 className="font-bold text-white mb-6">Project Info</h4>
                         <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Developed By</p>
-                            <p className="text-white font-bold mb-1">Group G14</p>
-                            <p className="text-xs text-gray-400">Matoshri College of Engineering</p>
+                            <p className="text-white font-bold mb-1">Group G9</p>
+                            <p className="text-xs text-gray-400">Dr. DY Patil College of Eng. and Innovation, Varale (Talegaon)</p>
                         </div>
                     </div>
                 </div>

@@ -404,7 +404,7 @@ export default function PredictPage() {
                                             <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> {prediction.processing_time_ms?.toFixed(0) || '<100'}MS Latency</span>
                                             <span>{prediction.model_version}</span>
                                         </div>
-                                        <span>Matoshri Agri-AI Lab</span>
+                                        <span>DYP Agri-AI Lab</span>
                                     </div>
                                 </div>
                             </div>

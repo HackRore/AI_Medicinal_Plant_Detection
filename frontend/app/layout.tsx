@@ -15,12 +15,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
     title: {
-        default: 'AI Medicinal Plant Detection | Group G14',
+        default: 'AI Medicinal Plant Detection | Group G9',
         template: '%s | Medicinal Plant AI'
     },
     description: 'Advanced deep learning system for high-accuracy botanical identification and medicinal insight extraction.',
     keywords: ['AI', 'Medicinal Plants', 'Leaf Recognition', 'MobileNetV2', 'Vision Transformer', 'Ayurveda', 'Botanical AI'],
-    authors: [{ name: 'Group G14' }],
+    authors: [{ name: 'Group G9' }],
 }
 
 export default function RootLayout({

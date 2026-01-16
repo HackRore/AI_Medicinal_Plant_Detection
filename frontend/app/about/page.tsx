@@ -33,10 +33,10 @@ export default function AboutPage() {
                     <h2 className="text-3xl font-bold text-center mb-12 text-primary-800">Meet the Team</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                         {[
-                            { name: "Madhura Wankhade", role: "Exam No: 24167" },
-                            { name: "Ravindra Ahire", role: "Exam No: 24101" },
-                            { name: "Samruddhi Gholap", role: "Exam No: 24116" },
-                            { name: "Pranali Ghugarkar", role: "Exam No: 24117" }
+                            { name: "Madhura Wankhade" },
+                            { name: "Ravindra Ahire" },
+                            { name: "Samruddhi Gholap" },
+                            { name: "Pranali Ghugarkar" }
                         ].map((member, idx) => (
                             <div key={idx} className="bg-white p-6 rounded-xl shadow-md flex items-center gap-4 hover:shadow-lg transition-shadow">
                                 <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
@@ -44,7 +44,6 @@ export default function AboutPage() {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-lg text-gray-800">{member.name}</h3>
-                                    <p className="text-gray-500">{member.role}</p>
                                 </div>
                             </div>
                         ))}
@@ -60,7 +59,7 @@ export default function AboutPage() {
                         <h3 className="text-2xl font-bold text-gray-800">Ms. Sneha Bankar</h3>
                         <p className="text-primary-600 font-semibold mb-2">Project Guide</p>
                         <p className="text-gray-500 text-center max-w-lg">
-                            Department of Computer Engineering, Matoshri College of Engineering and Research Centre, Nashik.
+                            Department of Artificial Intelligence and Data Science, Dr. DY Patil College of Eng. and Innovation, Varale (Talegaon).
                             Providing invaluable technical oversight and project direction.
                         </p>
                     </div>
