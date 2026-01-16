@@ -9,19 +9,19 @@ A professional multi-platform system designed to identify medicinal plants using
 ## 🖼️ System Preview
 
 <div align="center">
-  <img src="docs/screenshots/1.png" width="800" alt="Home Dashboard">
+  <img src="docs/Screenshots/1.png" width="800" alt="Home Dashboard">
   <p><i>Modern, interactive landing page providing instant access to botanical intelligence.</i></p>
   <br>
   
-  <img src="docs/screenshots/7.png" width="800" alt="Neural Scanner Interface">
+  <img src="docs/Screenshots/7.png" width="800" alt="Neural Scanner Interface">
   <p><i>Advanced Neural Scanner with real-time feedback and high-accuracy classification.</i></p>
   <br>
 
-  <img src="docs/screenshots/8.png" width="800" alt="Explainable AI Results">
+  <img src="docs/Screenshots/8.png" width="800" alt="Explainable AI Results">
   <p><i>Explainable AI (XAI) results using Grad-CAM and LIME for transparent predictions.</i></p>
   <br>
   
-  <img src="docs/screenshots/4.png" width="800" alt="About Section">
+  <img src="docs/Screenshots/4.png" width="800" alt="About Section">
   <p><i>Comprehensive project guidance and dedicated team information.</i></p>
 </div>
 
