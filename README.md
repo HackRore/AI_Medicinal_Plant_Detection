@@ -17,8 +17,8 @@ A professional multi-platform system designed to identify medicinal plants using
   <p><i>Advanced Neural Scanner with real-time feedback and high-accuracy classification.</i></p>
   <br>
 
-  <img src="docs/Screenshots/8.png" width="800" alt="Explainable AI Results">
-  <p><i>Explainable AI (XAI) results using Grad-CAM and LIME for transparent predictions.</i></p>
+  <img src="docs/Screenshots/2.png" width="800" alt="Botanical Scanner">
+  <p><i>Intuitive Neural Botanical Scanner interface for seamless plant identification.</i></p>
   <br>
   
   <img src="docs/Screenshots/4.png" width="800" alt="About Section">
