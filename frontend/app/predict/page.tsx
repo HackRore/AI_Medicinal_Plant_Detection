@@ -229,7 +229,8 @@ export default function PredictPage() {
                         </div>
 
                         {/* Guide Card */}
-                        {(showTip || !prediction.plant_details) && prediction && (
+                        {prediction && (showTip || !prediction.plant_details) && (
+
                             <div className={`p-8 rounded-[40px] shadow-2xl relative overflow-hidden animate-slide-up border-b-8 transition-colors
                                 ${prediction.plant_details ? 'bg-primary-900 border-green-400' : 'bg-red-950 border-red-500'}`}>
                                 <div className="relative z-10">

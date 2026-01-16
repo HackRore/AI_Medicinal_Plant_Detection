@@ -32,29 +32,37 @@ Explore the codebase directly through these functional links:
 
 ## 🚀 Getting Started
 
-### 1. Web Application
+To set up the project on a new machine after cloning, follow these steps:
+
+### 1. Automated Setup (Recommended)
+Run the provided PowerShell script to automatically configure environment files and ML placeholders:
+```powershell
+.\setup.ps1
+```
+
+### 2. Backend Setup
+```bash
+cd backend
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+python scripts/seed_data.py
+uvicorn app.main:app --reload
+```
+*The `seed_data.py` script will create the database and populate it with initial medicinal plant data.*
+
+### 3. Web Application
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*Access via http://localhost:3000*
 
-### 2. Mobile Application
+### 4. Mobile Application
 ```bash
 cd mobile
 npm install
 npx expo start
-```
-*Scan the QR code with the Expo Go app.*
-
-### 3. Backend (Local Setup)
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
 ```
 
 ---
@@ -69,11 +77,11 @@ uvicorn app.main:app --reload
 
 ## 👥 Team & Guidance
 
-### 👩‍🎓 Project Team (Group G14)
-- **Madhura Wankhade** (Exam No: 24167)
-- **Ravindra Ahire** (Exam No: 24101)
-- **Samruddhi Gholap** (Exam No: 24116)
-- **Pranali Ghugarkar** (Exam No: 24117)
+### 👩‍🎓 Project Team (Group G9)
+- **Madhura Wankhade**
+- **Ravindra Ahire**
+- **Samruddhi Gholap**
+- **Pranali Ghugarkar**
 
 ### 👩‍🏫 Project Guide
 - **Ms. Sneha Bankar**
