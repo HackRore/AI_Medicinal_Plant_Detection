@@ -229,22 +229,27 @@ export default function PredictPage() {
                         </div>
 
                         {/* Guide Card */}
-                        {showTip && prediction && (
-                            <div className="bg-primary-900 text-white p-8 rounded-[40px] shadow-2xl relative overflow-hidden animate-slide-up border-b-8 border-green-400">
+                        {(showTip || !prediction.plant_details) && prediction && (
+                            <div className={`p-8 rounded-[40px] shadow-2xl relative overflow-hidden animate-slide-up border-b-8 transition-colors
+                                ${prediction.plant_details ? 'bg-primary-900 border-green-400' : 'bg-red-950 border-red-500'}`}>
                                 <div className="relative z-10">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <span className="text-3xl">💡</span>
-                                        <h3 className="text-xl font-black uppercase tracking-widest">Botanical Insight</h3>
+                                        <span className="text-3xl">{prediction.plant_details ? '💡' : '⚡'}</span>
+                                        <h3 className="text-xl font-black uppercase tracking-widest text-white">
+                                            {prediction.plant_details ? 'Botanical Insight' : 'Identification Blocked'}
+                                        </h3>
                                     </div>
-                                    <p className="text-lg opacity-90 leading-relaxed italic font-medium">
-                                        "{prediction.plant_details?.medicinal_uses?.split('.')[0] || 'This species is highly valued in traditional medicine for its unique phytochemical profile.'}"
+                                    <p className="text-lg opacity-90 leading-relaxed italic font-medium text-white">
+                                        {prediction.plant_details
+                                            ? `"${prediction.plant_details?.description?.split('.')[0] || 'This species is highly valued in traditional medicine.'}"`
+                                            : "The neural engine detected insufficient medicinal markers. Please ensure the leaf is well-lit, centered, and isolated from background noise."}
                                     </p>
-                                    <div className="mt-4 flex items-center gap-2 text-green-400 font-bold">
-                                        <span>✓ Authenticity Verified</span>
-                                        <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
+                                    <div className={`mt-4 flex items-center gap-2 font-bold ${prediction.plant_details ? 'text-green-400' : 'text-red-400'}`}>
+                                        <span>{prediction.plant_details ? '✓ Authenticity Verified' : '✕ Specimen Rejected'}</span>
+                                        <span className={`w-2 h-2 rounded-full animate-ping ${prediction.plant_details ? 'bg-green-400' : 'bg-red-500'}`}></span>
                                     </div>
                                 </div>
-                                <div className="absolute -right-10 -bottom-10 text-[12rem] opacity-5">🌿</div>
+                                <div className="absolute -right-10 -bottom-10 text-[12rem] opacity-5 text-white">{prediction.plant_details ? '🌿' : '🚫'}</div>
                             </div>
                         )}
                     </div>
@@ -272,13 +277,23 @@ export default function PredictPage() {
                                                 <h3 className="text-5xl font-black text-gray-900 mb-6 group-hover:text-primary-800 transition-colors">
                                                     {prediction.predicted_class?.replace(/_/g, ' ')}
                                                 </h3>
-                                                {prediction.plant_details && (
+                                                {prediction.plant_details ? (
                                                     <div className="inline-flex items-center gap-3 px-5 py-3 bg-white rounded-2xl shadow-sm border border-gray-100">
                                                         <span className="text-3xl">🧬</span>
                                                         <div>
                                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Common Name</p>
                                                             <p className="font-bold text-gray-800 text-lg leading-tight">
                                                                 {prediction.plant_details.common_name}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="inline-flex items-center gap-3 px-5 py-3 bg-red-50 rounded-2xl shadow-sm border border-red-100">
+                                                        <span className="text-3xl">⚠️</span>
+                                                        <div>
+                                                            <p className="text-[10px] font-black text-red-400 uppercase tracking-widest">System Warning</p>
+                                                            <p className="font-bold text-red-800 text-sm leading-tight">
+                                                                Specimen does not meet botanical criteria
                                                             </p>
                                                         </div>
                                                     </div>
@@ -292,7 +307,6 @@ export default function PredictPage() {
                                             </div>
                                         </div>
 
-                                        {/* Progress Bar */}
                                         <div className="mt-12">
                                             <div className="flex justify-between text-[10px] font-black text-gray-400 mb-3 uppercase tracking-widest">
                                                 <span>Statistical Probability</span>
@@ -300,7 +314,8 @@ export default function PredictPage() {
                                             </div>
                                             <div className="h-4 w-full bg-gray-200/50 rounded-full overflow-hidden p-1">
                                                 <div
-                                                    className="h-full bg-gradient-premium rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(34,197,94,0.4)]"
+                                                    className={`h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(34,197,94,0.4)]
+                                                        ${prediction.plant_details ? 'bg-gradient-premium' : 'bg-red-500'}`}
                                                     style={{ width: `${prediction.confidence * 100}%` }}
                                                 ></div>
                                             </div>

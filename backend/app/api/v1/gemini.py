@@ -27,16 +27,20 @@ async def describe_plant_image(
     - **language**: Target language (en, hi, ta, te, bn)
     """
     try:
-        # For now, we'll use plant name from prediction
-        # In production, this would use Gemini Vision API with the image
         from fastapi import HTTPException
+        from app.services.ml_service import get_ml_service
         
+        ml_service = get_ml_service()
         gemini_service = get_gemini_service()
         
-        # Mock: Use a default plant name
-        # In real implementation, you'd first predict the plant from the image
-        plant_name = "Azadirachta indica (Neem)"
+        # Read image bytes
+        image_bytes = await file.read()
         
+        # Use ML model to identify the plant first
+        prediction = ml_service.predict(image_bytes)
+        plant_name = prediction["predicted_class"]
+        
+        # Now get botanical description for THIS specific plant
         description = gemini_service.get_plant_description(
             plant_name=plant_name,
             language=language

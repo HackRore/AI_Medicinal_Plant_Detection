@@ -19,6 +19,7 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.utils import class_weight
 
 # Configuration
 IMG_SIZE = (224, 224)
@@ -128,10 +129,10 @@ def create_model(num_classes):
     
     model = models.Model(inputs, outputs)
     
-    # Compile model
+    # Compile model with Label Smoothing for better generalization
     model.compile(
         optimizer=Adam(learning_rate=LEARNING_RATE),
-        loss='categorical_crossentropy',
+        loss=tf.keras.losses.CategoricalCrossentropy(label_smoothing=0.1),
         metrics=['accuracy', tf.keras.metrics.TopKCategoricalAccuracy(k=3, name='top_3_accuracy')]
     )
     
@@ -171,6 +172,15 @@ def train_model(model, base_model, train_gen, val_gen):
         )
     ]
     
+    # Calculate class weights
+    class_weights_list = class_weight.compute_class_weight(
+        class_weight='balanced',
+        classes=np.unique(train_gen.classes),
+        y=train_gen.classes
+    )
+    class_weights_dict = dict(enumerate(class_weights_list))
+    print(f"\n⚖️  Class weights calculated: {list(class_weights_dict.items())[:5]}...")
+
     # Phase 1: Train with frozen base
     print("\n📍 Phase 1: Training with frozen base model...")
     history1 = model.fit(
@@ -178,6 +188,7 @@ def train_model(model, base_model, train_gen, val_gen):
         validation_data=val_gen,
         epochs=min(15, EPOCHS),
         callbacks=callbacks,
+        class_weight=class_weights_dict,
         verbose=1
     )
     
@@ -198,6 +209,7 @@ def train_model(model, base_model, train_gen, val_gen):
         epochs=EPOCHS,
         initial_epoch=len(history1.history['loss']),
         callbacks=callbacks,
+        class_weight=class_weights_dict,
         verbose=1
     )
     

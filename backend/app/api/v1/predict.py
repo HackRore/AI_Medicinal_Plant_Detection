@@ -59,11 +59,33 @@ async def predict_plant(
         prediction_result = ml_service.predict(image_bytes)
         processing_time = (time.time() - start_time) * 1000  # Convert to ms
         
-        # Find plant in database
+        # Find plant in database - Superior Rejection Logic
+        CONFIDENCE_THRESHOLD = 0.65
+        GAP_THRESHOLD = 0.15
+        
         predicted_class = prediction_result["predicted_class"]
-        plant = db.query(Plant).filter(
-            Plant.species_name == predicted_class
-        ).first()
+        confidence = prediction_result["confidence"]
+        top_predictions = prediction_result.get("top_predictions", [])
+        
+        # Calculate gap between top 1 and top 2
+        gap = 1.0  # Default if only one class exists
+        if len(top_predictions) >= 2:
+            gap = top_predictions[0]["confidence"] - top_predictions[1]["confidence"]
+        
+        is_robust = confidence >= CONFIDENCE_THRESHOLD and gap >= GAP_THRESHOLD
+        
+        if not is_robust:
+             # Low confidence or ambiguous - likely not a medicinal leaf or confused
+             plant = None
+             if not is_robust:
+                 if confidence < CONFIDENCE_THRESHOLD:
+                     predicted_class = "Unknown / Not a Medicinal Leaf"
+                 else:
+                     predicted_class = "Ambiguous Input / Multiple Species Detected"
+        else:
+            plant = db.query(Plant).filter(
+                Plant.species_name == predicted_class
+            ).first()
         
         # Store prediction in database
         prediction_record = Prediction(
