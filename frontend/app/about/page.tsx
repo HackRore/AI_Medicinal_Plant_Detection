@@ -30,7 +30,7 @@ export default function AboutPage() {
                 </div>
 
                 <section className="mb-20">
-                    <h2 className="text-3xl font-bold text-center mb-12 text-primary-800">Meet the Team</h2>
+                    <h2 className="text-3xl font-bold text-center mb-12 text-primary-800">Meet the Team (Group G9)</h2>
                     <div className="grid md:grid-cols-2 gap-8">
                         {[
                             { name: "Madhura Wankhade" },

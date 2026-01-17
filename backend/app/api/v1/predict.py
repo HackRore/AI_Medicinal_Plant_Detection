@@ -12,6 +12,7 @@ from datetime import datetime
 
 from app.database import get_db
 from app.services.ml_service import get_ml_service
+from app.services.gemini_service import get_gemini_service
 from app.models.prediction import Prediction
 from app.models.plant import Plant
 from app.config import settings
@@ -108,8 +109,29 @@ async def predict_plant(
             "top_predictions": prediction_result["top_predictions"],
             "processing_time_ms": processing_time,
             "model_version": prediction_result["model_version"],
-            "plant_details": None
+            "plant_details": None,
+            "expert_verification": None
         }
+        
+        # Expert Fallback Logic - HIGH Intelligence mode
+        # Trigger Gemini if:
+        # 1. Local confidence is < 95% (Raised from 85%)
+        # 2. Rejection logic flagged it as not robust
+        if not is_robust or confidence < 0.95:
+            gemini = get_gemini_service()
+            if gemini.initialized:
+                expert_result = await gemini.identify_plant_from_image(image_bytes)
+                if expert_result.get("status") == "success":
+                    response["expert_verification"] = expert_result
+                    
+                    # Intelligence check: If the expert result doesn't mention a medicinal plant, 
+                    # flag it as a non-medicinal or unknown input.
+                    botanical_details = expert_result.get("identification_details", "").lower()
+                    if "not a leaf" in botanical_details or "not a plant" in botanical_details or "confidence: 0" in botanical_details:
+                         response["predicted_plant"] = "Non-Medicinal / Not a Plant"
+                         response["expert_notes"] = "AI Expert rejected this image as it does not contain a medicinal leaf."
+                    else:
+                         response["expert_notes"] = "This sample was verified and clarified by the AI expert."
         
         # Add plant details if found
         if plant:

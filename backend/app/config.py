@@ -4,7 +4,8 @@ Loads environment variables and provides application configuration
 """
 
 from pydantic_settings import BaseSettings
-from typing import List
+from pydantic import field_validator
+from typing import List, Union
 import os
 
 
@@ -14,7 +15,8 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "Medicinal Plant Detection API"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = True
+    DEBUG: bool = False
+    STRICT_ML_MODE: bool = False  # If True, fails if models aren't loaded instead of using mock
     API_V1_PREFIX: str = "/api/v1"
     
     # Server
@@ -28,13 +30,21 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Security
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    # CORS
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    
+    @field_validator("ALLOWED_ORIGINS", mode="before")
+    @classmethod
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
+        if isinstance(v, str) and not v.startswith("["):
+            return [i.strip() for i in v.split(",")]
+        elif isinstance(v, (list, str)):
+            return v
+        raise ValueError(v)
     
     # File Upload
     UPLOAD_DIR: str = "./uploads"
@@ -44,6 +54,7 @@ class Settings(BaseSettings):
     MODEL_DIR: str = "./ml_models"
     MOBILENET_MODEL_PATH: str = "./ml_models/mobilenetv2_best.onnx"
     VIT_MODEL_PATH: str = "./ml_models/vit_best.onnx"
+    ENHANCED_MODEL_PATH: str = "./ml_models/efficientnetv2_best.onnx"
     CLASS_NAMES_PATH: str = "./ml_models/class_names.json"
     ENSEMBLE_WEIGHTS_PATH: str = "./ml_models/ensemble_weights.json"
     

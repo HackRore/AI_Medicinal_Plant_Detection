@@ -38,6 +38,68 @@ class GeminiService:
         else:
             logger.warning("Gemini API key not configured. Using mock responses.")
     
+    async def identify_plant_from_image(
+        self, 
+        image_bytes: bytes,
+        language: str = "en"
+    ) -> Dict:
+        """
+        Identify medicinal plant directly from image using Gemini Vision
+        
+        Args:
+            image_bytes: Raw image bytes
+            language: Language code
+            
+        Returns:
+            Dictionary with identification result
+        """
+        if not self.initialized:
+            return {
+                "identified": False,
+                "error": "Gemini not initialized",
+                "source": "Gemini AI"
+            }
+        
+        try:
+            # Prepare image for Gemini
+            image_parts = [
+                {
+                    "mime_type": "image/jpeg",
+                    "data": image_bytes
+                }
+            ]
+            
+            prompt = """
+            You are a master botanist and Ayurvedic/Medicinal plant expert. 
+            Analyze this leaf/plant image and:
+            1. Identify the common and scientific name.
+            2. List 3 key medicinal properties.
+            3. Provide a 'Confidence Score' from 0-100%.
+            4. State if it is safe for common use.
+            
+            Format the response as a clean JSON-like structure.
+            """
+            
+            if language != "en":
+                prompt += f" Please provide details in {self._get_language_name(language)}."
+                
+            response = self.model.generate_content([prompt, image_parts[0]])
+            
+            return {
+                "identification_details": response.text,
+                "language": language,
+                "source": "Gemini AI Expert",
+                "status": "success"
+            }
+            
+        except Exception as e:
+            logger.error(f"Error in Gemini identification: {e}")
+            return {
+                "identified": False,
+                "error": str(e),
+                "source": "Gemini AI"
+            }
+
     def get_plant_description(
         self, 
         plant_name: str, 

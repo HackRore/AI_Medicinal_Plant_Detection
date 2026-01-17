@@ -179,6 +179,12 @@ export default function App() {
           </View>
         )}
 
+        {/* Footer Credit */}
+        <View style={{ marginTop: 30, alignItems: 'center', opacity: 0.5 }}>
+          <Text style={{ fontSize: 12, color: '#4b5563' }}>Developed by Group G9</Text>
+          <Text style={{ fontSize: 10, color: '#6b7280' }}>Dr. DY Patil College of Eng. and Innovation</Text>
+        </View>
+
       </ScrollView>
     </View>
   );

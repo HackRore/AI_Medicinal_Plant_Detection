@@ -14,6 +14,7 @@ import time
 from app.config import settings
 from app.database import engine, Base
 from app.api.v1 import auth, predict, plants, explain, recommend, gemini
+from app.middleware.rate_limit import RateLimitMiddleware
 
 # Configure logging
 logging.basicConfig(
@@ -42,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="AI-powered medicinal plant identification via leaf image recognition",
+    description="AI-powered medicinal plant identification via leaf image recognition. Developed by Group G9.",
     docs_url="/docs",
     redoc_url="/redoc",
     lifespan=lifespan
@@ -74,6 +75,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rate Limiting Middleware
+app.add_middleware(RateLimitMiddleware)
 
 # Include API routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["Authentication"])

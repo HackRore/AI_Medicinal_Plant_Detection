@@ -35,6 +35,7 @@ class MLService:
         # ONNX Sessions
         self.mobilenet_session = None
         self.vit_session = None
+        self.efficientnet_session = None
         
         # Thread pool for CPU-bound inference
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
@@ -84,12 +85,20 @@ class MLService:
                 self.vit_session = ort.InferenceSession(settings.VIT_MODEL_PATH, providers=providers)
                 logger.info(f"Loaded ViT from {settings.VIT_MODEL_PATH}")
             
+            if os.path.exists(settings.ENHANCED_MODEL_PATH):
+                self.efficientnet_session = ort.InferenceSession(settings.ENHANCED_MODEL_PATH, providers=providers)
+                logger.info(f"Loaded EfficientNetV2 from {settings.ENHANCED_MODEL_PATH}")
+            
             self.use_mock = False
             self.models_loaded = True
             logger.info("ML Sercice initialized (Production Mode)")
             
         except Exception as e:
             logger.error(f"Error loading models: {e}")
+            if settings.STRICT_ML_MODE:
+                logger.critical("ML Service failed to load models in STRICT_ML_MODE. Shutting down service availability.")
+                raise RuntimeError(f"ML Model initialization failed: {e}")
+            
             logger.warning("Falling back to DEMO mode due to load error.")
             self.use_mock = True
             self.models_loaded = True
@@ -154,6 +163,8 @@ class MLService:
     def _run_inference(self, image_bytes: bytes) -> Dict:
         """Run actual inference (executed in thread pool)"""
         if self.use_mock:
+            if settings.STRICT_ML_MODE:
+                raise RuntimeError("ML Service is in DEMO mode but STRICT_ML_MODE is enabled. Rejecting prediction.")
             return self._predict_mock()
 
         try:
@@ -178,8 +189,28 @@ class MLService:
                 vit_logits = vit_output[0]
                 vit_probs = np.exp(vit_logits) / np.sum(np.exp(vit_logits), axis=1, keepdims=True)
             
-            # Ensemble (Averaging)
-            if mobilenet_probs is not None and vit_probs is not None:
+            # Run EfficientNetV2 (Primary for Enhanced Intelligence)
+            efficientnet_probs = None
+            if self.efficientnet_session:
+                input_name = self.efficientnet_session.get_inputs()[0].name
+                # EfficientNetV2 internally handles rescaling, so we pass raw uint8-like float [0, 255]
+                # Re-preprocess for EfficientNetV2 if needed or assuming internal scaling
+                eff_input = (input_data + 1.0) * 127.5 # Back to [0, 255]
+                eff_output = self.efficientnet_session.run(None, {input_name: eff_input})
+                eff_logits = eff_output[0]
+                efficientnet_probs = np.exp(eff_logits) / np.sum(np.exp(eff_logits), axis=1, keepdims=True)
+
+            # Ensemble Logic (Weighted towards EfficientNetV2)
+            if efficientnet_probs is not None:
+                if mobilenet_probs is not None:
+                    final_probs = (efficientnet_probs * 0.7) + (mobilenet_probs * 0.3)
+                    ensemble_used = True
+                    model_version = "efficientnet-mobilenet-ensemble"
+                else:
+                    final_probs = efficientnet_probs
+                    ensemble_used = False
+                    model_version = "efficientnet-v2-s"
+            elif mobilenet_probs is not None and vit_probs is not None:
                 final_probs = (mobilenet_probs + vit_probs) / 2.0
                 ensemble_used = True
                 model_version = "ensemble-v1.0"
