@@ -37,8 +37,14 @@ class MLService:
         self.vit_session = None
         self.efficientnet_session = None
         
+        
         # Thread pool for CPU-bound inference
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+        
+        # OOD Threshold - The "Intelligence" Filters
+        self.CONFIDENCE_THRESHOLD = 0.65  # Below this is "Unknown Object"
+        self.AMBIGUOUS_THRESHOLD = 0.80   # Below this triggers "Check with Gemini" flag
+
         
     def load_models(self):
         """Load ML models and class names"""
@@ -229,6 +235,21 @@ class MLService:
             pred_idx = np.argmax(final_probs[0])
             confidence = float(final_probs[0][pred_idx])
             
+            # --- SUPERIOR REJECTION LOGIC (OOD) ---
+            # If not confident enough, admit ignorance rather than guessing wrong.
+            if confidence < self.CONFIDENCE_THRESHOLD:
+                logger.warning(f"OOD Detected: Low confidence ({confidence:.2f}) < Threshold ({self.CONFIDENCE_THRESHOLD})")
+                return {
+                    "predicted_class": "Unknown Object",
+                    "predicted_class_index": -1,
+                    "confidence": confidence,
+                    "top_predictions": [],
+                    "model_version": model_version,
+                    "ensemble_used": ensemble_used,
+                    "is_ambiguous": True,
+                    "message": "Object not recognized as a known medicinal plant."
+                }
+            
             # Top 5
             top_k_indices = np.argsort(final_probs[0])[::-1][:5]
             top_predictions = []
@@ -240,6 +261,9 @@ class MLService:
                     })
             
             predicted_class = self.class_names[pred_idx] if pred_idx < len(self.class_names) else f"Class_{pred_idx}"
+            
+            # Hybrid Intelligence Flag: If confident but not CERTAIN, suggest extended AI check
+            is_ambiguous = confidence < self.AMBIGUOUS_THRESHOLD
 
             return {
                 "predicted_class": predicted_class,
@@ -247,7 +271,8 @@ class MLService:
                 "confidence": confidence,
                 "top_predictions": top_predictions,
                 "model_version": model_version,
-                "ensemble_used": ensemble_used
+                "ensemble_used": ensemble_used,
+                "is_ambiguous": is_ambiguous
             }
 
         except Exception as e:
