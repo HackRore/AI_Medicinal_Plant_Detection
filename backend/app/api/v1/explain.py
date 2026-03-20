@@ -48,6 +48,7 @@ async def generate_gradcam_visualization(
                 "predicted_class": prediction_result["predicted_class"],
                 "confidence": prediction_result["confidence"]
             },
+            "botanical_reasoning": explainability_service.get_botanical_reasoning(prediction_result["predicted_class"]),
             **gradcam_result
         }
         
@@ -92,6 +93,7 @@ async def generate_lime_explanation(
                 "predicted_class": prediction_result["predicted_class"],
                 "confidence": prediction_result["confidence"]
             },
+            "botanical_reasoning": explainability_service.get_botanical_reasoning(prediction_result["predicted_class"]),
             **lime_result
         }
         
@@ -141,6 +143,7 @@ async def generate_combined_explanation(
                 "confidence": prediction_result["confidence"],
                 "top_predictions": prediction_result["top_predictions"]
             },
+            "botanical_reasoning": explainability_service.get_botanical_reasoning(prediction_result["predicted_class"]),
             "gradcam": gradcam_result,
             "lime": lime_result
         }

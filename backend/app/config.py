@@ -1,4 +1,4 @@
-"""
+the zipading """
 Configuration Settings
 Loads environment variables and provides application configuration
 """
@@ -52,11 +52,17 @@ class Settings(BaseSettings):
     
     # ML Models
     MODEL_DIR: str = "./ml_models"
-    MOBILENET_MODEL_PATH: str = "./ml_models/mobilenetv2_best.onnx"
+
     VIT_MODEL_PATH: str = "./ml_models/vit_best.onnx"
-    ENHANCED_MODEL_PATH: str = "./ml_models/efficientnetv2_best.onnx"
-    CLASS_NAMES_PATH: str = "./ml_models/class_names.json"
+    # Input Gate (Leaf vs Non-Leaf)
+    # If enabled and model exists, the API first checks whether the input is a leaf.
+    CLASS_NAMES_PATH: str = "./ml_models/class_names_full.json"
     ENSEMBLE_WEIGHTS_PATH: str = "./ml_models/ensemble_weights.json"
+    ENABLE_LEAF_GATE: bool = True
+    # Probability threshold for classifying as leaf. Tune using gate evaluation.
+    LEAF_GATE_THRESHOLD: float = 0.5
+    # If True, the app uses more permissive thresholds for demos.
+    SHOWCASE_MODE: bool = True
     
     # Google Gemini
     GEMINI_API_KEY: str | None = None

@@ -12,12 +12,19 @@ from PIL import Image
 import io
 import logging
 import concurrent.futures
+import hashlib
 
 try:
     import onnxruntime as ort
     ONNX_AVAILABLE = True
 except ImportError:
     ONNX_AVAILABLE = False
+
+try:
+    import tensorflow as tf
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
 
 from app.config import settings
 
@@ -33,17 +40,21 @@ class MLService:
         self.class_names = []
         
         # ONNX Sessions
+        self.leaf_gate_session = None
         self.mobilenet_session = None
         self.vit_session = None
         self.efficientnet_session = None
         
+        # TensorFlow Models (Fallback/Direct)
+        self.h5_model = None
+        self.h5_model_type = "none"
         
         # Thread pool for CPU-bound inference
         self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
         
         # OOD Threshold - The "Intelligence" Filters
-        self.CONFIDENCE_THRESHOLD = 0.65  # Below this is "Unknown Object"
-        self.AMBIGUOUS_THRESHOLD = 0.80   # Below this triggers "Check with Gemini" flag
+        self.CONFIDENCE_THRESHOLD = 0.01  # Default; overridden by SHOWCASE_MODE
+        self.AMBIGUOUS_THRESHOLD = 0.55   # Flag for Gemini verification
 
         
     def load_models(self):
@@ -80,12 +91,43 @@ class MLService:
                 self.models_loaded = True
                 return
 
-            # Initialize sessions
+            # 4. Load Master H5 Model (Disabled for absolute ONNX determinism)
+            # if TF_AVAILABLE:
+            #     mobilenet_h5 = settings.MOBILENET_MODEL_PATH.replace('.onnx', '.h5')
+            #     if os.path.exists(mobilenet_h5):
+            #         self.h5_model = tf.keras.models.load_model(mobilenet_h5, compile=False)
+            #         self.h5_model_type = "mobilenet-v2-master"
+            #         logger.info(f"Loaded MobileNet Master 80-Class Model from {mobilenet_h5}")
+            
+            # 4. Load Master H5 Model (Priority for 80-class accuracy)
+            if TF_AVAILABLE:
+                # Priority 1: MobileNetV2 Master (17MB) - Verified 80-Class
+                mobilenet_h5 = settings.MOBILENET_MODEL_PATH.replace('.onnx', '.h5')
+                
+                if os.path.exists(mobilenet_h5):
+                    self.h5_model = tf.keras.models.load_model(mobilenet_h5, compile=False)
+                    self.h5_model_type = "mobilenet-v2-master"
+                    logger.info(f"Loaded Master 80-Class H5 Model from {mobilenet_h5}")
+                else:
+                    self.h5_model = None
+                    self.h5_model_type = "none"
+            else:
+                self.h5_model = None
+                self.h5_model_type = "none"
+            
+            # 5. Initialize ONNX sessions
             providers = ['CPUExecutionProvider'] # Add 'CUDAExecutionProvider' if GPU available
+
+            # Leaf Gate (binary: leaf vs non-leaf)
+            if settings.ENABLE_LEAF_GATE and os.path.exists(settings.LEAF_GATE_MODEL_PATH):
+                self.leaf_gate_session = ort.InferenceSession(settings.LEAF_GATE_MODEL_PATH, providers=providers)
+                logger.info(f"Loaded Leaf Gate (ONNX) from {settings.LEAF_GATE_MODEL_PATH}")
+            else:
+                self.leaf_gate_session = None
             
             if os.path.exists(settings.MOBILENET_MODEL_PATH):
                 self.mobilenet_session = ort.InferenceSession(settings.MOBILENET_MODEL_PATH, providers=providers)
-                logger.info(f"Loaded MobileNetV2 from {settings.MOBILENET_MODEL_PATH}")
+                logger.info(f"Loaded MobileNetV2 (ONNX) from {settings.MOBILENET_MODEL_PATH}")
 
             if os.path.exists(settings.VIT_MODEL_PATH):
                 self.vit_session = ort.InferenceSession(settings.VIT_MODEL_PATH, providers=providers)
@@ -97,7 +139,7 @@ class MLService:
             
             self.use_mock = False
             self.models_loaded = True
-            logger.info("ML Sercice initialized (Production Mode)")
+            logger.info("ML Service initialized (Production Mode)")
             
         except Exception as e:
             logger.error(f"Error loading models: {e}")
@@ -108,8 +150,55 @@ class MLService:
             logger.warning("Falling back to DEMO mode due to load error.")
             self.use_mock = True
             self.models_loaded = True
+
+    def _softmax(self, logits: np.ndarray) -> np.ndarray:
+        logits = logits - np.max(logits, axis=1, keepdims=True)
+        exp = np.exp(logits)
+        return exp / np.sum(exp, axis=1, keepdims=True)
+
+    def _leaf_gate(self, image_bytes: bytes) -> Dict[str, Any]:
+        """
+        Binary gate: decides if the input is a leaf image.
+
+        Expected ONNX output: either probabilities shape [1,2] or logits [1,2].
+        Class convention used by training script: index 1 = leaf, index 0 = non_leaf.
+        """
+        if not settings.ENABLE_LEAF_GATE or not self.leaf_gate_session:
+            return {"enabled": False}
+
+        try:
+            # Gate models typically use NHWC float32. We'll use NHWC and normalize to [-1, 1].
+            gate_input = self.preprocess_image(image_bytes, return_nhwc=True)
+            gate_input = (gate_input / 127.5) - 1.0
+
+            input_name = self.leaf_gate_session.get_inputs()[0].name
+            output = self.leaf_gate_session.run(None, {input_name: gate_input})
+            raw = output[0]
+            if raw.ndim != 2 or raw.shape[0] != 1:
+                raise ValueError(f"Unexpected leaf gate output shape: {getattr(raw, 'shape', None)}")
+
+            # If outputs sum ~1 -> assume probs; else softmax logits.
+            row = raw.astype(np.float32)
+            s = float(np.sum(row[0]))
+            probs = row if 0.98 <= s <= 1.02 else self._softmax(row)
+
+            non_leaf_p = float(probs[0][0])
+            leaf_p = float(probs[0][1]) if probs.shape[1] > 1 else 0.0
+            is_leaf = leaf_p >= float(settings.LEAF_GATE_THRESHOLD)
+
+            return {
+                "enabled": True,
+                "is_leaf": bool(is_leaf),
+                "leaf_probability": leaf_p,
+                "non_leaf_probability": non_leaf_p,
+                "threshold": float(settings.LEAF_GATE_THRESHOLD),
+                "model": os.path.basename(settings.LEAF_GATE_MODEL_PATH),
+            }
+        except Exception as e:
+            logger.warning(f"Leaf gate failed; continuing without gate. Error: {e}")
+            return {"enabled": True, "error": str(e)}
     
-    def preprocess_image(self, image_bytes: bytes, target_size: Tuple[int, int] = (224, 224)) -> np.ndarray:
+    def preprocess_image(self, image_bytes: bytes, target_size: Tuple[int, int] = (224, 224), return_nhwc: bool = False) -> np.ndarray:
         """
         Preprocess image for model inference
         """
@@ -122,11 +211,16 @@ class MLService:
                 image = image.convert('RGB')
             
             # Resize
-            image = image.resize(target_size)
+            # Explicitly use BILINEAR to match standard training pipelines
+            image = image.resize(target_size, resample=Image.BILINEAR)
             
             # Convert to numpy array
             img_array = np.array(image, dtype=np.float32)
             
+            if return_nhwc:
+                # Direct for Keras: NHWC [0, 255]
+                return np.expand_dims(img_array, axis=0)
+
             # Normalize (0-1 range to -1 to 1 range usually for MobileNet, or specific mean/std)
             # Assuming standard MobileNet/ViT preprocessing: (x / 127.5) - 1.0
             img_array = (img_array / 127.5) - 1.0
@@ -174,13 +268,51 @@ class MLService:
             return self._predict_mock()
 
         try:
-            input_data = self.preprocess_image(image_bytes)
-            
+            # Leaf gate already rejects non-leaf inputs.
+            # Keep species classifier permissive for leaf images so we don't overuse "Unknown".
+            self.CONFIDENCE_THRESHOLD = 0.01
+
+            # --- STAGE 0: Leaf Gate ---
+            gate = self._leaf_gate(image_bytes)
+            if gate.get("enabled") and gate.get("is_leaf") is False:
+                return {
+                    "predicted_class": "Not a Plant Leaf",
+                    "predicted_class_index": -1,
+                    "confidence": 1.0 - float(gate.get("leaf_probability", 0.0)),
+                    "top_predictions": [],
+                    "model_version": "leaf-gate",
+                    "ensemble_used": False,
+                    "is_ambiguous": False,
+                    "gate": gate,
+                    "message": "Input rejected: not a plant leaf."
+                }
+
+            # --- PRIMARY: Master 80-Class Model (TensorFlow H5) ---
             mobilenet_probs = None
-            vit_probs = None
+            model_version = "unknown"
+            ensemble_used = False
             
-            # Run MobileNetV2
-            if self.mobilenet_session:
+            if self.h5_model:
+                # Use Direct NHWC preprocessing for Keras to avoid transpose bugs
+                h5_input = self.preprocess_image(image_bytes, return_nhwc=True)
+                
+                # Rescaling check (MobileNet-master expects [-1, 1])
+                if "mobilenet" in self.h5_model_type:
+                    h5_input = (h5_input / 127.5) - 1.0
+                
+                h5_output = self.h5_model.predict(h5_input, verbose=0)
+                mobilenet_probs = h5_output 
+                idx = int(np.argmax(mobilenet_probs[0]))
+                
+                model_version = self.h5_model_type
+                logger.info(f"🧠 {self.h5_model_type} predicted index {idx}")
+            
+            # Run ONNX models (Alternative/Fallback)
+            input_data = self.preprocess_image(image_bytes) # standard CHW [-1, 1]
+            vit_probs = None
+            efficientnet_probs = None
+            
+            if mobilenet_probs is None and self.mobilenet_session:
                 input_name = self.mobilenet_session.get_inputs()[0].name
                 mobilenet_output = self.mobilenet_session.run(None, {input_name: input_data})
                 mobilenet_logits = mobilenet_output[0]
@@ -206,8 +338,12 @@ class MLService:
                 eff_logits = eff_output[0]
                 efficientnet_probs = np.exp(eff_logits) / np.sum(np.exp(eff_logits), axis=1, keepdims=True)
 
-            # Ensemble Logic (Weighted towards EfficientNetV2)
-            if efficientnet_probs is not None:
+            # Authority Check: If Master H5 is loaded, skip ONNX ensemble to ensure mapping stability
+            if self.h5_model and mobilenet_probs is not None:
+                final_probs = mobilenet_probs
+                ensemble_used = False
+                model_version = self.h5_model_type
+            elif efficientnet_probs is not None:
                 if mobilenet_probs is not None:
                     final_probs = (efficientnet_probs * 0.7) + (mobilenet_probs * 0.3)
                     ensemble_used = True
@@ -222,8 +358,10 @@ class MLService:
                 model_version = "ensemble-v1.0"
             elif mobilenet_probs is not None:
                 final_probs = mobilenet_probs
-                ensemble_used = False
-                model_version = "mobilenet-v2"
+                if not self.h5_model:
+                    ensemble_used = False
+                    model_version = "mobilenet-v2"
+                # If h5_model was used, model_version and ensemble_used are already set
             elif vit_probs is not None:
                 final_probs = vit_probs
                 ensemble_used = False
@@ -240,14 +378,15 @@ class MLService:
             if confidence < self.CONFIDENCE_THRESHOLD:
                 logger.warning(f"OOD Detected: Low confidence ({confidence:.2f}) < Threshold ({self.CONFIDENCE_THRESHOLD})")
                 return {
-                    "predicted_class": "Unknown Object",
+                    "predicted_class": "Unknown / Not a Medicinal Leaf",
                     "predicted_class_index": -1,
                     "confidence": confidence,
                     "top_predictions": [],
                     "model_version": model_version,
                     "ensemble_used": ensemble_used,
                     "is_ambiguous": True,
-                    "message": "Object not recognized as a known medicinal plant."
+                    "gate": gate if isinstance(gate, dict) else None,
+                    "message": "Low-confidence result: input not recognized as a known medicinal plant leaf."
                 }
             
             # Top 5
@@ -272,11 +411,14 @@ class MLService:
                 "top_predictions": top_predictions,
                 "model_version": model_version,
                 "ensemble_used": ensemble_used,
-                "is_ambiguous": is_ambiguous
+                "is_ambiguous": is_ambiguous,
+                "gate": gate if isinstance(gate, dict) else None
             }
 
         except Exception as e:
             logger.error(f"Inference error: {e}")
+            if settings.STRICT_ML_MODE or not settings.SHOWCASE_MODE:
+                raise
             return self._predict_mock()
 
     def predict(self, image_bytes: bytes) -> Dict:

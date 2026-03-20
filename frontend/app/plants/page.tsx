@@ -28,8 +28,8 @@ export default function PlantsPage({
         setLoading(true)
         try {
             const url = query
-                ? `${process.env.API_URL || 'http://localhost:8000'}/api/v1/plants/search/by-name?q=${query}`
-                : `${process.env.API_URL || 'http://localhost:8000'}/api/v1/plants?limit=50`
+                ? `${process.env.API_URL || 'http://127.0.0.1:8000'}/api/v1/plants/search/by-name?q=${query}`
+                : `${process.env.API_URL || 'http://127.0.0.1:8000'}/api/v1/plants?limit=50`
 
             const res = await fetch(url)
             const data = await res.json()

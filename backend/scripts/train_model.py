@@ -18,20 +18,11 @@ logger = logging.getLogger(__name__)
 # Config
 DATA_DIR = r"d:\PROJECT STAGE 1\dataset\Indian Medicinal Leaves Image Datasets\Medicinal Leaf dataset"
 OUTPUT_DIR = r"d:\PROJECT STAGE 1\backend\ml_models"
-MODEL_PATH = os.path.join(OUTPUT_DIR, "mobilenetv2_best.onnx")
-CLASS_NAMES_PATH = os.path.join(OUTPUT_DIR, "class_names.json")
-
-# Mapping: Folder Name -> Scientific Name (DB Key)
-CLASS_MAPPING = {
-    "Tulsi": "Ocimum_tenuiflorum",
-    "Neem": "Azadirachta_indica",
-    "Aloevera": "Aloe_vera",
-    "Mint": "Mentha",
-    "Amruthaballi": "Tinospora_cordifolia"
-}
+MODEL_PATH = os.path.join(OUTPUT_DIR, "mobilenetv2_full.onnx")
+CLASS_NAMES_PATH = os.path.join(OUTPUT_DIR, "class_names_full.json")
 
 def train():
-    logger.info("Starting training pipeline...")
+    logger.info("Starting FULL DATASET training pipeline...")
     
     # 0. Check Data
     if not os.path.exists(DATA_DIR):
@@ -41,49 +32,42 @@ def train():
     # 1. Setup Data Transformations
     data_transforms = transforms.Compose([
         transforms.Resize((224, 224)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomRotation(15),
+        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
         transforms.ToTensor(),
-        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]) # MobileNetV2 usually expects [-1, 1] or similar normalization
+        transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])
     ])
 
-    # 2. Filter Dataset
-    # We only want the 5 classes we support in the DB
+    # 2. Train/Val Split + Balancing
     try:
+        from sklearn.model_selection import train_test_split
+        from sklearn.utils.class_weight import compute_class_weight
+        import numpy as np
+
         full_dataset = datasets.ImageFolder(DATA_DIR, transform=data_transforms)
+        logger.info(f"Full dataset: {len(full_dataset.classes)} classes, {len(full_dataset)} images")
         
-        # Get indices of the classes we want
-        wanted_classes = list(CLASS_MAPPING.keys())
-        wanted_indices = [i for i, c in enumerate(full_dataset.classes) if c in wanted_classes]
+        # Split 80/20 stratified
+        targets = [s[1] for s in full_dataset.samples]
+        train_idx, val_idx = train_test_split(range(len(targets)), test_size=0.2, stratify=targets, random_state=42)
         
-        # Create a mapping from stats.classes index to our new 0-4 index
-        # And ensure the order matches the scientific names mapping
+        train_sampler = torch.utils.data.Subset(full_dataset, train_idx)
+        val_sampler = torch.utils.data.Subset(full_dataset, val_idx)
         
-        # Actually, simpler: create a custom dataset or subset
-        # But for 'ImageFolder', it assumes all folders are classes. 
-        # We will create a list of samples (path, class_index) for ONLY our classes.
+        train_loader = torch.utils.data.DataLoader(train_sampler, batch_size=32, shuffle=True)
+        val_loader = torch.utils.data.DataLoader(val_sampler, batch_size=32, shuffle=False)
         
-        samples = []
-        class_to_idx = {cls: i for i, cls in enumerate(wanted_classes)} # 0: Tulsi, 1: Neem...
+        # Class weights
+        class_counts = np.bincount(targets)
+        class_weights = 1. / class_counts
+        class_weights = class_weights / class_weights.sum()
+        class_weights = torch.tensor(class_weights, dtype=torch.float).to(device)
         
-        for path, target in full_dataset.samples:
-            folder_name = full_dataset.classes[target]
-            if folder_name in wanted_classes:
-                samples.append((path, class_to_idx[folder_name]))
-                
-        if len(samples) == 0:
-            logger.error("No images found for the target classes!")
-            return
-
-        # Hack ImageFolder to only have our samples
-        full_dataset.samples = samples
-        full_dataset.classes = wanted_classes
-        full_dataset.class_to_idx = class_to_idx
-        
-        logger.info(f"Found {len(samples)} images for {len(wanted_classes)} classes.")
-
-        dataloader = torch.utils.data.DataLoader(full_dataset, batch_size=32, shuffle=True)
+        logger.info(f"Train/Val split: {len(train_idx)}/{len(val_idx)} images")
         
     except Exception as e:
-        logger.error(f"Error loading dataset: {e}")
+        logger.error(f"Error splitting dataset: {e}")
         return
 
     # 3. Setup Model (MobileNetV2)
@@ -100,19 +84,23 @@ def train():
     model.classifier[1] = nn.Linear(model.last_channel, len(wanted_classes))
     model.to(device)
     
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.Adam(model.classifier.parameters(), lr=0.001)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=2)
 
-    # 4. Train (Quick Fine-tuning)
-    epochs = 3 # Keep it small for this demo/setup task
-    model.train()
-    
+    # Early stopping
+    best_val_loss = float('inf')
+    patience_counter = 0
+
+    epochs = 10
     for epoch in range(epochs):
-        running_loss = 0.0
-        correct = 0
-        total = 0
+        # Train
+        model.train()
+        train_loss = 0.0
+        train_correct = 0
+        train_total = 0
         
-        for inputs, labels in dataloader:
+        for inputs, labels in train_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             
             optimizer.zero_grad()
@@ -121,15 +109,49 @@ def train():
             loss.backward()
             optimizer.step()
             
-            running_loss += loss.item()
+            train_loss += loss.item()
             _, predicted = torch.max(outputs.data, 1)
-            total += labels.size(0)
-            correct += (predicted == labels).sum().item()
-            
-        logger.info(f"Epoch {epoch+1}/{epochs} - Loss: {running_loss/len(dataloader):.4f} - Acc: {correct/total:.4f}")
+            train_total += labels.size(0)
+            train_correct += (predicted == labels).sum().item()
+        
+        # Val
+        model.eval()
+        val_loss = 0.0
+        val_correct = 0
+        val_total = 0
+        
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                val_loss += loss.item()
+                _, predicted = torch.max(outputs.data, 1)
+                val_total += labels.size(0)
+                val_correct += (predicted == labels).sum().item()
+        
+        train_acc = train_correct / train_total
+        val_acc = val_correct / val_total
+        logger.info(f"Epoch {epoch+1}: Train Loss {train_loss/len(train_loader):.4f} Acc {train_acc:.4f} | Val Loss {val_loss/len(val_loader):.4f} Acc {val_acc:.4f}")
+        
+        scheduler.step(val_loss / len(val_loader))
+        
+        # Early stop
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            patience_counter = 0
+            torch.save(model.state_dict(), os.path.join(OUTPUT_DIR, 'best_model.pth'))
+        else:
+            patience_counter += 1
+            if patience_counter >= 5:
+                logger.info("Early stopping")
+                break
 
+    # Load best model for export
+    model.load_state_dict(torch.load(os.path.join(OUTPUT_DIR, 'best_model.pth')))
+    
     # 5. Export to ONNX
-    logger.info("Exporting to ONNX...")
+    logger.info("Exporting best model to ONNX...")
     model.eval()
     dummy_input = torch.randn(1, 3, 224, 224).to(device)
     
@@ -140,16 +162,12 @@ def train():
     
     logger.info(f"Model saved to {MODEL_PATH}")
 
-    # 6. Save Class Names (Mapped to Scientific Names)
-    # The model predicts index 0..4. Index 0 corresponds to wanted_classes[0] ('Tulsi').
-    # We map 'Tulsi' -> 'Ocimum_tenuiflorum' using global mapping.
-    
-    final_class_names = [CLASS_MAPPING[cls] for cls in wanted_classes]
-    
+    # 6. Save Class Names (full common names)
+    final_class_names = full_dataset.classes
     with open(CLASS_NAMES_PATH, 'w') as f:
         json.dump(final_class_names, f)
         
-    logger.info(f"Class names saved to {CLASS_NAMES_PATH}: {final_class_names}")
+    logger.info(f"Class names saved: {len(final_class_names)} classes")
     logger.info("Training Complete!")
 
 if __name__ == "__main__":

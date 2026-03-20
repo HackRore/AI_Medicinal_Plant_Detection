@@ -6,7 +6,7 @@ const PROD_API_URL = 'https://api.yourmedicinalplantapp.com';
 // 10.0.2.2 is special alias for localhost in Android Emulator
 // localhost works for iOS Simulator
 const DEV_API_URL_ANDROID = 'http://10.0.2.2:8000';
-const DEV_API_URL_IOS = 'http://localhost:8000';
+const DEV_API_URL_IOS = 'http://127.0.0.1:8000';
 
 // Set this to true before building for production
 const IS_PRODUCTION = false;

@@ -41,7 +41,7 @@ export default function PlantDetailPage() {
 
     const fetchPlantDetails = async (id: string) => {
         try {
-            const res = await fetch(`${process.env.API_URL || 'http://localhost:8000'}/api/v1/plants/${id}`)
+            const res = await fetch(`${process.env.API_URL || 'http://127.0.0.1:8000'}/api/v1/plants/${id}`)
             if (res.ok) {
                 const data = await res.json()
                 setPlant(data)

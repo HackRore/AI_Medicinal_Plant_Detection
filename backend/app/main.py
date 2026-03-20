@@ -13,7 +13,7 @@ import time
 
 from app.config import settings
 from app.database import engine, Base
-from app.api.v1 import auth, predict, plants, explain, recommend, gemini
+from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback
 from app.middleware.rate_limit import RateLimitMiddleware
 
 # Configure logging
@@ -86,6 +86,7 @@ app.include_router(plants.router, prefix=f"{settings.API_V1_PREFIX}/plants", tag
 app.include_router(explain.router, prefix=f"{settings.API_V1_PREFIX}/explain", tags=["Explainability"])
 app.include_router(recommend.router, prefix=f"{settings.API_V1_PREFIX}/recommend", tags=["Recommendations"])
 app.include_router(gemini.router, prefix=f"{settings.API_V1_PREFIX}/gemini", tags=["Gemini AI"])
+app.include_router(feedback.router, prefix=f"{settings.API_V1_PREFIX}/feedback", tags=["AI Feedback Loop"])
 
 
 @app.get("/")

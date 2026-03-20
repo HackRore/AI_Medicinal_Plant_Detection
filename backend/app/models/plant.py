@@ -15,6 +15,7 @@ class Plant(Base):
     __tablename__ = "plants"
     
     id = Column(Integer, primary_key=True, index=True)
+    model_key = Column(String, unique=True, index=True, nullable=False)  # Matches model class index
     species_name = Column(String, unique=True, index=True, nullable=False)
     common_name_en = Column(String)
     common_name_hi = Column(String)
