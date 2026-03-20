@@ -257,7 +257,7 @@ Get plants for a specific ailment.
 
 ### POST /gemini/describe
 
-Get AI-generated plant description.
+
 
 **Request:**
 ```json
