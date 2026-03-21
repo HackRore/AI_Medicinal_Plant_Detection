@@ -242,11 +242,16 @@ def seed_plants(db):
             print(f"  - {plant_data['species_name']} already exists, skipping...")
             continue
         
+
         # Extract medicinal properties
         medicinal_props = plant_data.pop("medicinal_properties")
         
+        # Fix: Add model_key
+        plant_data['model_key'] = plant_data['species_name'].lower().replace('_', '-')
+        
         # Create plant
         plant = Plant(**plant_data)
+
         db.add(plant)
         db.flush()  # Get the plant ID
         

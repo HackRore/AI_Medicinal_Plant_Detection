@@ -1,4 +1,4 @@
-the zipading """
+"""
 Configuration Settings
 Loads environment variables and provides application configuration
 """

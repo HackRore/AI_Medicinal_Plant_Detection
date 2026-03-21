@@ -1,7 +1,7 @@
-
 import sys
 import os
 import logging
+import json
 from sqlalchemy.orm import Session
 
 # Add the parent directory to the python path so we can import app modules
@@ -23,35 +23,39 @@ def seed_data():
         Base.metadata.create_all(bind=engine)
         
         # Check if data already exists
-    class_names_path = r"d:\PROJECT STAGE 1\backend\ml_models\class_names_full.json"
+        if db.query(Plant).count() > 0:
+            logger.info("Database already contains data. Skipping seed.")
+            return
+
+        class_names_path = "ml_models/class_names.json"
     
-    if os.path.exists(class_names_path):
-        logger.info("Seeding from trained model classes...")
-        with open(class_names_path, 'r') as f:
-            class_names = json.load(f)
+        if os.path.exists(class_names_path):
+            logger.info("Seeding from trained model classes...")
+            with open(class_names_path, 'r') as f:
+                class_names = json.load(f)
         
-        dataset_dir = r"d:\PROJECT STAGE 1\dataset\Indian Medicinal Leaves Image Datasets\Medicinal Leaf dataset"
-        for model_key in class_names:
-            if db.query(Plant).filter(Plant.model_key == model_key).first():
-                continue
-                
-            species_name = model_key.replace('_', ' ').title()
-            plant = Plant(
-                model_key=model_key,
-                species_name=species_name,
-                common_name_en=model_key.replace('_', ' ').title(),
-                description=f"Medicinal plant: {species_name}"
-            )
-            db.add(plant)
-        db.commit()
-        logger.info(f"Seeded {len(class_names)} plants from model.")
-        return
+            for model_key in class_names:
+                if db.query(Plant).filter(Plant.model_key == model_key).first():
+                    continue
+                    
+                species_name = model_key.replace('_', ' ').title()
+                plant = Plant(
+                    model_key=model_key,
+                    species_name=species_name,
+                    common_name_en=model_key.replace('_', ' ').title(),
+                    description=f"Medicinal plant: {species_name}"
+                )
+                db.add(plant)
+            db.commit()
+            logger.info(f"Seeded {len(class_names)} plants from model.")
+            return
     
-    logger.info("No model classes found, seeding hardcoded...")
-    
-    if db.query(Plant).count() > 0:
-        logger.info("Database already contains data. Skipping seed.")
-        return
+        logger.info("No model classes found, seeding hardcoded...")
+        
+        plants_data = [
+            {
+                "species_name": "Ocimum_tenuiflorum",
+                "common_name_en": "Tulsi",
                 "common_name_hi": "तुलसी (Tulsi)",
                 "common_name_ta": "துளசி (Thulasi)",
                 "common_name_te": "తులసి (Tulasi)",
@@ -109,7 +113,7 @@ def seed_data():
                 "common_name_ta": "கற்றாழை (Kathalai)",
                 "common_name_te": "కలబంద (Kalabanda)",
                 "common_name_bn": "ঘৃতকুমারী (Ghritkumari)",
-                "scientific_classification": "Kingdom: Plantae, Family: Asphod乐acceae, Genus: Aloe",
+                "scientific_classification": "Kingdom: Plantae, Family: Asphodelaceae, Genus: Aloe",
                 "description": "Aloe vera is a succulent plant species of the genus Aloe. It is widely distributed, and is considered an invasive species in many world regions. An evergreen perennial, it originates from the Arabian Peninsula.",
                 "image_url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Aloe_vera_flower_insets.png",
                 "properties": [

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
 import Image from "next/image"
 import { toast } from "sonner"
+import { Upload } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Skeleton } from "@/components/ui/Skeleton"
 

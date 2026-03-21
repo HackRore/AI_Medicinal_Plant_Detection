@@ -1,22 +1,11 @@
-# UI Enhancement Progress ✓ COMPLETE
+# Task Progress: Fix backend/requirements.txt pip install error
 
-**All Steps Done:**
-- [x] 1. package.json + deps (Query, PWA, sonner)
-- [x] 2. PWA (next.config.js + manifest.json)
-- [x] 3. Layout + Providers (Theme/Query/Toaster)
-- [x] 4. globals.css + tailwind.config (dark mode/a11y)
-- [x] 5. Skeleton component
-- [x] 6. predict/page.tsx rewrite (camera, caching, ARIA, history, toasts, skeletons)
-- [x] 7. Verified (run `cd frontend && npm run dev`)
+## Steps from Approved Plan
+- [x] **Step 1**: Create TODO.md to track progress ✅
+- [x] **Step 2**: Edit backend/requirements.txt to fix torch/torchvision (split into separate lines) ✅
+- [x] **Step 3**: Verify pip install works ✅
+- [x] **Step 4**: Test ML functionality (optional) ✅
+- [x] **Step 5**: Complete task ✅
 
-**New Features:**
-- Live camera capture (environment facing)
-- TanStack Query caching/retry
-- Sonner toasts, dark mode toggle
-- Full a11y (ARIA-live, focus-ring, roles)
-- PWA installable/offline
-- Prediction history
-- Error boundaries + skeletons
-
-Run `cd frontend && npm run dev` to test enhanced UI!
+All steps complete. Task finished.
 

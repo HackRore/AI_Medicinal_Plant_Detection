@@ -106,11 +106,10 @@ export default function PredictPage() {
   }
 
 
-  useEffect(() => {
+useEffect(() => {
     let stream: MediaStream | null = null
     if (isCameraOpen && videoRef.current) {
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
-
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } } })
         .then((s) => {
           stream = s
           videoRef.current!.srcObject = s
