@@ -3,6 +3,7 @@ import { Inter, Outfit } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import DemoBanner from '@/components/layout/DemoBanner'
 import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
@@ -36,6 +37,7 @@ export default function RootLayout({
             <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased selection:bg-primary-500/30 selection:text-primary-900">
                 <Providers>
                     <Navbar />
+                       <DemoBanner />
     <main>
         <ErrorBoundary>
           {children}

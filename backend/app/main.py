@@ -15,6 +15,7 @@ from app.config import settings
 from app.database import engine, Base
 from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback
 from app.middleware.rate_limit import RateLimitMiddleware
+from app.services.ml_service import get_ml_service
 
 # Configure logging
 logging.basicConfig(
@@ -103,9 +104,16 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    try:
+        ml = get_ml_service()
+        demo_mode = bool(getattr(ml, 'use_mock', False)) or not getattr(ml, 'models_loaded', False)
+    except Exception:
+        demo_mode = True
+
     return {
         "status": "healthy",
-        "version": settings.APP_VERSION
+        "version": settings.APP_VERSION,
+        "demo_mode": demo_mode
     }
 
 

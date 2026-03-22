@@ -27,9 +27,10 @@ export default function PlantsPage({
     const fetchPlants = async (query = '') => {
         setLoading(true)
         try {
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
             const url = query
-                ? `${process.env.API_URL || 'http://127.0.0.1:8000'}/api/v1/plants/search/by-name?q=${query}`
-                : `${process.env.API_URL || 'http://127.0.0.1:8000'}/api/v1/plants?limit=50`
+                ? `${API_BASE}/api/v1/plants/search/by-name?q=${encodeURIComponent(query)}`
+                : `${API_BASE}/api/v1/plants?limit=50`
 
             const res = await fetch(url)
             const data = await res.json()
