@@ -10,7 +10,88 @@ from typing import Optional, List
 from app.database import get_db
 from app.models.plant import Plant, MedicinalProperty
 
+import os
+import json
+from app.models.plant import Plant, MedicinalProperty
+from app.database import get_db
+
 router = APIRouter()
+
+
+@router.post("/admin/seed")
+async def seed_database(db: Session = Depends(get_db)):
+    """
+    Temporary administrative endpoint to seed the production database.
+    Populates 6 core medicinal plants with details and placeholders for others.
+    """
+    try:
+        # 1. Load class names from model
+        class_names_path = os.path.join("ml_models", "class_names.json")
+        if not os.path.exists(class_names_path):
+            raise HTTPException(status_code=404, detail="class_names.json not found")
+            
+        with open(class_names_path, 'r') as f:
+            classes = json.load(f)
+
+        # 2. Define core data for the top 6 species
+        core_plants = {
+            "Azadirachta_indica": {
+                "common_name": "Neem",
+                "common_name_hi": "नीम",
+                "description": "Powerful antimicrobial and skin-healing tree native to India."
+            },
+            "Ocimum_sanctum": {
+                "common_name": "Holy Basil (Tulsi)",
+                "common_name_hi": "तुलसी",
+                "description": "Sacred adaptogen used for respiratory health and stress relief."
+            },
+            "Aloe_barbadensis": {
+                "common_name": "Aloe Vera",
+                "common_name_hi": "घृतकुमारी",
+                "description": "Succulent with thick gel used for burns, skin care, and digestion."
+            },
+            "Curcuma_longa": {
+                "common_name": "Turmeric",
+                "common_name_hi": "हल्दी",
+                "description": "Bright orange rhizome with potent anti-inflammatory curcumin."
+            },
+            "Withania_somnifera": {
+                "common_name": "Ashwagandha",
+                "common_name_hi": "अश्वगंधा",
+                "description": "Renowned adaptogen used for strength, vitality, and immunity."
+            },
+            "Mentha_arvensis": {
+                "common_name": "Mint",
+                "common_name_hi": "पुदीना",
+                "description": "Cooling herb used for digestion, oral health, and headaches."
+            }
+        }
+
+        seeded_count = 0
+        for cls_name in classes:
+            # Check if exists
+            existing = db.query(Plant).filter(Plant.species_name == cls_name).first()
+            if existing:
+                continue
+
+            core_info = core_plants.get(cls_name, {})
+            
+            plant = Plant(
+                model_key=cls_name.lower().replace('_', '-'),
+                species_name=cls_name,
+                common_name_en=core_info.get("common_name", cls_name.replace('_', ' ').title()),
+                common_name_hi=core_info.get("common_name_hi", ""),
+                description=core_info.get("description", f"Medicinal species: {cls_name.replace('_', ' ')}. Detailed botanical profile coming soon.")
+            )
+            db.add(plant)
+            seeded_count += 1
+            
+        db.commit()
+        return {"status": "success", "seeded_count": seeded_count, "total_classes": len(classes)}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
 
 
 @router.get("/")
