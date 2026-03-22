@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/Button"
 import { Skeleton } from "@/components/ui/Skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Camera, Upload, History, Sun, Moon, Zap, AlertCircle, ThumbsUp, ThumbsDown, Copy, Leaf } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
@@ -36,6 +36,21 @@ interface LocalHistoryItem {
   thumb: string
   timestamp: number
 }
+
+const SafetyBadge = ({isToxic, caution}: {isToxic: boolean, caution: string}) => (
+  <div style={{
+    padding: '12px 16px',
+    borderRadius: '10px',
+    background: isToxic ? '#FCEBEB' : caution ? '#FAEEDA' : '#EAF3DE',
+    borderLeft: `4px solid ${isToxic ? '#E24B4A' : caution ? '#EF9F27' : '#639922'}`,
+    marginTop: '12px'
+  }}>
+    <strong style={{color: isToxic ? '#A32D2D' : caution ? '#854F0B' : '#3B6D11'}}>
+      {isToxic ? 'TOXIC — Do not consume' : caution ? 'Use with caution' : 'Safe medicinal plant'}
+    </strong>
+    {caution && <p style={{margin:'4px 0 0', fontSize:'13px'}}>{caution}</p>}
+  </div>
+)
 
 export default function PredictPage() {
   const [preview, setPreview] = useState<string | null>(null)
@@ -411,16 +426,72 @@ export default function PredictPage() {
                       Copy Result
                     </Button>
                     {predictMutation.data.plant_details && (
-                      <Button asChild variant="outline" className="flex-1 gap-2">
-                        <Link href={`/plants/${predictMutation.data.plant_details.id}`}>
-                          <Leaf className="h-4 w-4" />
-                          Medicinal Details
-                        </Link>
-                      </Button>
+                      <Link href={`/plants/${predictMutation.data.plant_details.id}`} className="flex-1">
+  <Button variant="outline" className="w-full flex justify-center items-center gap-2">
+    <Leaf className="h-4 w-4" />
+    Medicinal Details
+  </Button>
+</Link>
                     )}
                   </div>
                 </CardContent>
               </Card>
+
+              {/* WOW FEATURES */}
+              {predictMutation.data.gradcam_base64 && (
+                <div className="gradcam-section" style={{marginTop:'12px'}}>
+                  <h3 className="font-bold text-lg mb-2">AI Attention Map</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Red areas = regions AI focused on to identify this plant</p>
+                  <div style={{position:'relative', display:'inline-block'}}>
+                    <img
+                      src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`}
+                      alt="Grad-CAM Heatmap"
+                      style={{width:'300px', borderRadius:'12px', border: '1px solid #ddd'}}
+                    />
+                    <span style={{
+                      position:'absolute', bottom:'8px', left:'8px',
+                      background:'rgba(0,0,0,0.7)', color:'white',
+                      padding:'4px 10px', borderRadius:'20px', fontSize:'12px'
+                    }}>
+                      AI Focus Areas
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
+
+              {predictMutation.data.medicinal_info && (
+                <div style={{
+                  background:'#f1f8e9', border:'1px solid #aed581',
+                  borderRadius:'10px', padding:'16px', marginTop:'12px'
+                }}>
+                  <h3 style={{margin:'0 0 12px', color:'#2e7d32'}} className="font-bold text-lg">
+                    Ayurvedic Information
+                  </h3>
+                  <p className="text-sm mb-2"><strong>Uses:</strong> {predictMutation.data.medicinal_info.uses}</p>
+                  <p className="text-sm mb-2"><strong>Preparation:</strong> {predictMutation.data.medicinal_info.prep}</p>
+                  <p className="text-sm"><strong>Caution:</strong> {predictMutation.data.medicinal_info.caution}</p>
+                </div>
+              )}
+
+              {predictMutation.data.alternatives?.length > 0 && (
+                <div style={{marginTop:'12px'}}>
+                  <p style={{fontSize:'13px', color:'#666', marginBottom:'8px'}}>
+                    AI also considered:
+                  </p>
+                  {predictMutation.data.alternatives.slice(1,4).map((alt: any, i: number) => (
+                    <div key={i} style={{
+                      display:'flex', justifyContent:'space-between',
+                      padding:'6px 10px', background:'#f5f5f5',
+                      borderRadius:'6px', marginBottom:'4px', fontSize:'13px'
+                    }}>
+                      <span>{alt.class_name.replace(/_/g, " ")}</span>
+                      <span style={{color:'#888'}}>{(alt.confidence * 100).toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               {/* Medicinal Information */}
               {isLoadingMedicinal ? (
@@ -455,11 +526,11 @@ export default function PredictPage() {
                         </div>
                       ))}
                     </div>
-                    <Button variant="outline" className="mt-6 w-full" asChild>
-                      <Link href={`/plants/${selectedPlantDetails.id}`}>
-                        Full Medicinal Profile →
-                      </Link>
-                    </Button>
+                    <Link href={`/plants/${selectedPlantDetails.id}`} className="w-full mt-6 block">
+  <Button variant="outline" className="w-full">
+    Full Medicinal Profile →
+  </Button>
+</Link>
                   </CardContent>
                 </Card>
               )}

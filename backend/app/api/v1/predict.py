@@ -150,7 +150,12 @@ async def predict_plant(
             "expert_verification": None,
             "storage_status": "saved" if prediction_id else "filtered_out",
             "gate": prediction_result.get("gate"),
-            "message": prediction_result.get("message")
+            "message": prediction_result.get("message"),
+            "gradcam_base64": prediction_result.get("gradcam_base64"),
+            "medicinal_info": prediction_result.get("medicinal_info"),
+            "alternatives": prediction_result.get("top_predictions", []),
+            "is_toxic": prediction_result.get("is_toxic", False),
+            "caution": prediction_result.get("caution", "")
         }
         
         # Expert Fallback Logic - HIGH Intelligence mode
