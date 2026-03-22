@@ -13,7 +13,7 @@ import time
 
 from app.config import settings
 from app.database import engine, Base
-from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback
+from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback, quality_check
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.services.ml_service import get_ml_service
 
@@ -82,6 +82,7 @@ app.add_middleware(RateLimitMiddleware)
 
 # Include API routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["Authentication"])
+app.include_router(quality_check.router, prefix=f"{settings.API_V1_PREFIX}/quality-check", tags=["Quality Check"])
 app.include_router(predict.router, prefix=f"{settings.API_V1_PREFIX}/predict", tags=["Prediction"])
 app.include_router(plants.router, prefix=f"{settings.API_V1_PREFIX}/plants", tags=["Plants"])
 app.include_router(explain.router, prefix=f"{settings.API_V1_PREFIX}/explain", tags=["Explainability"])

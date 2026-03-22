@@ -25,6 +25,10 @@ export const metadata: Metadata = {
     keywords: ['AI', 'Medicinal Plants', 'Leaf Recognition', 'MobileNetV2', 'Vision Transformer', 'Ayurveda', 'Botanical AI'],
     authors: [{ name: 'Group G9' }],
     manifest: '/manifest.json',
+    icons: {
+        icon: '/favicon.ico',
+        apple: '/icon-192.png',
+    },
 }
 
 export default function RootLayout({
