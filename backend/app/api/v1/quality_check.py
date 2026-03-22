@@ -7,7 +7,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException
 from typing import Dict
 import logging
 
-from ml_pipeline.models.quality_gatekeeper import quality_check
+from app.services.quality_gatekeeper import quality_check
 
 logger = logging.getLogger(__name__)
 
