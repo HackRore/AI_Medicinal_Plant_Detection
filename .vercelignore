@@ -1,0 +1,10 @@
+.venv/
+dataset/
+data/
+ml_models/
+__pycache__/
+logs/
+.git/
+node_modules/
+.next/
+uploads/
