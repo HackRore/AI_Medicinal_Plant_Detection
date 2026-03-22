@@ -21,7 +21,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-white/0 pointer-events-none" />
       <div className="relative z-10 w-full h-full">
-         {children}
+         {children as any}
       </div>
     </motion.div>
   )

@@ -1,83 +1,33 @@
 export default function AboutPage() {
-    return (
-        <div className="container mx-auto px-4 py-16">
-            <div className="max-w-4xl mx-auto">
-                <section className="text-center mb-16">
-                    <h1 className="text-5xl font-bold text-primary-800 mb-6">About Us</h1>
-                    <p className="text-xl text-gray-600 leading-relaxed">
-                        Bridging the gap between traditional botanical knowledge and modern technology
-                        to democratize access to herbal medicine.
-                    </p>
-                </section>
+  return (
+    <main className="container mx-auto p-12 max-w-4xl space-y-8 min-h-screen">
+      <h1 className="text-5xl font-black text-green-700 mb-6 tracking-tight">Project: PlantoAI</h1>
+      <div className="bg-white shadow-2xl rounded-3xl p-10 border border-green-100">
+        <h2 className="text-3xl font-bold mb-8 text-gray-900 border-b pb-4">Team: Group G9</h2>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-green-50 p-6 rounded-2xl">
+            <h3 className="text-xl font-bold text-green-800 mb-2">Tech Stack</h3>
+            <p className="text-green-900 font-medium">Next.js + FastAPI + EfficientNetV2 + Grad-CAM</p>
+          </div>
 
-                <div className="grid md:grid-cols-2 gap-12 mb-20">
-                    <div className="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-primary-500">
-                        <h2 className="text-2xl font-bold mb-4 text-gray-800">Our Mission</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                            To create an accessible, accurate, and easy-to-use tool that helps people identify medicinal
-                            plants in their surroundings. By combining deep learning with traditional Ayurvedic knowledge,
-                            we aim to preserve and promote the use of natural remedies for common ailments.
-                        </p>
-                    </div>
-                    <div className="bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-500">
-                        <h2 className="text-2xl font-bold mb-4 text-gray-800">The Technology</h2>
-                        <p className="text-gray-600 leading-relaxed">
-                            We utilize a state-of-the-art ensemble of MobileNetV2 and Vision Transformers to ensure
-                            high accuracy in leaf recognition. Our system is augmented by Google's Gemini Vision API
-                            to provide human-like descriptions and multilingual support.
-                        </p>
-                    </div>
-                </div>
-
-                <section className="mb-20">
-                    <h2 className="text-3xl font-bold text-center mb-12 text-primary-800">Meet the Team (Group G9)</h2>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {[
-                            { name: "Madhura Wankhade" },
-                            { name: "Ravindra Ahire" },
-                            { name: "Samruddhi Gholap" },
-                            { name: "Pranali Ghugarkar" }
-                        ].map((member, idx) => (
-                            <div key={idx} className="bg-white p-6 rounded-xl shadow-md flex items-center gap-4 hover:shadow-lg transition-shadow">
-                                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-bold text-xl">
-                                    {member.name.charAt(0)}
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg text-gray-800">{member.name}</h3>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                <section className="mb-20 bg-primary-50 p-8 rounded-2xl border border-primary-100">
-                    <h2 className="text-3xl font-bold text-center mb-8 text-primary-800">Project Guidance</h2>
-                    <div className="flex flex-col items-center">
-                        <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-primary-600 font-bold text-3xl shadow-md mb-4 ring-4 ring-primary-100">
-                            SB
-                        </div>
-                        <h3 className="text-2xl font-bold text-gray-800">Ms. Sneha Bankar</h3>
-                        <p className="text-primary-600 font-semibold mb-2">Project Guide</p>
-                        <p className="text-gray-500 text-center max-w-lg">
-                            Department of Artificial Intelligence and Data Science, Dr. DY Patil College of Eng. and Innovation, Varale (Talegaon).
-                            Providing invaluable technical oversight and project direction.
-                        </p>
-                    </div>
-                </section>
-
-                <section className="bg-gray-900 text-white p-12 rounded-3xl text-center">
-                    <h2 className="text-3xl font-bold mb-6">Contact Us</h2>
-                    <p className="text-lg opacity-80 mb-8">
-                        Have questions, suggestions, or want to contribute? We'd love to hear from you.
-                    </p>
-                    <a
-                        href="mailto:hackrore@gmail.com"
-                        className="bg-white text-gray-900 px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors inline-block"
-                    >
-                        hackrore@gmail.com
-                    </a>
-                </section>
-            </div>
+          <div className="bg-emerald-50 p-6 rounded-2xl">
+            <h3 className="text-xl font-bold text-emerald-800 mb-2">Dataset</h3>
+            <p className="text-emerald-900 font-medium">3 Kaggle datasets — 21,412 images — 226 species</p>
+          </div>
         </div>
-    )
+
+        <div className="mt-8 bg-gray-50 p-8 rounded-2xl">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">Key Features</h3>
+          <ul className="space-y-3 text-gray-700 font-medium">
+            <li className="flex items-center gap-3"><span className="text-xl">🔬</span> Real AI detection with Grad-CAM explainability</li>
+            <li className="flex items-center gap-3"><span className="text-xl">⚠️</span> Toxicity warning system</li>
+            <li className="flex items-center gap-3"><span className="text-xl">📚</span> Ayurvedic knowledge base</li>
+            <li className="flex items-center gap-3"><span className="text-xl">🛡️</span> Quality gating</li>
+            <li className="flex items-center gap-3"><span className="text-xl">📱</span> PWA mobile support</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+  )
 }

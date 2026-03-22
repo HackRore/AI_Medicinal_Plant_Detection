@@ -28,6 +28,15 @@ interface Prediction {
     common_name: string
     description: string
   }
+  gradcam_base64?: string
+  is_toxic: boolean
+  caution: string
+  medicinal_info?: {
+    uses: string
+    prep: string
+    caution: string
+  }
+  alternatives?: Array<{ class_name: string; confidence: number }>
 }
 
 interface LocalHistoryItem {
