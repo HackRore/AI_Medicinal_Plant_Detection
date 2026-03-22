@@ -54,15 +54,39 @@ def get_last_conv_layer(model):
 
 def get_gradcam_base64(model, img_array, class_idx):
     try:
-        last_conv = get_last_conv_layer(model)
+        # Robust layer finding for nested functional models
+        last_conv_layer = None
+        target_model = model
+        
+        # Priority 1: Check top-level layers
+        for layer in reversed(model.layers):
+            if len(layer.output_shape) == 4:
+                last_conv_layer = layer
+                break
+        
+        # Priority 2: If the last 4D layer is a sub-model (like EfficientNet base), go inside
+        if last_conv_layer and hasattr(last_conv_layer, 'layers'):
+            target_model = last_conv_layer
+            for layer in reversed(target_model.layers):
+                if len(layer.output_shape) == 4 and "conv" in layer.name.lower():
+                    last_conv_layer = layer
+                    break
+        
+        if not last_conv_layer:
+            return None
+
         import tensorflow as tf
         grad_model = tf.keras.Model(
-            inputs=model.input,
-            outputs=[model.get_layer(last_conv).output, model.output]
+            inputs=target_model.input,
+            outputs=[last_conv_layer.output, target_model.output]
         )
+        
+        # If target_model is a sub-model, we need to pass the right input.
+        # But for GradientTape, we can just use the target_model's output branch.
         with tf.GradientTape() as tape:
             conv_outputs, predictions = grad_model(img_array)
             loss = predictions[:, class_idx]
+        
         grads = tape.gradient(loss, conv_outputs)
         pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
         conv_outputs = conv_outputs[0]
@@ -86,7 +110,10 @@ def get_gradcam_base64(model, img_array, class_idx):
         return base64.b64encode(buffer).decode('utf-8')
     except Exception as e:
         import logging
+        import traceback
         logging.getLogger(__name__).error(f"Grad-CAM error: {e}")
+        print(f"DEBUG GRADCAM ERROR: {e}")
+        traceback.print_exc()
         return None
 
 
