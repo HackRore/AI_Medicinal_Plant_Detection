@@ -165,13 +165,13 @@ class MLService:
             
             # 4. Load Master H5 Model (Priority for 80-class accuracy)
             if TF_AVAILABLE:
-                # Priority 1: MobileNetV2 Master (17MB) - Verified 80-Class
-                mobilenet_h5 = settings.MOBILENET_MODEL_PATH.replace('.onnx', '.h5')
+                # Priority 1: EfficientNetV2 Master (90MB) - Verified 80-Class
+                efficientnet_h5 = os.path.join(settings.MODEL_DIR, "efficientnetv2_best.h5")
                 
-                if os.path.exists(mobilenet_h5):
-                    self.h5_model = tf.keras.models.load_model(mobilenet_h5, compile=False)
-                    self.h5_model_type = "mobilenet-v2-master"
-                    logger.info(f"Loaded Master 80-Class H5 Model from {mobilenet_h5}")
+                if os.path.exists(efficientnet_h5):
+                    self.h5_model = tf.keras.models.load_model(efficientnet_h5, compile=False)
+                    self.h5_model_type = "efficientnet-v2"
+                    logger.info(f"Loaded Master 80-Class H5 Model from {efficientnet_h5}")
                 else:
                     self.h5_model = None
                     self.h5_model_type = "none"
