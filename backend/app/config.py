@@ -54,6 +54,9 @@ class Settings(BaseSettings):
     MODEL_DIR: str = "./ml_models"
 
     VIT_MODEL_PATH: str = "./ml_models/vit_best.onnx"
+    MOBILENET_MODEL_PATH: str = "./ml_models/mobilenetv2_best.onnx"
+    ENHANCED_MODEL_PATH: str = "./ml_models/enhanced_model.onnx"
+    LEAF_GATE_MODEL_PATH: str = "./ml_models/leaf_gate/leaf_gate.onnx"
     # Input Gate (Leaf vs Non-Leaf)
     # If enabled and model exists, the API first checks whether the input is a leaf.
     CLASS_NAMES_PATH: str = "./ml_models/class_names_full.json"
