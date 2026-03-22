@@ -13,7 +13,7 @@ export default function AboutPage() {
 
           <div className="bg-emerald-50 p-6 rounded-2xl">
             <h3 className="text-xl font-bold text-emerald-800 mb-2">Dataset</h3>
-            <p className="text-emerald-900 font-medium">3 Kaggle datasets — 21,412 images — 226 species</p>
+            <p className="text-emerald-900 font-medium">3 Kaggle datasets — 21,412 images — 80 species</p>
           </div>
         </div>
 

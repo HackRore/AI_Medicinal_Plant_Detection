@@ -6,7 +6,7 @@ import { Card } from "../ui/Card";
 
 export const FeaturesSection = () => {
     const STATS = [
-        { number: '226', label: 'Medicinal Species', icon: '🌿' },
+        { number: '80', label: 'Medicinal Species', icon: '🌿' },
         { number: 'Dual', label: 'Attention AI Architecture', icon: '🧠' },
         { number: 'Grad-CAM', label: 'Explainable AI', icon: '🔬' },
         { number: '100%', label: 'Toxicity Detection', icon: '⚠️' },
