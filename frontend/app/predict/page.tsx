@@ -484,7 +484,7 @@ export default function PredictPage() {
                 </div>
               )}
 
-              {predictMutation.data.alternatives?.length > 0 && (
+              {(predictMutation.data.alternatives?.length ?? 0) > 0 && (
                 <div style={{marginTop:'12px'}}>
                   <p style={{fontSize:'13px', color:'#666', marginBottom:'8px'}}>
                     AI also considered:
