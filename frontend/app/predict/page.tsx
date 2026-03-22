@@ -489,7 +489,7 @@ export default function PredictPage() {
                   <p style={{fontSize:'13px', color:'#666', marginBottom:'8px'}}>
                     AI also considered:
                   </p>
-                  {predictMutation.data.alternatives.slice(1,4).map((alt: any, i: number) => (
+                  {predictMutation.data.alternatives?.slice(1,4).map((alt: any, i: number) => (
                     <div key={i} style={{
                       display:'flex', justifyContent:'space-between',
                       padding:'6px 10px', background:'#f5f5f5',
