@@ -35,7 +35,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:8000"]
+    ALLOWED_ORIGINS: List[str] = [
+        "http://localhost:3000", 
+        "http://localhost:8000", 
+        "https://plantoai.vercel.app", 
+        "https://phytoai-3n01zj1s8-hackrores-projects.vercel.app"
+    ]
     
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
