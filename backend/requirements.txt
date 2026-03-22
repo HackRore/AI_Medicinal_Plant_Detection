@@ -45,8 +45,3 @@ torchvision>=0.19.1
 onnxruntime>=1.16.3
 opencv-python-headless>=4.8.1.78
 lime>=0.2.0.1
-transformers
-huggingface_hub
-
-transformers==4.44.2
-huggingface_hub>=0.25.1
