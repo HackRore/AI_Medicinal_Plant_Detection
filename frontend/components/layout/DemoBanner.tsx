@@ -7,14 +7,22 @@ export default function DemoBanner() {
 
     useEffect(() => {
         const api = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
-        fetch(`${api}/health`).then(async (res) => {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+
+        fetch(`${api}/health`, { signal: controller.signal }).then(async (res) => {
+            clearTimeout(timeoutId)
             try {
                 const j = await res.json()
                 setDemoMode(Boolean(j?.demo_mode))
             } catch (e) {
                 setDemoMode(true)
             }
-        }).catch(() => setDemoMode(true))
+        }).catch(() => {
+            clearTimeout(timeoutId)
+            setDemoMode(true)
+        })
+        return () => clearTimeout(timeoutId)
     }, [])
 
     if (demoMode === null) return null

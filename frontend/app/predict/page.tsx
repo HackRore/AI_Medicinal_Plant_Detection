@@ -92,7 +92,7 @@ export default function PredictPage() {
   const predictMutation = useMutation({
     mutationFn: async (file: File): Promise<Prediction> => {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 60000) // 60s timeout
 
       try {
         const formData = new FormData()
@@ -114,7 +114,7 @@ export default function PredictPage() {
         return res.json()
       } catch (err: any) {
         clearTimeout(timeoutId)
-        if (err.name === "AbortError") throw new Error("Request timeout (30s). Please try a smaller image or check connection.")
+        if (err.name === "AbortError") throw new Error("Request timeout (60s). Please try a smaller image or check connection.")
         if (!navigator.onLine) throw new Error("No internet connection. Please check your network.")
         throw err
       }
