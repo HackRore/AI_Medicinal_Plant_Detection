@@ -8,7 +8,7 @@ import { Upload } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { Skeleton } from "@/components/ui/Skeleton"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1"
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com") + "/api/v1"
 
 export default function ExplainPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)

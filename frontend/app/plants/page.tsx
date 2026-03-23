@@ -27,7 +27,7 @@ export default function PlantsPage({
     const fetchPlants = async (query = '') => {
         setLoading(true)
         try {
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://plantoai-backend.onrender.com'
             const url = query
                 ? `${API_BASE}/api/v1/plants/search/by-name?q=${encodeURIComponent(query)}`
                 : `${API_BASE}/api/v1/plants?limit=50`
