@@ -34,6 +34,22 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created")
     
+    # Download model from GitHub Releases
+    import os
+    model_path = "ml_models/efficientnetv2_best.h5"
+    if not os.path.exists(model_path):
+        print("Downloading model from GitHub releases...")
+        import requests
+        url = "https://github.com/HackRore/AI_Medicinal_Plant_Detection/releases/download/v1.0/efficientnetv2_best.h5"
+        try:
+            r = requests.get(url, stream=True)
+            with open(model_path, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            print("Model downloaded successfully!")
+        except Exception as e:
+            print(f"Bypassing model download: {e}")
+    
     yield
     
     # Shutdown
