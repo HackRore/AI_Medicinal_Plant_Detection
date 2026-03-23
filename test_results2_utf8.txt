@@ -1,0 +1,18 @@
+﻿python : Traceback (most recent call last):
+At line:1 char:276
++ ... ests numpy ; python run_all_tests.py > 
+test_results2.txt 2>&1 ; Get-C ...
++                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( 
+   Traceback (most recent call last)::String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandEr 
+   ror
+ 
+  File "C:\Users\Dell\Downloads\HackRore\AI_Me
+dicinal_Plant_Detection\run_all_tests.py", 
+line 1, in <module>
+    import tensorflow as tf
+ModuleNotFoundError: No module named 
+'tensorflow'

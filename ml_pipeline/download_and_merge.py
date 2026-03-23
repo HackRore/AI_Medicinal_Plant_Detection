@@ -23,7 +23,7 @@ for i, p in enumerate(DATASETS, 1):
     print(f"{i}. {p}")
 
 # Merged dir (project relative)
-MERGED_DIR = Path("d:/PROJECT STAGE 1/dataset/merged_dataset")
+MERGED_DIR = Path("dataset/merged_dataset")
 MERGED_DIR.mkdir(exist_ok=True, parents=True)
 
 class_counts = {}

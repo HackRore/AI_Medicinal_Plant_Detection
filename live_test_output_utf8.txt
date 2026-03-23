@@ -1,0 +1,30 @@
+﻿============================================================
+python : Traceback (most recent call last):
+At line:1 char:142
++ ... ivate.ps1 ; python test_live_api.py 
+> live_test_output.txt 2>&1 ; Get ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified 
+   : (Traceback (most recent call last)::  
+  String) [], RemoteException
+    + FullyQualifiedErrorId : NativeComman 
+   dError
+ 
+  File "C:\Users\Dell\Downloads\HackRore\AI
+_Medicinal_Plant_Detection\test_live_api.py
+", line 12, in <module>
+    print("\U0001f30d LIVE PRODUCTION API 
+STRESS TEST")
+    
+~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Dell\AppData\Local\Python\
+pythoncore-3.14-64\Lib\encodings\cp1252.py"
+, line 19, in encode
+    return codecs.charmap_encode(input,self
+.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't 
+encode character '\U0001f30d' in position 
+0: character maps to <undefined>
