@@ -41,7 +41,6 @@ export default function RootLayout({
             <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased selection:bg-primary-500/30 selection:text-primary-900">
                 <Providers>
                     <Navbar />
-                       <DemoBanner />
     <main>
         <ErrorBoundary>
           {children}

@@ -11,6 +11,7 @@ import { Skeleton } from "@/components/ui/Skeleton"
 import { Progress } from "@/components/ui/progress"
 import { Camera, Upload, History, Sun, Moon, Zap, AlertCircle, ThumbsUp, ThumbsDown, Copy, Leaf } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
+import DemoBanner from "@/components/layout/DemoBanner"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
@@ -227,6 +228,7 @@ export default function PredictPage() {
 
   return (
     <main className="container mx-auto p-6 min-h-screen space-y-8 max-w-6xl">
+      <DemoBanner />
       {/* Header */}
       <header className="text-center py-12">
         <h1 className="text-6xl font-black bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent mb-6 drop-shadow-lg">

@@ -10,7 +10,7 @@ export const FeaturesSection = () => {
         { number: 'Dual', label: 'Attention AI Architecture', icon: '🧠' },
         { number: 'Grad-CAM', label: 'Explainable AI', icon: '🔬' },
         { number: '100%', label: 'Toxicity Detection', icon: '⚠️' },
-        { number: '5000+', label: 'Ayurvedic Facts', icon: '📚' },
+        { number: '86', label: 'Ayurvedic Facts', icon: '📚' },
     ];
 
     return (

@@ -38,7 +38,7 @@ export const Footer = () => {
                         <ul className="space-y-4 text-sm text-gray-400">
                             <li><Link href="/predict" className="hover:text-primary-400 transition-colors">Neural Scanner</Link></li>
                             <li><Link href="/plants" className="hover:text-primary-400 transition-colors">Plant Database</Link></li>
-                            <li><Link href="/api-docs" className="hover:text-primary-400 transition-colors">API Reference</Link></li>
+                            <li><a href="https://plantoai-backend.onrender.com/docs" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">API Reference</a></li>
                         </ul>
                     </div>
 
@@ -47,7 +47,7 @@ export const Footer = () => {
                         <ul className="space-y-4 text-sm text-gray-400">
                             <li><Link href="/about" className="hover:text-primary-400 transition-colors">Documentation</Link></li>
                             <li><Link href="/about" className="hover:text-primary-400 transition-colors">Research Paper</Link></li>
-                            <li><Link href="#" className="hover:text-primary-400 transition-colors">Dataset</Link></li>
+                            <li><a href="https://www.kaggle.com/datasets/rizkikecek/dataset-herbal-leaves" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Dataset</a></li>
                         </ul>
                     </div>
 
