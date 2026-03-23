@@ -11,7 +11,7 @@ export const StatsSection = () => {
             <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
                     {[
-                        { value: "40+", label: "Medicinal Species" },
+                        { value: "80", label: "Medicinal Species" },
                         { value: "92.5%", label: "Accuracy" },
                         { value: "< 2s", label: "Inference Time" },
                         { value: "24/7", label: "Availability" }

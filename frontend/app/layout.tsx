@@ -3,7 +3,6 @@ import { Inter, Outfit } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
-import DemoBanner from '@/components/layout/DemoBanner'
 import { Providers } from './providers'
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
