@@ -33,37 +33,78 @@ async def seed_database(db: Session = Depends(get_db)):
         with open(class_names_path, 'r') as f:
             classes = json.load(f)
 
-        # 2. Define core data for the top 6 species
         core_plants = {
-            "Azadirachta_indica": {
-                "common_name": "Neem",
-                "common_name_hi": "नीम",
-                "description": "Powerful antimicrobial and skin-healing tree native to India."
+            "Neem": {
+                "species": "Neem",
+                "hi": "नीम",
+                "desc": "Powerful antimicrobial and skin-healing tree native to India.",
+                "props": [("Skin diseases", "Leaf paste application", "2-3 times daily", "Safe externally; avoid high oral doses")]
             },
-            "Ocimum_sanctum": {
-                "common_name": "Holy Basil (Tulsi)",
-                "common_name_hi": "तुलसी",
-                "description": "Sacred adaptogen used for respiratory health and stress relief."
+            "Tulsi": {
+                "species": "Tulsi",
+                "hi": "तুলसी",
+                "desc": "Sacred adaptogen used for respiratory health and stress relief.",
+                "props": [("Cold & Cough", "Boil leaves in water (Tea)", "2 cups daily", "Avoid during pregnancy")]
             },
-            "Aloe_barbadensis": {
-                "common_name": "Aloe Vera",
-                "common_name_hi": "घृतकुमारी",
-                "description": "Succulent with thick gel used for burns, skin care, and digestion."
+            "Aloevera": {
+                "species": "Aloevera",
+                "hi": "घृतकुमारी",
+                "desc": "Succulent with thick gel used for burns, skin care, and digestion.",
+                "props": [("Burns/Skin", "Direct gel application", "As needed", "Avoid yellow latex layer")]
             },
-            "Curcuma_longa": {
-                "common_name": "Turmeric",
-                "common_name_hi": "हल्दी",
-                "description": "Bright orange rhizome with potent anti-inflammatory curcumin."
+            "Turmeric": {
+                "species": "Turmeric",
+                "hi": "हल्दी",
+                "desc": "Bright orange rhizome with potent anti-inflammatory curcumin.",
+                "props": [("Inflammation", "Mix with milk or honey", "1 tsp daily", "High doses may interfere with blood thinners")]
             },
-            "Withania_somnifera": {
-                "common_name": "Ashwagandha",
-                "common_name_hi": "अश्वगंधा",
-                "description": "Renowned adaptogen used for strength, vitality, and immunity."
+            "Ashwagandha": {
+                "species": "Ashwagandha",
+                "hi": "अश्वगंधा",
+                "desc": "Renowned adaptogen used for strength, vitality, and immunity.",
+                "props": [("Stress/Anxiety", "Root powder with milk", "1-2 tsp daily", "Consult doctor if hyperthyroid")]
             },
-            "Mentha_arvensis": {
-                "common_name": "Mint",
-                "common_name_hi": "पुदीना",
-                "description": "Cooling herb used for digestion, oral health, and headaches."
+            "Mint": {
+                "species": "Mint",
+                "hi": "पुदीना",
+                "desc": "Cooling herb used for digestion, oral health, and headaches.",
+                "props": [("Digestion", "Fresh leaves or juice", "As needed", "Generally safe")]
+            },
+            "Amla": {
+                "species": "Amla",
+                "hi": "आंवला",
+                "desc": "Richest source of Vitamin C; improves immunity and hair health.",
+                "props": [("Immunity", "Raw fruit or juice", "10-20ml daily", "Safe for most")]
+            },
+            "Amruthaballi": {
+                "species": "Amruthaballi",
+                "hi": "गिलोय",
+                "desc": "Versatile herb (Giloy) used for chronic fevers and immunity.",
+                "props": [("Chronic Fever", "Boiled stem extract", "30ml daily", "Safe; monitors blood sugar if diabetic")]
+            },
+            "Ginger": {
+                "species": "Ginger",
+                "hi": "अदरक",
+                "desc": "Warming rhizome used for nausea and digestive warmth.",
+                "props": [("Nausea", "Fresh juice with honey", "1-2 tsp", "Avoid in excessive heat")]
+            },
+            "Betel": {
+                "species": "Betel",
+                "hi": "पान",
+                "desc": "Heart-shaped leaf used as digestive stimulant and antiseptic.",
+                "props": [("Digestion", "Chew fresh leaves", "After meals", "Avoid with tobacco")]
+            },
+            "Doddpathre": {
+                 "species": "Doddpathre",
+                 "hi": "अजवाइन पत्र",
+                 "desc": "Indian Borage; excellent for infant cough and digestion.",
+                 "props": [("Infant Cough", "Warm juice with honey", "5ml", "Very safe for children")]
+            },
+            "Drumstick": {
+                 "species": "Drumstick",
+                 "hi": "सहजन",
+                 "desc": "Moringa; superfood with high mineral content.",
+                 "props": [("Nutritional boost", "Cooked leaves or pods", "Regular diet", "None")]
             }
         }
 
@@ -74,16 +115,36 @@ async def seed_database(db: Session = Depends(get_db)):
             if existing:
                 continue
 
-            core_info = core_plants.get(cls_name, {})
+            # Find matching core data by species name or common name
+            core_info = {}
+            for k, v in core_plants.items():
+                if v["species"] == cls_name or k == cls_name:
+                    core_info = v
+                    break
             
             plant = Plant(
                 model_key=cls_name.lower().replace('_', '-'),
                 species_name=cls_name,
                 common_name_en=core_info.get("common_name", cls_name.replace('_', ' ').title()),
-                common_name_hi=core_info.get("common_name_hi", ""),
-                description=core_info.get("description", f"Medicinal species: {cls_name.replace('_', ' ')}. Detailed botanical profile coming soon.")
+                common_name_hi=core_info.get("hi", ""),
+                description=core_info.get("desc", f"Medicinal species: {cls_name.replace('_', ' ')}. Detailed botanical profile coming soon.")
             )
             db.add(plant)
+            db.flush() # Get plant ID
+
+            # Add properties if available
+            if "props" in core_info:
+                for ailment, usage, dose, caution in core_info["props"]:
+                    prop = MedicinalProperty(
+                        plant_id=plant.id,
+                        ailment=ailment,
+                        usage_description=usage,
+                        dosage=dose,
+                        precautions=caution,
+                        source="Traditional Ayurvedic Knowledge"
+                    )
+                    db.add(prop)
+            
             seeded_count += 1
             
         db.commit()

@@ -10,6 +10,7 @@ import io
 import base64
 from typing import Dict, Tuple
 import logging
+from app.services.ml_service import get_gradcam_base64
 
 logger = logging.getLogger(__name__)
 
@@ -45,30 +46,19 @@ class ExplainabilityService:
             Dictionary with Grad-CAM visualization data
         """
         try:
-            # Open and process image
-            image = Image.open(io.BytesIO(image_bytes))
-            if image.mode != 'RGB':
-                image = image.convert('RGB')
-            
-            # Resize to model input size
-            image_resized = image.resize((224, 224))
-            img_array = np.array(image_resized, dtype=np.float32)
-            
-            # Generate mock heatmap (replace with actual Grad-CAM when models are loaded)
-            # This creates a realistic-looking attention map
-            heatmap = self._generate_mock_heatmap(img_array)
-            
-            # Create overlay
-            overlay_image = self._create_overlay(img_array, heatmap)
-            
-            # Convert to base64 for API response
-            overlay_base64 = self._image_to_base64(overlay_image)
-            heatmap_base64 = self._image_to_base64(heatmap)
-            
+            # Check if prediction result already contains real Grad-CAM from ML Service
+            if prediction_result.get("gradcam_base64"):
+                return {
+                    "gradcam_overlay": prediction_result["gradcam_base64"],
+                    "heatmap": None,  # Heatmap is already superimposed in the base64
+                    "explanation": "Authentic Neural Insight: This visualization shows the exact botanical features (veins, margins) that the model prioritized for identification.",
+                    "method": "Grad-CAM (Authentic)"
+                }
+
+            # Fallback to generating it if needed (but ML service should have handled it)
             return {
-                "gradcam_overlay": overlay_base64,
-                "heatmap": heatmap_base64,
-                "explanation": "The highlighted regions show areas the model focused on to make its prediction. Brighter areas indicate higher importance.",
+                "gradcam_overlay": None,
+                "explanation": "Grad-CAM visualization currently unavailable for this model type.",
                 "method": "Grad-CAM"
             }
             

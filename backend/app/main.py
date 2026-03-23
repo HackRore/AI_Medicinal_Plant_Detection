@@ -14,6 +14,7 @@ import time
 from app.config import settings
 from app.database import engine, Base
 from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback, quality_check
+from app.models.cache import GeminiCache # Register for metadata
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.services.ml_service import get_ml_service
 

@@ -5,8 +5,11 @@ Google Gemini Vision API integration for natural language plant descriptions
 
 import os
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 from app.config import settings
+import hashlib
+from app.database import SessionLocal
+from app.models.cache import GeminiCache
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +64,21 @@ class GeminiService:
             }
         
         try:
+            # --- CACHE CHECK: Identify by image hash ---
+            image_hash = hashlib.sha256(image_bytes).hexdigest()
+            db = SessionLocal()
+            try:
+                cached = db.query(GeminiCache).filter(GeminiCache.image_hash == image_hash).first()
+                if cached:
+                    logger.info(f"🚀 Cache Hit: Gemini result for hash {image_hash[:10]}...")
+                    return {
+                        **cached.response_json,
+                        "source": "Gemini AI (Cached)",
+                        "status": "success"
+                    }
+            finally:
+                db.close()
+
             # Prepare image for Gemini
             image_parts = [
                 {
@@ -85,12 +103,30 @@ class GeminiService:
                 
             response = self.model.generate_content([prompt, image_parts[0]])
             
-            return {
+            result = {
                 "identification_details": response.text,
                 "language": language,
                 "source": "Gemini AI Expert",
                 "status": "success"
             }
+
+            # --- STORE IN CACHE ---
+            db = SessionLocal()
+            try:
+                new_cache = GeminiCache(
+                    image_hash=image_hash,
+                    response_json=result
+                )
+                db.add(new_cache)
+                db.commit()
+                logger.info(f"💾 Cache Store: Saved Gemini result for hash {image_hash[:10]}...")
+            except Exception as cache_err:
+                logger.warning(f"Failed to store Gemini cache: {cache_err}")
+                db.rollback()
+            finally:
+                db.close()
+
+            return result
             
         except Exception as e:
             logger.error(f"Error in Gemini identification: {e}")
