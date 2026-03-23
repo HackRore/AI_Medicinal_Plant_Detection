@@ -16,9 +16,8 @@ try:
     # Check for 40+ (OLD)
     has_40plus = "40+" in text or "40 +" in text
     
-    # Check for 80 (NEW)
-    # Be careful with 80 since it can be in CSS/JS hashes, look for >80< or 80 species
-    has_80 = "80" in text
+    # Check for 80 (FINAL VALUE)
+    has_80_final = ">80<" in text or "80 Medicinal Species" in text
     
     # Check for /api-docs (OLD)
     has_old_docs = "/api-docs" in text
@@ -29,7 +28,7 @@ try:
     print(f"Still shows 226   : {has_226} — {'FAIL' if has_226 else 'PASS'}")
     print(f"Still shows 5000+ : {has_5000} — {'FAIL' if has_5000 else 'PASS'}")
     print(f"Still shows 40+   : {has_40plus} — {'FAIL' if has_40plus else 'PASS'}")
-    print(f"Shows 80 species  : {has_80} — {'PASS' if has_80 else 'FAIL'}")
+    print(f"Shows 80 Species  : {has_80_final} — {'PASS' if has_80_final else 'FAIL'}")
     print(f"Broken /api-docs : {has_old_docs} — {'FAIL' if has_old_docs else 'PASS'}")
     print(f"Shows /docs       : {has_new_docs} — {'PASS' if has_new_docs else 'FAIL'}")
     
