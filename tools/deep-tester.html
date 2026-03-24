@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlantoAI — Model Prediction Deep Tester</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;padding:2rem}
+h1{font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:.25rem}
+.sub{font-size:.85rem;color:#64748b;margin-bottom:2rem}
+.card{background:#1a1f2e;border:1px solid #2d3748;border-radius:12px;padding:1.5rem;margin-bottom:1.5rem}
+.card-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#64748b;margin-bottom:1rem}
+.backend-row{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+input[type=text]{flex:1;min-width:200px;background:#0f1117;border:1px solid #2d3748;border-radius:8px;padding:.6rem 1rem;color:#e2e8f0;font-size:.9rem;outline:none}
+input[type=text]:focus{border-color:#3b82f6}
+button{background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:.6rem 1.2rem;font-size:.875rem;font-weight:500;cursor:pointer;transition:background .15s}
+button:hover{background:#2563eb}
+button:disabled{background:#374151;color:#6b7280;cursor:not-allowed}
+.btn-ghost{background:transparent;border:1px solid #2d3748;color:#94a3b8}
+.btn-ghost:hover{background:#1e293b;border-color:#475569}
+.btn-danger{background:#dc2626}
+.btn-danger:hover{background:#b91c1c}
+.status-dot{width:8px;height:8px;border-radius:50%;background:#374151;flex-shrink:0}
+.status-dot.green{background:#22c55e;box-shadow:0 0 6px #22c55e}
+.status-dot.red{background:#ef4444;box-shadow:0 0 6px #ef4444}
+.status-dot.yellow{background:#f59e0b;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.drop-zone{border:2px dashed #2d3748;border-radius:12px;padding:3rem;text-align:center;cursor:pointer;transition:all .2s;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:#3b82f6;background:rgba(59,130,246,.05)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:2.5rem;margin-bottom:.75rem}
+.drop-text{font-size:.9rem;color:#94a3b8}
+.drop-hint{font-size:.75rem;color:#4b5563;margin-top:.4rem}
+.thumb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:.75rem;margin-top:1rem}
+.thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#0f1117;border:1px solid #2d3748}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .remove{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.7);border:none;color:#fff;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.thumb .idx{position:absolute;bottom:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;padding:2px 6px;border-radius:4px}
+.run-bar{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;margin-top:1rem}
+.progress-bar{height:4px;background:#1e293b;border-radius:2px;overflow:hidden;margin-top:.5rem}
+.progress-fill{height:100%;background:linear-gradient(90deg,#3b82f6,#8b5cf6);border-radius:2px;transition:width .3s}
+.results-list{display:flex;flex-direction:column;gap:1rem}
+.result-item{background:#0f1117;border:1px solid #2d3748;border-radius:10px;overflow:hidden}
+.result-header{padding:.875rem 1rem;display:flex;align-items:center;gap:.75rem;border-bottom:1px solid #2d3748;background:#141821}
+.result-thumb{width:52px;height:52px;border-radius:6px;object-fit:cover;flex-shrink:0}
+.result-meta{flex:1}
+.result-name{font-size:1rem;font-weight:600;color:#fff}
+.result-sci{font-size:.8rem;color:#94a3b8;margin-top:1px}
+.conf-badge{padding:.3rem .75rem;border-radius:6px;font-size:.8rem;font-weight:600;flex-shrink:0}
+.conf-high{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}
+.conf-med{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.conf-low{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.result-body{padding:1rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.75rem}
+.field{background:#1a1f2e;border-radius:8px;padding:.75rem}
+.field-label{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:#4b5563;margin-bottom:.4rem}
+.field-val{font-size:.85rem;color:#e2e8f0;line-height:1.5}
+.field-val.missing{color:#ef4444;font-style:italic}
+.field-val.present{color:#22c55e}
+.toxic-badge{display:inline-block;padding:.2rem .6rem;border-radius:4px;font-size:.75rem;font-weight:600}
+.toxic-yes{background:rgba(239,68,68,.15);color:#ef4444}
+.toxic-no{background:rgba(34,197,94,.15);color:#22c55e}
+.raw-toggle{font-size:.75rem;color:#3b82f6;cursor:pointer;padding:.5rem 1rem;border-bottom:1px solid #2d3748;display:block;background:#141821}
+.raw-json{padding:1rem;font-family:monospace;font-size:.75rem;color:#94a3b8;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow-y:auto;background:#0a0d14}
+.latency-bar{height:3px;background:#1e293b;border-radius:2px;overflow:hidden;margin-top:.5rem}
+.latency-fill{height:100%;border-radius:2px}
+.alert{padding:.75rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:.75rem;border-left:3px solid}
+.alert.error{background:rgba(239,68,68,.08);border-color:#ef4444;color:#fca5a5}
+.alert.warn{background:rgba(245,158,11,.08);border-color:#f59e0b;color:#fcd34d}
+.alert.info{background:rgba(59,130,246,.08);border-color:#3b82f6;color:#93c5fd}
+.alert.success{background:rgba(34,197,94,.08);border-color:#22c55e;color:#86efac}
+.gap-section{margin-bottom:.75rem}
+.gap-row{display:flex;align-items:center;gap:.5rem;padding:.4rem 0;border-bottom:1px solid #1e293b;font-size:.825rem}
+.gap-row:last-child{border-bottom:none}
+.gap-icon{font-size:.85rem;flex-shrink:0}
+.gap-label{flex:1;color:#94a3b8}
+.gap-status{font-size:.75rem;font-weight:500}
+.gap-present{color:#22c55e}
+.gap-missing{color:#ef4444}
+.gap-partial{color:#f59e0b}
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:.75rem;margin-bottom:1rem}
+.sum-card{background:#1a1f2e;border-radius:8px;padding:.75rem;text-align:center}
+.sum-num{font-size:1.5rem;font-weight:700}
+.sum-label{font-size:.7rem;color:#4b5563;margin-top:.25rem}
+</style>
+</head>
+<body>
+
+<h1>🔬 PlantoAI — Live Model Deep Tester</h1>
+<p class="sub">Tests real API predictions, response fields, latency, confidence, and what the model is missing.</p>
+
+<div class="card">
+  <div class="card-title">Backend configuration</div>
+  <div class="backend-row">
+    <input type="text" id="backendUrl" value="https://plantoai-backend.onrender.com" placeholder="Backend URL">
+    <input type="text" id="predictPath" value="/api/v1/predict/" placeholder="Predict endpoint path" style="max-width:180px">
+    <button onclick="pingBackend()" id="pingBtn">Ping</button>
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText" style="font-size:.85rem;color:#64748b">Not tested</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="pingProgress" style="width:0"></div></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Upload leaf images (up to 5)</div>
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" accept="image/*" multiple onchange="handleFiles(this.files)">
+    <div class="drop-icon">🍃</div>
+    <div class="drop-text">Drop leaf images here or click to browse</div>
+    <div class="drop-hint">JPG, PNG, WEBP — any medicinal plant leaf</div>
+  </div>
+  <div class="thumb-grid" id="thumbGrid"></div>
+  <div class="run-bar">
+    <button onclick="runAllTests()" id="runBtn" disabled>Run Prediction Tests</button>
+    <button class="btn-ghost" onclick="clearAll()">Clear</button>
+    <span id="runStatus" style="font-size:.825rem;color:#64748b"></span>
+  </div>
+</div>
+
+<div id="resultsSection" style="display:none">
+  <div class="card">
+    <div class="card-title">Test summary</div>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div id="summaryAlerts"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Per-image prediction results</div>
+    <div class="results-list" id="resultsList"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Model response audit — what's present vs missing</div>
+    <div id="auditSection"></div>
+  </div>
+</div>
+
+<script>
+let images = [];
+let testResults = [];
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); handleFiles(e.dataTransfer.files); });
+
+function handleFiles(files) {
+  for (const f of files) {
+    if (images.length >= 5) break;
+    if (!f.type.startsWith('image/')) continue;
+    const url = URL.createObjectURL(f);
+    images.push({ file: f, url, name: f.name, size: f.size });
+  }
+  renderThumbs();
+  document.getElementById('runBtn').disabled = images.length === 0;
+}
+
+function renderThumbs() {
+  const grid = document.getElementById('thumbGrid');
+  grid.innerHTML = '';
+  images.forEach((img, i) => {
+    const d = document.createElement('div');
+    d.className = 'thumb';
+    d.innerHTML = `<img src="${img.url}"><button class="remove" onclick="removeImage(${i})">×</button><span class="idx">#${i+1}</span>`;
+    grid.appendChild(d);
+  });
+}
+
+function removeImage(i) {
+  images.splice(i, 1);
+  renderThumbs();
+  document.getElementById('runBtn').disabled = images.length === 0;
+}
+
+function clearAll() {
+  images = [];
+  testResults = [];
+  renderThumbs();
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('runStatus').textContent = '';
+}
+
+async function pingBackend() {
+  const btn = document.getElementById('pingBtn');
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  const bar = document.getElementById('pingProgress');
+  btn.disabled = true;
+  dot.className = 'status-dot yellow';
+  txt.textContent = 'Pinging (may take 30s if cold)...';
+  bar.style.width = '30%';
+
+  const baseUrl = document.getElementById('backendUrl').value.trim();
+  const start = Date.now();
+
+  const endpoints = ['/', '/api/v1/health', '/api/v1/plants/'];
+  let found = false;
+  for (const ep of endpoints) {
+    try {
+      bar.style.width = (30 + endpoints.indexOf(ep) * 15) + '%';
+      const r = await fetch(baseUrl + ep, { signal: AbortSignal.timeout(40000) });
+      const latency = Date.now() - start;
+      dot.className = 'status-dot green';
+      txt.textContent = `Online ✓ — ${latency}ms — ${ep} → HTTP ${r.status}`;
+      bar.style.width = '100%';
+      found = true;
+      break;
+    } catch(e) {}
+  }
+  if (!found) {
+    dot.className = 'status-dot red';
+    txt.textContent = `Unreachable after ${Date.now()-start}ms — check URL or backend is down`;
+    bar.style.width = '0';
+  }
+  btn.disabled = false;
+}
+
+async function runAllTests() {
+  const btn = document.getElementById('runBtn');
+  const status = document.getElementById('runStatus');
+  btn.disabled = true;
+  testResults = [];
+
+  const baseUrl = document.getElementById('backendUrl').value.trim();
+  const path = document.getElementById('predictPath').value.trim();
+
+  for (let i = 0; i < images.length; i++) {
+    status.textContent = `Testing image ${i+1} of ${images.length}...`;
+    const result = await testSingleImage(images[i], baseUrl, path, i);
+    testResults.push(result);
+  }
+
+  status.textContent = `Done — ${testResults.length} image(s) tested`;
+  btn.disabled = false;
+  renderResults();
+}
+
+async function testSingleImage(img, baseUrl, path, idx) {
+  const result = {
+    idx, name: img.name, url: img.url,
+    status: null, httpCode: null, latency: null,
+    raw: null, parsed: null, error: null,
+    fields: {}
+  };
+
+  const form = new FormData();
+  form.append('file', img.file);
+
+  const start = Date.now();
+  try {
+    const r = await fetch(baseUrl + path, {
+      method: 'POST',
+      body: form,
+      signal: AbortSignal.timeout(60000)
+    });
+    result.latency = Date.now() - start;
+    result.httpCode = r.status;
+    const text = await r.text();
+    result.raw = text;
+    try {
+      result.parsed = JSON.parse(text);
+      result.status = r.ok ? 'success' : 'api_error';
+    } catch {
+      result.status = 'parse_error';
+    }
+  } catch(e) {
+    result.latency = Date.now() - start;
+    result.status = 'network_error';
+    result.error = e.message;
+  }
+
+  if (result.parsed) analyzeFields(result);
+  return result;
+}
+
+function analyzeFields(result) {
+  const p = result.parsed;
+  const f = result.fields;
+  const flatten = obj => {
+    const keys = [];
+    const recurse = (o, prefix='') => {
+      for (const k in o) {
+        keys.push((prefix ? prefix + '.' : '') + k);
+        if (o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) recurse(o[k], (prefix?prefix+'.':'')+k);
+      }
+    };
+    recurse(obj);
+    return keys;
+  };
+  const keys = flatten(p).map(k => k.toLowerCase());
+  const get = (...paths) => paths.some(p => keys.some(k => k.includes(p)));
+
+  f.plantName = get('plant','class','label','species','name','prediction');
+  f.confidence = get('confidence','conf','probability','score','prob','percent');
+  f.scientificName = get('scientific','latin','genus','species');
+  f.commonName = get('common','vernacular');
+  f.toxicity = get('toxic','poison','harmful','danger','safety');
+  f.ayurveda = get('ayurved','medicinal','use','benefit','treatment','herb');
+  f.gradcam = get('gradcam','grad_cam','heatmap','cam','explainab','visualization');
+  f.top5 = get('top','top5','alternatives','candidates','similar');
+  f.family = get('family','genus','taxonomy','botanical');
+  f.imageQuality = get('quality','blur','valid','usable','gating');
+  f.description = get('description','desc','about','overview','detail');
+  f.region = get('region','habitat','origin','native','location');
+  f.preparation = get('preparation','dosage','dose','usage','recipe','remedy');
+  f.allTopKeys = Object.keys(p);
+}
+
+function getNestedVal(obj, ...paths) {
+  const str = JSON.stringify(obj).toLowerCase();
+  for (const path of paths) {
+    const re = new RegExp(`"${path}"\\s*:\\s*"?([^",{}\\[\\]]+)"?`, 'i');
+    const m = str.match(re);
+    if (m) return m[1].trim();
+  }
+  return null;
+}
+
+function renderResults() {
+  document.getElementById('resultsSection').style.display = 'block';
+
+  const successCount = testResults.filter(r => r.status === 'success').length;
+  const errCount = testResults.filter(r => r.status !== 'success').length;
+  const avgLatency = testResults.filter(r => r.latency).reduce((a,b) => a + b.latency, 0) / testResults.length;
+  const allFields = testResults.filter(r => r.fields).map(r => r.fields);
+  const hasConf = allFields.some(f => f.confidence);
+  const hasGrad = allFields.some(f => f.gradcam);
+  const hasTox = allFields.some(f => f.toxicity);
+
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="sum-card"><div class="sum-num" style="color:${successCount>0?'#22c55e':'#ef4444'}">${successCount}/${testResults.length}</div><div class="sum-label">Successful</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:${avgLatency<3000?'#22c55e':avgLatency<10000?'#f59e0b':'#ef4444'}">${(avgLatency/1000).toFixed(1)}s</div><div class="sum-label">Avg latency</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:${hasConf?'#22c55e':'#ef4444'}">${hasConf?'YES':'NO'}</div><div class="sum-label">Confidence %</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:${hasGrad?'#22c55e':'#ef4444'}">${hasGrad?'YES':'NO'}</div><div class="sum-label">Grad-CAM</div></div>
+    <div class="sum-card"><div class="sum-num" style="color:${hasTox?'#22c55e':'#ef4444'}">${hasTox?'YES':'NO'}</div><div class="sum-label">Toxicity</div></div>
+  `;
+
+  const alerts = [];
+  if (errCount > 0) alerts.push(`<div class="alert error">${errCount} image(s) failed to get a prediction. Check backend status and endpoint path.</div>`);
+  if (!hasConf) alerts.push(`<div class="alert warn">No confidence score in API response — users can't judge prediction reliability.</div>`);
+  if (!hasGrad) alerts.push(`<div class="alert warn">Grad-CAM data absent from response — explainability feature is NOT wired to frontend.</div>`);
+  if (avgLatency > 5000) alerts.push(`<div class="alert warn">Average latency is ${(avgLatency/1000).toFixed(1)}s — Render cold-start likely. Add warm-up strategy.</div>`);
+  if (successCount > 0 && !hasConf && !hasGrad) alerts.push(`<div class="alert info">Core prediction works but response is missing most advertised features. See audit below.</div>`);
+  if (successCount > 0) alerts.push(`<div class="alert success">Backend is reachable and returning predictions ✓</div>`);
+  document.getElementById('summaryAlerts').innerHTML = alerts.join('');
+
+  const list = document.getElementById('resultsList');
+  list.innerHTML = '';
+  testResults.forEach((r, i) => {
+    const item = document.createElement('div');
+    item.className = 'result-item';
+
+    if (r.status === 'network_error' || r.status === 'parse_error') {
+      item.innerHTML = `
+        <div class="result-header">
+          <img class="result-thumb" src="${r.url}">
+          <div class="result-meta"><div class="result-name">Image #${i+1} — ${r.name}</div><div class="result-sci">${r.status === 'network_error' ? 'Network error — backend unreachable' : 'Response not valid JSON'}</div></div>
+          <span class="conf-badge conf-low">FAILED</span>
+        </div>
+        <div style="padding:1rem"><div class="alert error">${r.error || r.raw || 'Unknown error'}</div></div>`;
+      list.appendChild(item);
+      return;
+    }
+
+    const p = r.parsed || {};
+    const plantName = getNestedVal(p,'plant','class','label','prediction','name','species','result') || 'Unknown';
+    const sciName = getNestedVal(p,'scientific_name','latin_name','scientific','genus') || null;
+    const confRaw = getNestedVal(p,'confidence','probability','score','conf') || null;
+    const confNum = confRaw ? parseFloat(confRaw) : null;
+    const confPct = confNum !== null ? (confNum <= 1 ? (confNum*100).toFixed(1)+'%' : confNum.toFixed(1)+'%') : null;
+    const confClass = confNum !== null ? (confNum > (confNum<=1?.8:80) ? 'conf-high' : confNum > (confNum<=1?.5:50) ? 'conf-med' : 'conf-low') : 'conf-med';
+    const toxicVal = getNestedVal(p,'toxic','is_toxic','poisonous','toxicity','danger');
+    const latencyColor = r.latency < 2000 ? '#22c55e' : r.latency < 5000 ? '#f59e0b' : '#ef4444';
+    const latencyPct = Math.min(100, (r.latency / 30000) * 100);
+
+    const allKeys = Object.keys(p);
+
+    item.innerHTML = `
+      <div class="result-header">
+        <img class="result-thumb" src="${r.url}">
+        <div class="result-meta">
+          <div class="result-name">#${i+1} — ${plantName}</div>
+          <div class="result-sci">${sciName || 'Scientific name not in response'} &nbsp;·&nbsp; HTTP ${r.httpCode} &nbsp;·&nbsp; ${r.latency}ms</div>
+          <div class="latency-bar"><div class="latency-fill" style="width:${latencyPct}%;background:${latencyColor}"></div></div>
+        </div>
+        <span class="conf-badge ${confClass}">${confPct ? confPct : r.fields?.confidence ? 'Conf in response' : 'No conf %'}</span>
+      </div>
+      <div class="result-body">
+        <div class="field"><div class="field-label">Response keys</div><div class="field-val" style="font-size:.75rem;color:#94a3b8">${allKeys.length > 0 ? allKeys.join(', ') : 'none'}</div></div>
+        <div class="field"><div class="field-label">Confidence</div><div class="field-val ${r.fields?.confidence?'present':'missing'}">${confPct || 'MISSING'}</div></div>
+        <div class="field"><div class="field-label">Toxicity flag</div><div class="field-val ${r.fields?.toxicity?'present':'missing'}">${toxicVal || (r.fields?.toxicity ? 'Present' : 'MISSING')}</div></div>
+        <div class="field"><div class="field-label">Grad-CAM</div><div class="field-val ${r.fields?.gradcam?'present':'missing'}">${r.fields?.gradcam ? 'Present in response' : 'MISSING'}</div></div>
+        <div class="field"><div class="field-label">Top-5 alternatives</div><div class="field-val ${r.fields?.top5?'present':'missing'}">${r.fields?.top5 ? 'Present' : 'MISSING'}</div></div>
+        <div class="field"><div class="field-label">Ayurvedic info</div><div class="field-val ${r.fields?.ayurveda?'present':'missing'}">${r.fields?.ayurveda ? 'Present' : 'MISSING'}</div></div>
+        <div class="field"><div class="field-label">Scientific name</div><div class="field-val ${r.fields?.scientificName?'present':'missing'}">${sciName || 'MISSING'}</div></div>
+        <div class="field"><div class="field-label">Image quality gate</div><div class="field-val ${r.fields?.imageQuality?'present':'missing'}">${r.fields?.imageQuality ? 'Present' : 'MISSING'}</div></div>
+      </div>
+      <span class="raw-toggle" onclick="toggleRaw(${i})">▶ Show raw JSON response</span>
+      <div id="raw${i}" class="raw-json" style="display:none">${JSON.stringify(r.parsed, null, 2) || r.raw}</div>`;
+    list.appendChild(item);
+  });
+
+  renderAudit();
+}
+
+function toggleRaw(i) {
+  const el = document.getElementById('raw'+i);
+  const tog = el.previousElementSibling;
+  if (el.style.display === 'none') { el.style.display = 'block'; tog.textContent = '▼ Hide raw JSON'; }
+  else { el.style.display = 'none'; tog.textContent = '▶ Show raw JSON response'; }
+}
+
+function renderAudit() {
+  const successResults = testResults.filter(r => r.fields);
+  if (successResults.length === 0) {
+    document.getElementById('auditSection').innerHTML = '<div class="alert error">No successful predictions to audit.</div>';
+    return;
+  }
+  const check = key => successResults.some(r => r.fields[key]);
+
+  const items = [
+    {key:'plantName', icon:'🌿', label:'Plant name / class', crit:true},
+    {key:'confidence', icon:'📊', label:'Confidence score (%)', crit:true},
+    {key:'scientificName', icon:'🔬', label:'Scientific (Latin) name', crit:false},
+    {key:'commonName', icon:'💬', label:'Common name', crit:false},
+    {key:'toxicity', icon:'⚠️', label:'Toxicity / safety flag', crit:true},
+    {key:'ayurveda', icon:'📚', label:'Ayurvedic / medicinal use info', crit:true},
+    {key:'gradcam', icon:'🧠', label:'Grad-CAM heatmap data', crit:false},
+    {key:'top5', icon:'🏆', label:'Top-5 alternative predictions', crit:false},
+    {key:'family', icon:'🌱', label:'Plant family / taxonomy', crit:false},
+    {key:'imageQuality', icon:'🛡️', label:'Image quality gate / validation', crit:false},
+    {key:'description', icon:'📝', label:'Plant description / overview', crit:false},
+    {key:'region', icon:'🌍', label:'Native region / habitat', crit:false},
+    {key:'preparation', icon:'🍵', label:'Preparation / dosage guidance', crit:false},
+  ];
+
+  const html = items.map(item => {
+    const present = check(item.key);
+    return `<div class="gap-row">
+      <span class="gap-icon">${item.icon}</span>
+      <span class="gap-label">${item.label}${item.crit ? ' <span style="color:#ef4444;font-size:.7rem">critical</span>' : ''}</span>
+      <span class="gap-status ${present ? 'gap-present' : 'gap-missing'}">${present ? '✓ In response' : '✗ Missing'}</span>
+    </div>`;
+  }).join('');
+
+  const presentCount = items.filter(i => check(i.key)).length;
+  const critMissing = items.filter(i => i.crit && !check(i.key)).map(i => i.label);
+
+  document.getElementById('auditSection').innerHTML = `
+    <div class="alert ${presentCount >= 8 ? 'success' : presentCount >= 4 ? 'warn' : 'error'}">
+      Response completeness: ${presentCount}/${items.length} expected fields found.
+      ${critMissing.length ? ' Critical gaps: ' + critMissing.join(', ') + '.' : ''}
+    </div>
+    <div class="gap-section">${html}</div>`;
+}
+</script>
+</body>
+</html>
