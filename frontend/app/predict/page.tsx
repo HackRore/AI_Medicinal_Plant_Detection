@@ -388,85 +388,97 @@ export default function PredictPage() {
               )}
 
               {/* Main Prediction Result */}
-              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-2xl">
-                <CardHeader>
+              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-2xl overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 -rotate-45 translate-x-16 -translate-y-16" />
+                <CardHeader className="relative">
                   <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className="text-4xl font-black">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-tighter">
+                          AI Identification
+                        </span>
+                      </div>
+                      <CardTitle className="text-4xl font-black text-emerald-950">
                         {predictMutation.data.predicted_class.replace(/_/g, " ")}
                       </CardTitle>
-                      <CardDescription className="text-2xl font-bold text-emerald-700 mt-1">
-                        {(predictMutation.data.confidence * 100).toFixed(0)}% match
-                      </CardDescription>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-muted-foreground mb-1">Model</p>
-                      <div className="font-mono text-xs bg-muted px-3 py-1 rounded-full">
+                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Model Version</p>
+                      <div className="font-mono text-xs bg-emerald-100/50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
                         {predictMutation.data.model_version}
                       </div>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-0 pb-8">
-                  <div className="grid md:grid-cols-3 gap-4 mb-8">
-                    <Card className="col-span-1">
-                      <CardContent className="p-6">
-                        <h4 className="font-semibold text-muted-foreground mb-3 text-xs uppercase tracking-wide">Top Alternatives</h4>
-                        <ul className="space-y-1">
+                <CardContent className="relative space-y-8">
+                  {/* Confidence Highlight */}
+                  <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white shadow-inner">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-sm font-bold text-emerald-800">Neural Confidence</span>
+                      <span className="text-3xl font-black text-emerald-600">
+                        {(predictMutation.data.confidence * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                    <Progress value={predictMutation.data.confidence * 100} className="h-4 bg-emerald-100/50" />
+                  </div>
+
+                  {/* Grad-CAM Neural Insight */}
+                  {predictMutation.data.gradcam_base64 && (
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2">
+                            <Zap className="h-4 w-4 text-emerald-500 fill-emerald-500" />
+                            <h3 className="font-bold text-emerald-900">Neural Attention Map</h3>
+                        </div>
+                        <div className="relative group rounded-2xl overflow-hidden border-2 border-emerald-200/50 bg-black/5 p-1">
+                            <img
+                            src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`}
+                            alt="Grad-CAM Heatmap"
+                            className="w-full h-auto rounded-xl shadow-2xl transition-transform duration-700 group-hover:scale-105"
+                            />
+                            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[10px] font-medium leading-tight opacity-0 group-hover:opacity-100 transition-opacity">
+                                The heat gradient highlights regions (red) that the AI focused on to authenticate this species.
+                            </div>
+                        </div>
+                    </div>
+                  )}
+
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Card className="bg-white/40 border-none shadow-none">
+                      <CardContent className="p-4">
+                        <h4 className="font-bold text-emerald-800 mb-3 text-[10px] uppercase tracking-widest">Top Alternatives</h4>
+                        <ul className="space-y-2">
                           {predictMutation.data.top_predictions.slice(1, 4).map((pred, i) => (
-                            <li key={i} className="flex justify-between text-sm">
-                              <span>{pred.class_name.replace(/_/g, " ")}</span>
-                              <span className="font-mono font-semibold">
-                                {(pred.confidence * 100).toFixed(1)}%
+                            <li key={i} className="flex justify-between items-center text-xs">
+                              <span className="text-gray-600 font-medium">{pred.class_name.replace(/_/g, " ")}</span>
+                              <span className="font-mono font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
+                                {(pred.confidence * 100).toFixed(0)}%
                               </span>
                             </li>
                           ))}
                         </ul>
                       </CardContent>
                     </Card>
-                  </div>
 
-                  <div className="flex flex-col lg:flex-row gap-4">
-                    <Button className="flex-1 gap-2" onClick={() => {
-                      navigator.clipboard.writeText(predictMutation.data.predicted_class)
-                      toast.success("Plant name copied!")
-                    }}>
-                      <Copy className="h-4 w-4" />
-                      Copy Result
-                    </Button>
-                    {predictMutation.data.plant_details && (
-                      <Link href={`/plants/${predictMutation.data.plant_details.id}`} className="flex-1">
-  <Button variant="outline" className="w-full flex justify-center items-center gap-2">
-    <Leaf className="h-4 w-4" />
-    Medicinal Details
-  </Button>
-</Link>
-                    )}
+                    <div className="flex flex-col gap-3">
+                        <Button className="w-full gap-2 shadow-emerald-200 shadow-xl" onClick={() => {
+                        navigator.clipboard.writeText(predictMutation.data.predicted_class)
+                        toast.success("Plant name copied!")
+                        }}>
+                        <Copy className="h-4 w-4" />
+                        Copy Identification
+                        </Button>
+                        {predictMutation.data.plant_details && (
+                        <Link href={`/plants/${predictMutation.data.plant_details.id}`}>
+                            <Button variant="outline" className="w-full gap-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50">
+                                <Leaf className="h-4 w-4" />
+                                Medicinal Profile
+                            </Button>
+                        </Link>
+                        )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-
-              {/* WOW FEATURES */}
-              {predictMutation.data.gradcam_base64 && (
-                <div className="gradcam-section" style={{marginTop:'12px'}}>
-                  <h3 className="font-bold text-lg mb-2">AI Attention Map</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Red areas = regions AI focused on to identify this plant</p>
-                  <div style={{position:'relative', display:'inline-block'}}>
-                    <img
-                      src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`}
-                      alt="Grad-CAM Heatmap"
-                      style={{width:'300px', borderRadius:'12px', border: '1px solid #ddd'}}
-                    />
-                    <span style={{
-                      position:'absolute', bottom:'8px', left:'8px',
-                      background:'rgba(0,0,0,0.7)', color:'white',
-                      padding:'4px 10px', borderRadius:'20px', fontSize:'12px'
-                    }}>
-                      AI Focus Areas
-                    </span>
-                  </div>
-                </div>
-              )}
 
               <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
 

@@ -12,7 +12,7 @@ const navLinks = [
     { name: "Home", href: "/" },
     { name: "Neural Scanner", href: "/predict" },
     { name: "Botanical DB", href: "/plants" },
-    { name: "Architects", href: "/about" },
+    { name: "About", href: "/about" },
 ];
 
 export const Navbar = () => {
@@ -68,11 +68,6 @@ export const Navbar = () => {
                                     {link.name}
                                 </Link>
                             ))}
-                            <Link href="/predict">
-                                <Button size="sm" variant="primary">
-                                    Get Started
-                                </Button>
-                            </Link>
                         </div>
 
                         {/* Mobile Toggle */}

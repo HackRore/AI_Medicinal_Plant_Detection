@@ -19,20 +19,27 @@ export default function PlantsPage({
     const [plants, setPlants] = useState<Plant[]>([])
     const [loading, setLoading] = useState(true)
     const [search, setSearch] = useState(searchParams.q || '')
+    const [isTakingLong, setIsTakingLong] = useState(false)
 
     useEffect(() => {
         fetchPlants(search)
+        const timer = setTimeout(() => {
+            if (loading) setIsTakingLong(true)
+        }, 5000)
+        return () => clearTimeout(timer)
     }, [])
 
     const fetchPlants = async (query = '') => {
         setLoading(true)
+        setIsTakingLong(false)
         try {
             const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'https://plantoai-backend.onrender.com'
             const url = query
                 ? `${API_BASE}/api/v1/plants/search/by-name?q=${encodeURIComponent(query)}`
-                : `${API_BASE}/api/v1/plants?limit=50`
+                : `${API_BASE}/api/v1/plants?limit=80`
 
             const res = await fetch(url)
+            if (!res.ok) throw new Error('Backend unavailable')
             const data = await res.json()
 
             if (query) {
@@ -44,6 +51,7 @@ export default function PlantsPage({
             console.error('Failed to fetch plants:', error)
         } finally {
             setLoading(false)
+            setIsTakingLong(false)
         }
     }
 
@@ -76,6 +84,15 @@ export default function PlantsPage({
                     </button>
                 </form>
             </div>
+
+            {isTakingLong && (
+                <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3 animate-pulse">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" />
+                    <p className="text-blue-800 font-medium">
+                        Backend is waking up from its nap (Render cold start)... Hang tight!
+                    </p>
+                </div>
+            )}
 
             {loading ? (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -22,7 +22,7 @@ export const FeaturesSection = () => {
                         PlantoAI <span className="text-primary-600">Intelligence</span>
                     </h2>
                     <p className="text-gray-500 max-w-2xl mx-auto">
-                        Crowd Outstanding AI Medicinal Plant Detection Pipeline.
+                        State-of-the-Art AI Medicinal Plant Detection Pipeline.
                     </p>
                 </div>
 

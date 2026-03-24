@@ -45,9 +45,9 @@ export const Footer = () => {
                     <div>
                         <h4 className="font-bold text-white mb-6">Resources</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
-                            <li><Link href="/about" className="hover:text-primary-400 transition-colors">Documentation</Link></li>
-                            <li><Link href="/about" className="hover:text-primary-400 transition-colors">Research Paper</Link></li>
-                            <li><a href="https://www.kaggle.com/datasets/rizkikecek/dataset-herbal-leaves" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Dataset</a></li>
+                            <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Documentation</a></li>
+                            <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Technical Report</a></li>
+                            <li><a href="https://www.kaggle.com/datasets/rizkikecek/dataset-herbal-leaves" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Training Dataset</a></li>
                         </ul>
                     </div>
 
