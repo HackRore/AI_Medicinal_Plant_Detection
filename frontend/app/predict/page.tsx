@@ -6,10 +6,11 @@ import Link from "next/link"
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
 import confetti from "canvas-confetti"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { Skeleton } from "@/components/ui/Skeleton"
 import { Progress } from "@/components/ui/progress"
-import { Camera, Upload, History, Sun, Moon, Zap, AlertCircle, ThumbsUp, ThumbsDown, Copy, Leaf } from "lucide-react"
+import { Camera, Upload, History, Sun, Moon, Zap, AlertCircle, ThumbsUp, ThumbsDown, Copy, Leaf, ShieldAlert } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
@@ -68,9 +69,31 @@ export default function PredictPage() {
   const [localHistory, setLocalHistory] = useState<LocalHistoryItem[]>([])
   const [isLoadingMedicinal, setIsLoadingMedicinal] = useState(false)
   const [selectedPlantDetails, setSelectedPlantDetails] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState('identity')
+  const [activeModule, setActiveModule] = useState<'scanner' | 'symptoms'>('scanner')
+  const [symptoms, setSymptoms] = useState("")
+  const [symptomResults, setSymptomResults] = useState<any>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const queryClient = useQueryClient()
+
+  // Symptom Search mutation
+  const symptomMutation = useMutation({
+    mutationFn: async (symptoms: string) => {
+      const res = await fetch(`${API_BASE}/api/v1/symptom-search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symptoms })
+      })
+      if (!res.ok) throw new Error("Search failed")
+      return res.json()
+    },
+    onSuccess: (data) => {
+      setSymptomResults(data)
+      if (data.error) toast.error(data.error)
+      else toast.success("Remedies found!")
+    }
+  })
 
   const TOXIC_PLANTS = [
     "datura", "oleander", "belladonna", "aconite", "hemlock"
@@ -224,7 +247,6 @@ export default function PredictPage() {
       if (stream) stream.getTracks().forEach(track => track.stop())
     }
   }, [isCameraOpen])
-
   return (
     <main className="container mx-auto p-6 min-h-screen space-y-8 max-w-6xl">
       {/* Header */}
@@ -233,423 +255,158 @@ export default function PredictPage() {
           PlantoAI
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          AI-powered medicinal plant detection with toxicity warnings and detailed Ayurvedic information
+          AI-powered medicinal plant detection & Ayurvedic Physician
         </p>
+        
+        {/* MODULE SWITCHER */}
+        <div className="flex justify-center gap-4 mt-12">
+          <Button 
+            onClick={() => setActiveModule('scanner')}
+            variant={activeModule === 'scanner' ? 'default' : 'outline'}
+            className="rounded-2xl px-8 h-12 font-bold uppercase tracking-widest"
+          >
+            Neural Scanner
+          </Button>
+          <Button 
+            onClick={() => setActiveModule('symptoms')}
+            variant={activeModule === 'symptoms' ? 'default' : 'outline'}
+            className="rounded-2xl px-8 h-12 font-bold uppercase tracking-widest"
+          >
+            Symptom Search
+          </Button>
+        </div>
       </header>
 
-      <div className="grid lg:grid-cols-2 gap-12 items-start">
-        {/* Input Panel */}
-        <div className="space-y-6">
-          {/* Upload & Camera Controls */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <label className="group cursor-pointer block p-8 border-2 border-dashed border-muted rounded-3xl hover:border-primary transition-all text-center focus-within:ring-4 ring-primary/20">
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileSelect}
-                className="sr-only"
-                disabled={predictMutation.isPending}
-              />
-              <Upload className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary mb-4" />
-              <div className="space-y-1">
-                <p className="font-bold text-lg">Upload Images</p>
-                <p className="text-sm text-muted-foreground">JPG/PNG (max 3, 10MB each)</p>
-              </div>
-            </label>
-
-            <Button
-              onClick={() => setIsCameraOpen(true)}
-              size="lg"
-              variant="outline"
-              className="h-full p-8 gap-3"
-              disabled={predictMutation.isPending}
-            >
-              <Camera className="h-12 w-12" />
-              <div className="text-left">
-                <p className="font-bold text-lg">Live Camera</p>
-                <p className="text-sm text-muted-foreground">Instant scan</p>
-              </div>
-            </Button>
-          </div>
-
-          {/* Image Previews */}
-          {uploadedImages.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {uploadedImages.map((img, i) => (
-                <div key={i} className="group relative rounded-2xl overflow-hidden shadow-lg border">
-                  <Image
-                    src={img.preview}
-                    alt={`Preview ${i+1}`}
-                    width={300}
-                    height={200}
-                    className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <button
-                    onClick={() => setUploadedImages(prev => prev.filter((_, idx) => idx !== i))}
-                    className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
-                    title="Remove"
-                  >
-                    <AlertCircle className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Loading State */}
-          {predictMutation.isPending && (
-            <Card className="p-8 animate-pulse">
-              <div className="space-y-4">
-                <div className="h-64 bg-muted rounded-2xl" />
-                <div className="flex items-center gap-4">
-                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-6 bg-muted rounded-full w-3/4" />
-                    <div className="h-4 bg-muted rounded-full w-1/2" />
-                  </div>
-                </div>
-              </div>
-            </Card>
-          )}
-        </div>
-
-        {/* Results Panel */}
-        <div className="space-y-6">
-          {/* Error State */}
-          {predictMutation.isError && (
-            <Card className="border-destructive bg-destructive/5">
-              <CardContent className="p-8">
-                <div className="flex items-start gap-4">
-                  <AlertCircle className="h-10 w-10 text-destructive mt-1 flex-shrink-0" />
-                  <div>
-                    <h3 className="font-bold text-xl mb-2 text-destructive-foreground">
-                      Analysis Failed
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      {predictMutation.error?.message || 'Unknown error'}
-                    </p>
-                    <Button onClick={() => predictMutation.reset()} variant="outline" size="sm">
-                      Try Again
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Success State */}
-          {predictMutation.isSuccess && (
+      <AnimatePresence mode="wait">
+        {activeModule === 'scanner' ? (
+          <motion.div 
+            key="scanner-module"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="grid lg:grid-cols-2 gap-12 items-start"
+          >
+            {/* Input Panel */}
             <div className="space-y-6">
-              {/* Confidence Progress */}
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-2">
-                    <Progress value={predictMutation.data.confidence * 100} className="h-3" />
-                    <p className="text-sm text-center font-mono">
-                      {(predictMutation.data.confidence * 100).toFixed(1)}% confidence
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Demo Mode Banner */}
-              {predictMutation.data.demo_mode && (
-                <Card className="border-yellow-200 bg-yellow-50">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-3">
-                      <AlertCircle className="h-6 w-6 text-yellow-600" />
-                      <div>
-                        <h4 className="font-bold text-lg text-yellow-800">Demo Mode Active</h4>
-                        <p className="text-sm text-yellow-700">Full AI model training in progress. Production ready.</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Toxicity Warning */}
-              {TOXIC_PLANTS.some(toxic => 
-                predictMutation.data.predicted_class.toLowerCase().includes(toxic)
-              ) && (
-                <Card className="border-destructive bg-destructive/5">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <AlertCircle className="h-10 w-10 text-destructive mt-1 flex-shrink-0" />
-                      <div>
-                        <h3 className="font-bold text-xl text-destructive mb-2">⚠️ TOXIC PLANT DETECTED</h3>
-                        <p className="text-destructive-foreground">
-                          This plant is potentially poisonous. Do not ingest without expert medical supervision.
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Main Prediction Result */}
-              <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-2xl overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 -rotate-45 translate-x-16 -translate-y-16" />
-                <CardHeader className="relative">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-full uppercase tracking-tighter">
-                          AI Identification
-                        </span>
-                      </div>
-                      <CardTitle className="text-4xl font-black text-emerald-950">
-                        {predictMutation.data.predicted_class.replace(/_/g, " ")}
-                      </CardTitle>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">Model Version</p>
-                      <div className="font-mono text-xs bg-emerald-100/50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-200">
-                        {predictMutation.data.model_version}
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="relative space-y-8">
-                  {/* Confidence Highlight */}
-                  <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white shadow-inner">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-bold text-emerald-800">Neural Confidence</span>
-                      <span className="text-3xl font-black text-emerald-600">
-                        {(predictMutation.data.confidence * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <Progress value={predictMutation.data.confidence * 100} className="h-4 bg-emerald-100/50" />
-                  </div>
-
-                  {/* Grad-CAM Neural Insight */}
-                  {predictMutation.data.gradcam_base64 && (
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-emerald-500 fill-emerald-500" />
-                            <h3 className="font-bold text-emerald-900">Neural Attention Map</h3>
-                        </div>
-                        <div className="relative group rounded-2xl overflow-hidden border-2 border-emerald-200/50 bg-black/5 p-1">
-                            <img
-                            src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`}
-                            alt="Grad-CAM Heatmap"
-                            className="w-full h-auto rounded-xl shadow-2xl transition-transform duration-700 group-hover:scale-105"
-                            />
-                            <div className="absolute bottom-4 left-4 right-4 bg-black/60 backdrop-blur-md text-white px-4 py-2 rounded-xl text-[10px] font-medium leading-tight opacity-0 group-hover:opacity-100 transition-opacity">
-                                The heat gradient highlights regions (red) that the AI focused on to authenticate this species.
-                            </div>
-                        </div>
-                    </div>
-                  )}
-
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <Card className="bg-white/40 border-none shadow-none">
-                      <CardContent className="p-4">
-                        <h4 className="font-bold text-emerald-800 mb-3 text-[10px] uppercase tracking-widest">Top Alternatives</h4>
-                        <ul className="space-y-2">
-                          {predictMutation.data.top_predictions.slice(1, 4).map((pred, i) => (
-                            <li key={i} className="flex justify-between items-center text-xs">
-                              <span className="text-gray-600 font-medium">{pred.class_name.replace(/_/g, " ")}</span>
-                              <span className="font-mono font-black text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                                {(pred.confidence * 100).toFixed(0)}%
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-                    </Card>
-
-                    <div className="flex flex-col gap-3">
-                        <Button className="w-full gap-2 shadow-emerald-200 shadow-xl" onClick={() => {
-                        navigator.clipboard.writeText(predictMutation.data.predicted_class)
-                        toast.success("Plant name copied!")
-                        }}>
-                        <Copy className="h-4 w-4" />
-                        Copy Identification
-                        </Button>
-                        {predictMutation.data.plant_details && (
-                        <Link href={`/plants/${predictMutation.data.plant_details.id}`}>
-                            <Button variant="outline" className="w-full gap-2 border-emerald-200 text-emerald-800 hover:bg-emerald-50">
-                                <Leaf className="h-4 w-4" />
-                                Medicinal Profile
-                            </Button>
-                        </Link>
-                        )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
-
-              {predictMutation.data.medicinal_info && (
-                <div style={{
-                  background:'#f1f8e9', border:'1px solid #aed581',
-                  borderRadius:'10px', padding:'16px', marginTop:'12px'
-                }}>
-                  <h3 style={{margin:'0 0 12px', color:'#2e7d32'}} className="font-bold text-lg">
-                    Ayurvedic Information
-                  </h3>
-                  <p className="text-sm mb-2"><strong>Uses:</strong> {predictMutation.data.medicinal_info.uses}</p>
-                  <p className="text-sm mb-2"><strong>Preparation:</strong> {predictMutation.data.medicinal_info.prep}</p>
-                  <p className="text-sm"><strong>Caution:</strong> {predictMutation.data.medicinal_info.caution}</p>
-                </div>
-              )}
-
-              {(predictMutation.data.alternatives?.length ?? 0) > 0 && (
-                <div style={{marginTop:'12px'}}>
-                  <p style={{fontSize:'13px', color:'#666', marginBottom:'8px'}}>
-                    AI also considered:
-                  </p>
-                  {predictMutation.data.alternatives?.slice(1,4).map((alt: any, i: number) => (
-                    <div key={i} style={{
-                      display:'flex', justifyContent:'space-between',
-                      padding:'6px 10px', background:'#f5f5f5',
-                      borderRadius:'6px', marginBottom:'4px', fontSize:'13px'
-                    }}>
-                      <span>{alt.class_name.replace(/_/g, " ")}</span>
-                      <span style={{color:'#888'}}>{(alt.confidence * 100).toFixed(1)}%</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Medicinal Information */}
-              {isLoadingMedicinal ? (
-                <Card>
-                  <CardContent className="p-8">
-                    <div className="space-y-4">
-                      <Skeleton className="h-6 w-1/2" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-3/4" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : selectedPlantDetails && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Leaf className="h-6 w-6 text-emerald-600" />
-                      Medicinal Information
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="prose prose-sm max-w-none [&>div]:mb-4 [&>h5]:font-semibold [&>h5]:text-lg [&>h5]:mb-2 [&>h5]:border-b [&>h5]:pb-2">
-                      <p className="text-muted-foreground mb-6 leading-relaxed">
-                        {selectedPlantDetails.description?.substring(0, 250)}...
-                      </p>
-                      {selectedPlantDetails.medicinal_properties?.slice(0, 3).map((prop: any, i: number) => (
-                        <div key={i} className="bg-muted/50 p-4 rounded-xl border-l-4 border-emerald-400">
-                          <h5>{prop.ailment}</h5>
-                          <p className="text-sm text-muted-foreground mt-2">{prop.usage_description}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <Link href={`/plants/${selectedPlantDetails.id}`} className="w-full mt-6 block">
-  <Button variant="outline" className="w-full">
-    Full Medicinal Profile →
-  </Button>
-</Link>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Feedback */}
-              <Card className="border-orange-200 bg-orange-50">
-                <CardContent className="p-6">
-                  <h4 className="font-semibold text-orange-800 mb-4 flex items-center gap-2">
-                    Was this identification accurate?
-                  </h4>
-                  <div className="flex gap-3">
-                    <Button 
-                      variant="outline" 
-                      className="flex-1 gap-2 h-12"
-                      onClick={() => {
-                        localStorage.setItem(`feedback_${predictMutation.data.predicted_class}_${Date.now()}`, 'wrong')
-                        toast.success("Thank you for the feedback! This helps improve our AI.")
-                      }}
-                    >
-                      <ThumbsDown className="h-4 w-4" />
-                      Wrong result
-                    </Button>
-                    <Button 
-                      className="flex-1 gap-2 h-12 bg-emerald-500 hover:bg-emerald-600"
-                      onClick={() => toast.success("Great! Marked as correct.")}
-                    >
-                      <ThumbsUp className="h-4 w-4" />
-                      Correct
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="grid md:grid-cols-2 gap-6">
+                <label className="group cursor-pointer block p-8 border-2 border-dashed border-muted rounded-3xl hover:border-primary transition-all text-center">
+                  <input type="file" accept="image/*" multiple onChange={handleFileSelect} className="sr-only" disabled={predictMutation.isPending} />
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary mb-4" />
+                  <p className="font-bold text-lg">Upload Images</p>
+                </label>
+                <Button onClick={() => setIsCameraOpen(true)} size="lg" variant="outline" className="h-full p-8 gap-3" disabled={predictMutation.isPending}>
+                  <Camera className="h-12 w-12" />
+                  <p className="font-bold text-lg text-left">Live Camera</p>
+                </Button>
+              </div>
             </div>
-          )}
 
-          {/* History */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <History className="h-5 w-5" />
-                Detection History (Last 10)
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {localHistory.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">
-                  No detections yet. Upload your first plant image!
-                </p>
-              ) : (
-                <div className="space-y-3 max-h-80 overflow-y-auto">
-                  {localHistory.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-4 hover:bg-accent rounded-xl group transition-all cursor-pointer" onClick={() => {
-                      // Re-show this prediction
-                    }}>
-                      <div className="w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden shadow-md">
-                        <Image 
-                          src={item.thumb} 
-                          alt="Plant thumbnail"
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-lg truncate">
-                          {item.prediction.predicted_class.replace(/_/g, " ")}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(item.timestamp).toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="text-right flex flex-col items-end gap-1 min-w-[80px]">
-                        <div className="font-mono text-sm font-bold text-primary">
-                          {(item.prediction.confidence * 100).toFixed(0)}%
+            {/* Results Panel */}
+            <div className="space-y-6">
+              {predictMutation.isPending && <Card className="p-8 animate-pulse"><div className="h-64 bg-muted rounded-2xl" /></Card>}
+              {predictMutation.isSuccess && (
+                <div className="space-y-6">
+                  <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-green-50 shadow-2xl overflow-hidden p-6">
+                    <h3 className="text-4xl font-black text-emerald-950 mb-4">{predictMutation.data.predicted_class.replace(/_/g, " ")}</h3>
+                    <div className="space-y-4">
+                        <div className="flex justify-between items-center bg-white/60 p-4 rounded-2xl border">
+                            <span className="font-bold text-emerald-800">Confidence</span>
+                            <span className="text-2xl font-black text-emerald-600">{(predictMutation.data.confidence * 100).toFixed(1)}%</span>
                         </div>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          className="h-8 px-3 text-xs h-fit"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            navigator.clipboard.writeText(item.prediction.predicted_class)
-                            toast.success("Copied plant name!")
-                          }}
-                        >
-                          Copy
-                        </Button>
-                      </div>
+                        {predictMutation.data.gradcam_base64 && (
+                            <div className="rounded-2xl overflow-hidden border-2 border-emerald-200">
+                                <img src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`} alt="Heatmap" className="w-full" />
+                            </div>
+                        )}
+                        <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
                     </div>
-                  ))}
+                  </Card>
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="symptoms-module"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="max-w-4xl mx-auto space-y-12"
+          >
+            <Card className="p-8 space-y-6 shadow-2xl border-emerald-100">
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Patient Symptoms</label>
+                <textarea 
+                  value={symptoms}
+                  onChange={(e) => setSymptoms(e.target.value)}
+                  placeholder="Describe your symptoms e.g. fever, headache, joint pain..."
+                  className="w-full h-40 rounded-2xl bg-muted/30 border border-muted p-6 text-[var(--text)] focus:outline-none focus:border-emerald-500 transition-all text-lg"
+                />
+              </div>
+              <Button 
+                onClick={() => symptomMutation.mutate(symptoms)}
+                disabled={symptomMutation.isPending || symptoms.length < 3}
+                className="w-full h-20 rounded-2xl bg-emerald-600 text-white font-black uppercase tracking-widest text-lg shadow-xl hover:translate-y-[-2px] transition-all"
+              >
+                {symptomMutation.isPending ? "Consulting Ayurvedic AI..." : "Get Physician Consultation"}
+              </Button>
+            </Card>
 
-      {/* Camera Modal */}
+            {symptomMutation.isPending && (
+                <div className="flex flex-col items-center gap-4 py-12">
+                    <div className="w-12 h-12 rounded-full border-4 border-emerald-500 border-t-transparent animate-spin" />
+                    <p className="font-serif italic text-muted-foreground text-xl">Analyzing classical texts...</p>
+                </div>
+            )}
+
+            {symptomResults && !symptomResults.error && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-3 gap-6">
+                {symptomResults.recommendations?.map((rec: any, i: number) => (
+                  <Card key={i} className="p-6 border-emerald-100 hover:shadow-xl transition-all h-full flex flex-col">
+                    <div className="space-y-1 mb-6">
+                      <h4 className="text-2xl font-serif font-bold text-emerald-800">{rec.plant}</h4>
+                      <p className="text-[10px] italic text-muted-foreground">{rec.scientific_name}</p>
+                    </div>
+                    <div className="space-y-4 flex-1">
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">Why</p>
+                        <p className="text-sm text-gray-700 leading-relaxed">{rec.why}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest mb-1">Preparation</p>
+                        <p className="text-sm text-emerald-800 font-medium">{rec.preparation}</p>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4 pt-4 border-t border-emerald-50">
+                        <div>
+                          <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Dosha</p>
+                          <p className="text-xs font-bold text-orange-700">{rec.dosha_effect}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">Reference</p>
+                          <p className="text-[9px] text-muted-foreground italic truncate" title={rec.classical_reference}>{rec.classical_reference}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </motion.div>
+            )}
+
+            {symptomResults && !symptomResults.error && (
+                <Card className="p-8 border-yellow-100 bg-yellow-50/50">
+                    <h5 className="font-serif italic text-2xl text-emerald-900 mb-4">Physician's Closing Advice</h5>
+                    <p className="text-lg text-emerald-800 leading-relaxed mb-8">{symptomResults.lifestyle_advice}</p>
+                    <div className="p-4 rounded-xl bg-orange-100 text-orange-900 flex items-start gap-3">
+                        <ShieldAlert className="h-6 w-6 shrink-0" />
+                        <p className="text-sm font-medium">{symptomResults.warning}</p>
+                    </div>
+                </Card>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Camera UI */}
       {isCameraOpen && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4" role="dialog">
           <div className="bg-background rounded-3xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-2xl">
