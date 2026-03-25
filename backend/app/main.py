@@ -115,7 +115,7 @@ async def root():
     return {
         "message": "AI Medicinal Plant Detection API",
         "version": settings.APP_VERSION,
-        "deployment_timestamp": "2026-03-25T16:25:00Z", # FINAL HANDOVER MARKER
+        "deployment_timestamp": "2026-03-25T16:30:00Z", # FINAL HANDOVER MK-II
         "docs": "/docs",
         "health": "/health"
     }

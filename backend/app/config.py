@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     LEAF_GATE_MODEL_PATH: str = "./ml_models/leaf_gate/leaf_gate.onnx"
     # Input Gate (Leaf vs Non-Leaf)
     # If enabled and model exists, the API first checks whether the input is a leaf.
-    CLASS_NAMES_PATH: str = "./ml_models/class_names_full.json"
+    CLASS_NAMES_PATH: str = "./ml_models/class_names.json"
     ENSEMBLE_WEIGHTS_PATH: str = "./ml_models/ensemble_weights.json"
     ENABLE_LEAF_GATE: bool = True
     # Probability threshold for classifying as leaf. Tune using gate evaluation.
