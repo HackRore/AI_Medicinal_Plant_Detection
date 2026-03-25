@@ -159,76 +159,46 @@ async def seed_database(db: Session = Depends(get_db)):
 PLANT_FALLBACK = [
     {
         "id": 1, 
-        "name": "Aloevera", 
-        "common_name": "Aloevera",
+        "common_name": "Aloevera", 
         "common_names": {"en": "Aloevera", "hi": "Kumari", "ta": "Kattralai", "te": "Kalabanda", "bn": "Ghritakumari"},
         "species_name": "Aloe_barbadensis_miller",
         "scientific_classification": "Kingdom: Plantae, Order: Asparagales, Family: Asphodelaceae, Genus: Aloe, Species: A. vera",
-        "family": "Asphodelaceae", 
-        "medicinal_uses": "Burns, wound healing, digestive disorders, anti-inflammatory, skin conditions", 
-        "ayurvedic_name": "Kumari", 
-        "parts_used": "Leaf gel, latex", 
-        "preparation": "Gel applied topically; juice 20ml twice daily", 
-        "toxicity": "Gel safe externally; latex avoid prolonged use", 
         "description": "Succulent plant with powerful healing gel used worldwide in medicine and cosmetics", 
-        "active_compounds": "Aloin, acemannan, anthraquinones, vitamins A, C, E",
         "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [
-            {"ailment": "Skin Burns", "usage": "Apply fresh gel directly to the burn", "preparation": "Slice leaf and extract gel", "dosage": "As needed", "precautions": "Avoid if allergic to lily family"}
-        ]
+        "medicinal_properties": [{"ailment": "Burns", "usage": "Gel applied topically", "preparation": "Fresh gel", "dosage": "As needed", "precautions": "Lily allergy"}]
     },
     {
         "id": 2, 
-        "name": "Neem", 
-        "common_name": "Neem",
-        "common_names": {"en": "Neem", "hi": "Nimba", "ta": "Veppa-maram", "te": "Vepa", "bn": "Nim"},
+        "common_name": "Neem", 
+        "common_names": {"en": "Neem", "hi": "Nimba", "ta": "Veppa", "te": "Vepa", "bn": "Nim"},
         "species_name": "Azadirachta_indica",
-        "scientific_classification": "Kingdom: Plantae, Order: Sapindales, Family: Meliaceae, Genus: Azadirachta, Species: A. indica",
-        "family": "Meliaceae", 
-        "medicinal_uses": "Antibacterial, antifungal, blood purifier, skin diseases, dental hygiene, malaria", 
-        "ayurvedic_name": "Nimba", 
-        "parts_used": "Leaves, bark, seeds, oil", 
-        "preparation": "Leaf paste, decoction, oil, twig as toothbrush", 
-        "toxicity": "Safe medicinally; seed oil toxic in high doses; avoid in pregnancy", 
+        "scientific_classification": "Kingdom: Plantae, Family: Meliaceae, Genus: Azadirachta",
         "description": "The village pharmacy of India — every part has documented medicinal value", 
-        "active_compounds": "Nimbin, nimbidin, azadirachtin, quercetin, limonoids",
         "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [
-            {"ailment": "Skin Disorders", "usage": "Apply paste of leaves or neem oil", "preparation": "Crush fresh leaves into a paste", "dosage": "Apply twice daily", "precautions": "Avoid internal use of oil in children"}
-        ]
+        "medicinal_properties": [{"ailment": "Skin", "usage": "Paste or oil", "preparation": "Leaves", "dosage": "Twice daily", "precautions": "Pregnancy"}]
     },
     {
         "id": 3, 
-        "name": "Tulsi", 
-        "common_name": "Tulsi",
+        "common_name": "Tulsi", 
         "common_names": {"en": "Tulsi", "hi": "Tulasi", "ta": "Thulasi", "te": "Tulasi", "bn": "Tulsi"},
         "species_name": "Ocimum_tenuiflorum",
-        "scientific_classification": "Kingdom: Plantae, Order: Lamiales, Family: Lamiaceae, Genus: Ocimum, Species: O. tenuiflorum",
-        "family": "Lamiaceae", 
-        "medicinal_uses": "Respiratory disorders, stress, fever, antibacterial, adaptogen, immunity", 
-        "ayurvedic_name": "Tulasi", 
-        "parts_used": "Leaves, seeds, roots, oil", 
-        "preparation": "10 fresh leaves chewed daily; decoction as tea", 
-        "toxicity": "Safe; avoid large doses in pregnancy; may slow clotting", 
+        "scientific_classification": "Kingdom: Plantae, Family: Lamiaceae, Genus: Ocimum",
         "description": "Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen", 
-        "active_compounds": "Eugenol, rosmarinic acid, ursolic acid, linalool",
         "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [
-            {"ailment": "Common Cold", "usage": "Boil leaves in water and drink as tea", "preparation": "Boil 10-15 leaves in 2 cups water", "dosage": "1 cup twice daily", "precautions": "Safe for everyone"}
-        ]
+        "medicinal_properties": [{"ailment": "Cough", "usage": "Tea", "preparation": "Leaves decoction", "dosage": "1 cup", "precautions": "None"}]
     },
-    {"id":4,"name":"Amla","scientific_name":"Phyllanthus emblica","family":"Phyllanthaceae","medicinal_uses":"Vitamin C, hair growth, immunity, digestion, anti-aging, liver protection","ayurvedic_name":"Amalaki","parts_used":"Fruit, leaves, bark, seeds","preparation":"Raw fruit, juice, churna powder, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Contains as much Vitamin C as 20 oranges — heat stable due to protective tannins","active_compounds":"Emblicanin A and B, ascorbic acid, gallic acid, ellagic acid"},
-    {"id":5,"name":"Ashwagandha","scientific_name":"Withania somnifera","family":"Solanaceae","medicinal_uses":"Adaptogen, anxiety, stamina, anti-inflammatory, testosterone, thyroid support","ayurvedic_name":"Ashwagandha","parts_used":"Root, leaves, berries","preparation":"Root powder in warm milk; 3-6g daily","toxicity":"Avoid in pregnancy and autoimmune conditions; interacts with thyroid meds","description":"3000-year-old Ayurvedic rejuvenator — one of the most studied adaptogenic herbs","active_compounds":"Withanolides, withaferin A, sitoindosides, alkaloids"},
-    {"id":6,"name":"Giloy","scientific_name":"Tinospora cordifolia","family":"Menispermaceae","medicinal_uses":"Immune booster, fever, diabetes, antioxidant, liver protection, arthritis","ayurvedic_name":"Guduchi","parts_used":"Stem, roots, leaves","preparation":"Stem decoction, powder, juice, kadha","toxicity":"Safe; monitor blood sugar if diabetic; avoid in autoimmune disease","description":"Called Amrita — nectar of immortality — one of only 3 plants with Rasayana status","active_compounds":"Tinosporine, berberine, tinosporic acid, cordifolide"},
-    {"id":7,"name":"Turmeric","scientific_name":"Curcuma longa","family":"Zingiberaceae","medicinal_uses":"Anti-inflammatory, antioxidant, wound healing, joint pain, liver, digestion","ayurvedic_name":"Haridra","parts_used":"Rhizome","preparation":"Powder in food, golden milk, paste, capsules","toxicity":"Safe in food doses; high doses cause nausea; avoid with blood thinners","description":"Subject of 12000+ peer-reviewed studies — most scientifically studied natural compound","active_compounds":"Curcumin, bisdemethoxycurcumin, ar-turmerone"},
-    {"id":8,"name":"Brahmi","scientific_name":"Bacopa monnieri","family":"Plantaginaceae","medicinal_uses":"Memory, cognitive function, anxiety, ADHD, neuroprotection, epilepsy","ayurvedic_name":"Brahmi","parts_used":"Whole plant","preparation":"Fresh juice, powder, ghee infusion, tablets","toxicity":"Safe; may cause nausea on empty stomach; avoid in hypothyroidism","description":"NASA studied Brahmi for astronauts — proven to reduce cognitive fatigue under stress","active_compounds":"Bacosides A and B, brahmine, herpestine"},
-    {"id":9,"name":"Moringa","scientific_name":"Moringa oleifera","family":"Moringaceae","medicinal_uses":"Malnutrition, anti-inflammatory, blood sugar, antioxidant, lactation","ayurvedic_name":"Shigru","parts_used":"Leaves, seeds, pods, roots","preparation":"Leaf powder, fresh leaves cooked, seed oil","toxicity":"Leaves and pods safe; root bark toxic — avoid","description":"Miracle tree: 7x vitamin C of oranges, 4x calcium of milk, 2x protein of yogurt","active_compounds":"Isothiocyanates, quercetin, chlorogenic acid, zeatin"},
-    {"id":10,"name":"Ginger","scientific_name":"Zingiber officinale","family":"Zingiberaceae","medicinal_uses":"Nausea, digestion, anti-inflammatory, cold and flu, pain relief, circulation","ayurvedic_name":"Shunthi","parts_used":"Rhizome","preparation":"Fresh juice, decoction, powder, tea","toxicity":"Safe in food amounts; high doses may cause heartburn; caution with blood thinners","description":"Used for 5000 years across every major traditional medicine system in the world","active_compounds":"Gingerols, shogaols, paradols, zingerone"},
-    {"id":11,"name":"Hibiscus","scientific_name":"Hibiscus rosa-sinensis","family":"Malvaceae","medicinal_uses":"Blood pressure, hair growth, liver protection, anti-inflammatory, cholesterol","ayurvedic_name":"Japa","parts_used":"Flowers, leaves, roots","preparation":"Flower tea, hair oil, paste","toxicity":"Generally safe; avoid in pregnancy in high doses","description":"Vibrant red flowers used medicinally across Africa, Asia, and Latin America","active_compounds":"Anthocyanins, hibiscin, quercetin, vitamin C"},
-    {"id":12,"name":"Fenugreek","scientific_name":"Trigonella foenum-graecum","family":"Fabaceae","medicinal_uses":"Diabetes, cholesterol, digestion, lactation, testosterone, anti-inflammatory","ayurvedic_name":"Methi","parts_used":"Seeds, leaves","preparation":"Soaked seeds, powder, decoction, fresh leaves in food","toxicity":"Safe in food; high doses cause diarrhea; avoid in pregnancy","description":"Seeds contain compounds structurally similar to insulin — proven hypoglycemic effect","active_compounds":"Diosgenin, trigonelline, galactomannan, saponins"},
-    {"id":13,"name":"Curry Leaves","scientific_name":"Murraya koenigii","family":"Rutaceae","medicinal_uses":"Diabetes, hair loss, digestion, cholesterol, antioxidant, antibacterial","ayurvedic_name":"Meetha Neem","parts_used":"Leaves, bark, roots","preparation":"Fresh leaves in food, decoction, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Essential in South Indian cuisine — leaves contain alkaloids proven to lower blood sugar","active_compounds":"Mahanimbine, carbazole alkaloids, koenigine, murrayanol"},
-    {"id":14,"name":"Lemongrass","scientific_name":"Cymbopogon citratus","family":"Poaceae","medicinal_uses":"Anxiety, fever, pain relief, antifungal, antibacterial, cholesterol, detox","ayurvedic_name":"Bhustrina","parts_used":"Stems, leaves, essential oil","preparation":"Tea, essential oil diffusion, decoction","toxicity":"Safe as tea; essential oil toxic if ingested; avoid in pregnancy","description":"Citral content provides powerful antimicrobial and anti-anxiety effects","active_compounds":"Citral, geraniol, limonene, myrcene, linalool"},
-    {"id":15,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","ayurvedic_name":"Pudina","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","toxicity":"Safe as tea; essential oil toxic undiluted; never use on infants","description":"A natural hybrid that doesn't exist in the wild — crossed between watermint and spearmint","active_compounds":"Menthol, menthone, menthyl acetate, limonene"},
+    {"id":4, "common_name": "Amla", "species_name": "Phyllanthus_emblica", "common_names": {"en": "Amla", "hi": "Amalaki"}, "description": "High Vitamin C fruit used for immunity and hair health.", "image_url": "https://images.unsplash.com/photo-1606830732731-97b5e4344449?q=80&w=800&auto=format&fit=crop"},
+    {"id":5, "common_name": "Ashwagandha", "species_name": "Withania_somnifera", "common_names": {"en": "Ashwagandha", "hi": "Ashwagandha"}, "description": "Powerful adaptogen for stress and stamina.", "image_url": "https://images.unsplash.com/photo-1611073114324-4c1bb38053f3?q=80&w=800&auto=format&fit=crop"},
+    {"id":6, "common_name": "Giloy", "species_name": "Tinospora_cordifolia", "common_names": {"en": "Giloy", "hi": "Guduchi"}, "description": "Immune booster and fever treatment.", "image_url": "https://images.unsplash.com/photo-1601641772186-538be2383861?q=80&w=800&auto=format&fit=crop"},
+    {"id":7, "common_name": "Turmeric", "species_name": "Curcuma_longa", "common_names": {"en": "Turmeric", "hi": "Haridra"}, "description": "Anti-inflammatory and antioxidant powerhouse.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
+    {"id":8, "common_name": "Brahmi", "species_name": "Bacopa_monnieri", "common_names": {"en": "Brahmi", "hi": "Brahmi"}, "description": "Cognitive booster and memory enhancer.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
+    {"id":9, "common_name": "Moringa", "species_name": "Moringa_oleifera", "common_names": {"en": "Moringa", "hi": "Shigru"}, "description": "The miracle tree, highly nutrient-dense.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
+    {"id":10, "common_name": "Ginger", "species_name": "Zingiber_officinale", "common_names": {"en": "Ginger", "hi": "Shunthi"}, "description": "Nausea, cold, and digestion aid.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
+    {"id":11, "common_name": "Hibiscus", "species_name": "Hibiscus_rosa-sinensis", "common_names": {"en": "Hibiscus", "hi": "Japa"}, "description": "Hair growth and blood pressure support.", "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop"},
+    {"id":12, "common_name": "Fenugreek", "species_name": "Trigonella_foenum-graecum", "common_names": {"en": "Fenugreek", "hi": "Methi"}, "description": "Diabetes and cholesterol management.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
+    {"id":13, "common_name": "Curry Leaves", "species_name": "Murraya_koenigii", "common_names": {"en": "Curry Leaves", "hi": "Meetha Neem"}, "description": "Digestive aid and hair health support.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
+    {"id":14, "common_name": "Lemongrass", "species_name": "Cymbopogon_citratus", "common_names": {"en": "Lemongrass", "hi": "Bhustrina"}, "description": "Calming tea for anxiety and fever.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
+    {"id":15, "common_name": "Peppermint", "species_name": "Mentha_piperita", "common_names": {"en": "Peppermint", "hi": "Pudina"}, "description": "IBS and headache relief.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
 ]
 
 @router.get("/")
@@ -254,7 +224,7 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
     result = PLANT_FALLBACK
     if search:
         result = [p for p in result if search.lower() in p.get("common_name", "").lower()
-                  or search.lower() in p.get("medicinal_uses","").lower()]
+                  or search.lower() in p.get("description", "").lower()]
     return {"plants": result, "total": len(result), "source": "fallback"}
 
 
@@ -312,24 +282,23 @@ async def get_plant(plant_id: int, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail="Plant not found (even in fallback)")
 
     # Ensure format matches what Detail Page expects
-    # Map fallback data to the expected structure
     return {
         "id": fallback_plant.get("id"),
-        "species_name": fallback_plant.get("species_name", fallback_plant.get("scientific_name")),
-        "common_names": fallback_plant.get("common_names", {"en": fallback_plant.get("name"), "hi": fallback_plant.get("ayurvedic_name", "")}),
-        "scientific_classification": fallback_plant.get("scientific_classification", f"Family: {fallback_plant.get('family')}"),
-        "description": fallback_plant.get("description"),
+        "species_name": fallback_plant.get("species_name") or fallback_plant.get("scientific_name", "Unknown species"),
+        "common_names": fallback_plant.get("common_names", {"en": fallback_plant.get("common_name", "Unknown Plant")}),
+        "scientific_classification": fallback_plant.get("scientific_classification") or f"Family: {fallback_plant.get('family', 'Unknown')}",
+        "description": fallback_plant.get("description", "No description available in fallback."),
         "image_url": fallback_plant.get("image_url", "https://via.placeholder.com/800x600?text=No+Image"),
         "medicinal_properties": fallback_plant.get("medicinal_properties", [
             {
-                "ailment": fallback_plant.get("medicinal_uses"),
-                "usage": fallback_plant.get("parts_used"),
-                "preparation": fallback_plant.get("preparation"),
-                "dosage": "As needed", # Default if not specified in fallback
-                "precautions": fallback_plant.get("toxicity")
+                "ailment": fallback_plant.get("medicinal_uses", "General health and wellness"),
+                "usage": fallback_plant.get("parts_used", "Whole plant"),
+                "preparation": fallback_plant.get("preparation", "Standard decoction or infusion"),
+                "dosage": "As directed by a healthcare professional",
+                "precautions": fallback_plant.get("toxicity", "Always consult a qualified practitioner before use.")
             }
         ]),
-        "created_at": None, # Fallback data doesn't have this
+        "created_at": None,
         "source": "fallback"
     }
      
