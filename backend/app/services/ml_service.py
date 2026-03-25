@@ -13,6 +13,7 @@ import io
 import logging
 import concurrent.futures
 import hashlib
+import subprocess
 
 try:
     import onnxruntime as ort
@@ -192,9 +193,21 @@ class MLService:
             
             # 4. Load Master H5 Model (Priority for 80-class accuracy)
             if TF_AVAILABLE:
-                # Priority 1: EfficientNetV2 Master (90MB) - Verified 80-Class
+                # Priority 1: EfficientNetV2 Master (91MB) - Verified 80-Class
                 efficientnet_h5 = os.path.join(settings.MODEL_DIR, "efficientnetv2_best.h5")
                 
+                # SELF-HEALING: If model is missing but parts exist, assemble it!
+                if not os.path.exists(efficientnet_h5):
+                    assemble_script = os.path.join(settings.MODEL_DIR, "assemble_model.py")
+                    if os.path.exists(assemble_script):
+                        logger.info("🛠️ ML Model missing. Triggering auto-assembly from parts...")
+                        try:
+                            # Run assembly in sub-process
+                            subprocess.run([sys.executable, assemble_script], check=True, capture_output=True)
+                            logger.info("✅ ML Model auto-assembly successful!")
+                        except Exception as e:
+                            logger.error(f"❌ Auto-assembly failed: {e}")
+
                 if os.path.exists(efficientnet_h5):
                     self.h5_model = tf.keras.models.load_model(efficientnet_h5, compile=False)
                     self.h5_model_type = "efficientnet-v2"
