@@ -20,6 +20,55 @@ from app.services.gemini_service import get_gemini_service
 from app.models.prediction import Prediction
 from app.models.plant import Plant
 from app.config import settings
+import cv2
+import numpy as np
+import base64
+import tensorflow as tf
+
+def generate_gradcam(image_bytes: bytes, model, class_idx: int) -> str:
+    """Generate Grad-CAM heatmap overlay. Returns base64 JPEG string."""
+    try:
+        # Find last conv layer
+        last_conv_layer = None
+        for layer in reversed(model.layers):
+            if isinstance(layer, tf.keras.layers.Conv2D):
+                last_conv_layer = layer.name
+                break
+        if not last_conv_layer:
+            return None
+
+        grad_model = tf.keras.models.Model(
+            inputs=model.inputs,
+            outputs=[model.get_layer(last_conv_layer).output, model.output]
+        )
+
+        # Preprocess
+        nparr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        img_resized = cv2.resize(img, (224, 224))
+        img_array = np.expand_dims(img_resized / 255.0, axis=0).astype(np.float32)
+
+        with tf.GradientTape() as tape:
+            conv_out, preds = grad_model(img_array)
+            loss = preds[:, class_idx]
+
+        grads = tape.gradient(loss, conv_out)[0]
+        pooled = tf.reduce_mean(grads, axis=(0, 1))
+        cam = conv_out[0] @ pooled[..., tf.newaxis]
+        cam = tf.squeeze(cam).numpy()
+        cam = np.maximum(cam, 0)
+        cam = cam / (cam.max() + 1e-8)
+        cam = cv2.resize(cam, (224, 224))
+
+        heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+        original = cv2.resize(img, (224, 224))
+        overlay = cv2.addWeighted(original, 0.55, heatmap, 0.45, 0)
+
+        _, buffer = cv2.imencode('.jpg', overlay, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        return base64.b64encode(buffer).decode('utf-8')
+    except Exception as e:
+        print(f"Grad-CAM error: {e}")
+        return None
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +106,12 @@ async def predict_plant(
         start_time = time.time()
         prediction_result = ml_service.predict(image_bytes)
         processing_time = (time.time() - start_time) * 1000  # Convert to ms
+        
+        # --- LIVE GRAD-CAM GENERATION ---
+        predicted_class_idx = prediction_result.get("predicted_class_index")
+        if predicted_class_idx is not None and predicted_class_idx != -1 and ml_service.h5_model:
+            gradcam_b64 = generate_gradcam(image_bytes, ml_service.h5_model, predicted_class_idx)
+            prediction_result["gradcam_base64"] = gradcam_b64
         
         # --- PRO-GRADE INTELLIGENT STORAGE FILTER ---
         # We don't save the file yet. We analyze it in-memory first.
