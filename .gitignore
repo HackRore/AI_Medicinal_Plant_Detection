@@ -28,12 +28,16 @@ env/
 *.ipynb_checkpoints
 
 # ML Models
+# Keep large H5 files out of git, use parts instead
 *.h5
 *.pkl
 *.pth
 *.onnx
 *.pb
-ml_models/
+# Allow critical ML data
+!backend/ml_models/class_names.json
+!backend/ml_models/*.h5.part*
+!ml_models/assemble_model.py
 checkpoints/
 
 # Data

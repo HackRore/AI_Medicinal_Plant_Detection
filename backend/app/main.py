@@ -131,7 +131,7 @@ async def health_check():
         demo_mode = True
 
     return {
-        "status": "healthy",
+        "status": "ok",
         "version": settings.APP_VERSION,
         "demo_mode": demo_mode
     }
