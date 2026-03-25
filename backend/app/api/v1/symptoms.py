@@ -25,6 +25,8 @@ def safe_parse(text: str) -> dict:
         pass
     return {"error": "Could not parse response", "raw": text[:300]}
 
+from app.config import settings
+
 @router.post("/symptom-search")
 async def symptom_search(payload: dict):
     symptoms = payload.get("symptoms", "")
@@ -32,7 +34,10 @@ async def symptom_search(payload: dict):
         return {"error": "Please describe your symptoms"}
 
     try:
-        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+        if not settings.GEMINI_API_KEY:
+            return {"error": "Gemini API key not configured"}
+            
+        genai.configure(api_key=settings.GEMINI_API_KEY)
         model = genai.GenerativeModel("gemini-1.5-flash")
 
         prompt = f"""You are a senior Ayurvedic physician with 30 years of clinical experience.
