@@ -165,22 +165,34 @@ async def predict_plant(
         try:
             if not is_robust or confidence < 0.95:
                 gemini = get_gemini_service()
+                response["gemini_initialized"] = gemini.initialized
                 if gemini.initialized:
                     expert_result = await gemini.identify_plant_from_image(image_bytes)
-                    if expert_result and expert_result.get("status") == "success":
+                    if expert_result:
                         response["expert_verification"] = expert_result
+                        response["expert_verification_status"] = "success"
                         
                         # Intelligence check: If the expert result doesn't mention a medicinal plant, 
                         # flag it as a non-medicinal or unknown input.
-                        botanical_details = expert_result.get("identification_details", "").lower()
+                        # Since parsed_result is a dict now:
+                        identification = expert_result.get("identification_details", {})
+                        if isinstance(identification, dict):
+                            botanical_details = str(identification).lower()
+                        else:
+                            botanical_details = str(identification).lower()
+                            
                         if "not a leaf" in botanical_details or "not a plant" in botanical_details or "confidence: 0" in botanical_details:
                              response["predicted_plant"] = "Non-Medicinal / Not a Plant"
                              response["expert_notes"] = "AI Expert rejected this image as it does not contain a medicinal leaf."
                         else:
                              response["expert_notes"] = "This sample was verified and clarified by the AI expert."
+                    else:
+                        response["expert_verification_status"] = "empty_result"
+                else:
+                    response["expert_verification_status"] = "not_initialized"
         except Exception as gem_err:
             logger.error(f"Graceful fallback: Gemini Expert Verification failed: {gem_err}")
-            response["expert_verification_status"] = "offline"
+            response["expert_verification_status"] = f"error: {str(gem_err)[:50]}"
             response["expert_notes"] = "Expert verification currently unavailable, using local model identification."
         
         # Add plant details if found
