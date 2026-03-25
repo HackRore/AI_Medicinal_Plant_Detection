@@ -155,54 +155,47 @@ async def seed_database(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
 
 
+# Hardcoded fallback — survives ALL Render restarts, zero DB dependency
+PLANT_FALLBACK = [
+    {"id":1,"name":"Aloevera","scientific_name":"Aloe barbadensis miller","family":"Asphodelaceae","medicinal_uses":"Burns, wound healing, digestive disorders, anti-inflammatory, skin conditions","ayurvedic_name":"Kumari","parts_used":"Leaf gel, latex","preparation":"Gel applied topically; juice 20ml twice daily","toxicity":"Gel safe externally; latex avoid prolonged use","description":"Succulent plant with powerful healing gel used worldwide in medicine and cosmetics","active_compounds":"Aloin, acemannan, anthraquinones, vitamins A, C, E"},
+    {"id":2,"name":"Neem","scientific_name":"Azadirachta indica","family":"Meliaceae","medicinal_uses":"Antibacterial, antifungal, blood purifier, skin diseases, dental hygiene, malaria","ayurvedic_name":"Nimba","parts_used":"Leaves, bark, seeds, oil","preparation":"Leaf paste, decoction, oil, twig as toothbrush","toxicity":"Safe medicinally; seed oil toxic in high doses; avoid in pregnancy","description":"The village pharmacy of India — every part has documented medicinal value","active_compounds":"Nimbin, nimbidin, azadirachtin, quercetin, limonoids"},
+    {"id":3,"name":"Tulsi","scientific_name":"Ocimum tenuiflorum","family":"Lamiaceae","medicinal_uses":"Respiratory disorders, stress, fever, antibacterial, adaptogen, immunity","ayurvedic_name":"Tulasi","parts_used":"Leaves, seeds, roots, oil","preparation":"10 fresh leaves chewed daily; decoction as tea","toxicity":"Safe; avoid large doses in pregnancy; may slow clotting","description":"Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen","active_compounds":"Eugenol, rosmarinic acid, ursolic acid, linalool"},
+    {"id":4,"name":"Amla","scientific_name":"Phyllanthus emblica","family":"Phyllanthaceae","medicinal_uses":"Vitamin C, hair growth, immunity, digestion, anti-aging, liver protection","ayurvedic_name":"Amalaki","parts_used":"Fruit, leaves, bark, seeds","preparation":"Raw fruit, juice, churna powder, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Contains as much Vitamin C as 20 oranges — heat stable due to protective tannins","active_compounds":"Emblicanin A and B, ascorbic acid, gallic acid, ellagic acid"},
+    {"id":5,"name":"Ashwagandha","scientific_name":"Withania somnifera","family":"Solanaceae","medicinal_uses":"Adaptogen, anxiety, stamina, anti-inflammatory, testosterone, thyroid support","ayurvedic_name":"Ashwagandha","parts_used":"Root, leaves, berries","preparation":"Root powder in warm milk; 3-6g daily","toxicity":"Avoid in pregnancy and autoimmune conditions; interacts with thyroid meds","description":"3000-year-old Ayurvedic rejuvenator — one of the most studied adaptogenic herbs","active_compounds":"Withanolides, withaferin A, sitoindosides, alkaloids"},
+    {"id":6,"name":"Giloy","scientific_name":"Tinospora cordifolia","family":"Menispermaceae","medicinal_uses":"Immune booster, fever, diabetes, antioxidant, liver protection, arthritis","ayurvedic_name":"Guduchi","parts_used":"Stem, roots, leaves","preparation":"Stem decoction, powder, juice, kadha","toxicity":"Safe; monitor blood sugar if diabetic; avoid in autoimmune disease","description":"Called Amrita — nectar of immortality — one of only 3 plants with Rasayana status","active_compounds":"Tinosporine, berberine, tinosporic acid, cordifolide"},
+    {"id":7,"name":"Turmeric","scientific_name":"Curcuma longa","family":"Zingiberaceae","medicinal_uses":"Anti-inflammatory, antioxidant, wound healing, joint pain, liver, digestion","ayurvedic_name":"Haridra","parts_used":"Rhizome","preparation":"Powder in food, golden milk, paste, capsules","toxicity":"Safe in food doses; high doses cause nausea; avoid with blood thinners","description":"Subject of 12000+ peer-reviewed studies — most scientifically studied natural compound","active_compounds":"Curcumin, bisdemethoxycurcumin, ar-turmerone"},
+    {"id":8,"name":"Brahmi","scientific_name":"Bacopa monnieri","family":"Plantaginaceae","medicinal_uses":"Memory, cognitive function, anxiety, ADHD, neuroprotection, epilepsy","ayurvedic_name":"Brahmi","parts_used":"Whole plant","preparation":"Fresh juice, powder, ghee infusion, tablets","toxicity":"Safe; may cause nausea on empty stomach; avoid in hypothyroidism","description":"NASA studied Brahmi for astronauts — proven to reduce cognitive fatigue under stress","active_compounds":"Bacosides A and B, brahmine, herpestine"},
+    {"id":9,"name":"Moringa","scientific_name":"Moringa oleifera","family":"Moringaceae","medicinal_uses":"Malnutrition, anti-inflammatory, blood sugar, antioxidant, lactation","ayurvedic_name":"Shigru","parts_used":"Leaves, seeds, pods, roots","preparation":"Leaf powder, fresh leaves cooked, seed oil","toxicity":"Leaves and pods safe; root bark toxic — avoid","description":"Miracle tree: 7x vitamin C of oranges, 4x calcium of milk, 2x protein of yogurt","active_compounds":"Isothiocyanates, quercetin, chlorogenic acid, zeatin"},
+    {"id":10,"name":"Ginger","scientific_name":"Zingiber officinale","family":"Zingiberaceae","medicinal_uses":"Nausea, digestion, anti-inflammatory, cold and flu, pain relief, circulation","ayurvedic_name":"Shunthi","parts_used":"Rhizome","preparation":"Fresh juice, decoction, powder, tea","toxicity":"Safe in food amounts; high doses may cause heartburn; caution with blood thinners","description":"Used for 5000 years across every major traditional medicine system in the world","active_compounds":"Gingerols, shogaols, paradols, zingerone"},
+    {"id":11,"name":"Hibiscus","scientific_name":"Hibiscus rosa-sinensis","family":"Malvaceae","medicinal_uses":"Blood pressure, hair growth, liver protection, anti-inflammatory, cholesterol","ayurvedic_name":"Japa","parts_used":"Flowers, leaves, roots","preparation":"Flower tea, hair oil, paste","toxicity":"Generally safe; avoid in pregnancy in high doses","description":"Vibrant red flowers used medicinally across Africa, Asia, and Latin America","active_compounds":"Anthocyanins, hibiscin, quercetin, vitamin C"},
+    {"id":12,"name":"Fenugreek","scientific_name":"Trigonella foenum-graecum","family":"Fabaceae","medicinal_uses":"Diabetes, cholesterol, digestion, lactation, testosterone, anti-inflammatory","ayurvedic_name":"Methi","parts_used":"Seeds, leaves","preparation":"Soaked seeds, powder, decoction, fresh leaves in food","toxicity":"Safe in food; high doses cause diarrhea; avoid in pregnancy","description":"Seeds contain compounds structurally similar to insulin — proven hypoglycemic effect","active_compounds":"Diosgenin, trigonelline, galactomannan, saponins"},
+    {"id":13,"name":"Curry Leaves","scientific_name":"Murraya koenigii","family":"Rutaceae","medicinal_uses":"Diabetes, hair loss, digestion, cholesterol, antioxidant, antibacterial","ayurvedic_name":"Meetha Neem","parts_used":"Leaves, bark, roots","preparation":"Fresh leaves in food, decoction, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Essential in South Indian cuisine — leaves contain alkaloids proven to lower blood sugar","active_compounds":"Mahanimbine, carbazole alkaloids, koenigine, murrayanol"},
+    {"id":14,"name":"Lemongrass","scientific_name":"Cymbopogon citratus","family":"Poaceae","medicinal_uses":"Anxiety, fever, pain relief, antifungal, antibacterial, cholesterol, detox","ayurvedic_name":"Bhustrina","parts_used":"Stems, leaves, essential oil","preparation":"Tea, essential oil diffusion, decoction","toxicity":"Safe as tea; essential oil toxic if ingested; avoid in pregnancy","description":"Citral content provides powerful antimicrobial and anti-anxiety effects","active_compounds":"Citral, geraniol, limonene, myrcene, linalool"},
+    {"id":15,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","ayurvedic_name":"Pudina","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","toxicity":"Safe as tea; essential oil toxic undiluted; never use on infants","description":"A natural hybrid that doesn't exist in the wild — crossed between watermint and spearmint","active_compounds":"Menthol, menthone, menthyl acetate, limonene"},
+]
+
 @router.get("/")
-async def list_plants(
-    skip: int = 0,
-    limit: int = 50,
-    search: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    """
-    List all medicinal plants with pagination
-    
-    - **skip**: Number of records to skip
-    - **limit**: Maximum number of records to return
-    - **search**: Optional search query
-    """
+def get_plants(search: str = "", db: Session = Depends(get_db)):
+    # Try database first
     try:
-        query = db.query(Plant)
-        
-        if search:
-            search_filter = f"%{search}%"
-            query = query.filter(
-                (Plant.species_name.ilike(search_filter)) |
-                (Plant.common_name_en.ilike(search_filter)) |
-                (Plant.description.ilike(search_filter))
-            )
-        
-        total = query.count()
-        plants = query.offset(skip).limit(limit).all()
-        
-        results = []
-        for plant in plants:
-            results.append({
-                "id": plant.id,
-                "species_name": plant.species_name,
-                "common_name": plant.common_name_en,
-                "common_name_hi": plant.common_name_hi,
-                "description": plant.description[:200] + "..." if plant.description and len(plant.description) > 200 else plant.description,
-                "image_url": plant.image_url
-            })
-        
-        return {
-            "total": total,
-            "skip": skip,
-            "limit": limit,
-            "plants": results
-        }
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to list plants: {str(e)}")
+        plants = db.query(Plant).all()
+        if plants and len(plants) > 0:
+            db_list = [
+                {c.name: getattr(p, c.name) for c in p.__table__.columns}
+                for p in plants
+            ]
+            if search:
+                db_list = [p for p in db_list if search.lower() in p.get("name","").lower()]
+            return {"plants": db_list, "total": len(db_list), "source": "database"}
+    except Exception:
+        pass
+
+    # Database empty or failed — use fallback (always works)
+    result = PLANT_FALLBACK
+    if search:
+        result = [p for p in result if search.lower() in p["name"].lower()
+                  or search.lower() in p.get("medicinal_uses","").lower()]
+    return {"plants": result, "total": len(result), "source": "fallback"}
 
 
 @router.get("/{plant_id}")
