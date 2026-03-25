@@ -160,45 +160,45 @@ PLANT_FALLBACK = [
     {
         "id": 1, 
         "common_name": "Aloevera", 
-        "common_names": {"en": "Aloevera", "hi": "Kumari", "ta": "Kattralai", "te": "Kalabanda", "bn": "Ghritakumari"},
         "species_name": "Aloe_barbadensis_miller",
-        "scientific_classification": "Kingdom: Plantae, Order: Asparagales, Family: Asphodelaceae, Genus: Aloe, Species: A. vera",
-        "description": "Succulent plant with powerful healing gel used worldwide in medicine and cosmetics", 
+        "common_names": {"en": "Aloevera", "hi": "Kumari", "ta": "Kattralai", "te": "Kalabanda", "bn": "Ghritakumari"},
+        "scientific_classification": "Kingdom: Plantae, Family: Asphodelaceae, Genus: Aloe, Species: A. vera",
+        "description": "Succulent plant with powerful healing gel used worldwide in medicine and cosmetics.", 
         "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [{"ailment": "Burns", "usage": "Gel applied topically", "preparation": "Fresh gel", "dosage": "As needed", "precautions": "Lily allergy"}]
+        "medicinal_properties": [{"ailment": "Skin Burns", "usage": "Apply fresh gel directly", "preparation": "Fresh gel", "dosage": "As needed", "precautions": "None"}]
     },
     {
         "id": 2, 
         "common_name": "Neem", 
-        "common_names": {"en": "Neem", "hi": "Nimba", "ta": "Veppa", "te": "Vepa", "bn": "Nim"},
         "species_name": "Azadirachta_indica",
+        "common_names": {"en": "Neem", "hi": "Nimba", "ta": "Veppa", "te": "Vepa", "bn": "Nim"},
         "scientific_classification": "Kingdom: Plantae, Family: Meliaceae, Genus: Azadirachta",
-        "description": "The village pharmacy of India — every part has documented medicinal value", 
+        "description": "The village pharmacy of India — every part has documented medicinal value.", 
         "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [{"ailment": "Skin", "usage": "Paste or oil", "preparation": "Leaves", "dosage": "Twice daily", "precautions": "Pregnancy"}]
+        "medicinal_properties": [{"ailment": "Infections", "usage": "Apply leaf paste", "preparation": "Crushed leaves", "dosage": "Twice daily", "precautions": "Avoid pregnancy"}]
     },
     {
         "id": 3, 
         "common_name": "Tulsi", 
-        "common_names": {"en": "Tulsi", "hi": "Tulasi", "ta": "Thulasi", "te": "Tulasi", "bn": "Tulsi"},
         "species_name": "Ocimum_tenuiflorum",
+        "common_names": {"en": "Tulsi", "hi": "Tulasi", "ta": "Thulasi", "te": "Tulasi", "bn": "Tulsi"},
         "scientific_classification": "Kingdom: Plantae, Family: Lamiaceae, Genus: Ocimum",
-        "description": "Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen", 
+        "description": "Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen.", 
         "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop",
-        "medicinal_properties": [{"ailment": "Cough", "usage": "Tea", "preparation": "Leaves decoction", "dosage": "1 cup", "precautions": "None"}]
+        "medicinal_properties": [{"ailment": "Cough & Cold", "usage": "Drink as tea", "preparation": "Boiled leaves", "dosage": "1 cup", "precautions": "None"}]
     },
-    {"id":4, "common_name": "Amla", "species_name": "Phyllanthus_emblica", "common_names": {"en": "Amla", "hi": "Amalaki"}, "description": "High Vitamin C fruit used for immunity and hair health.", "image_url": "https://images.unsplash.com/photo-1606830732731-97b5e4344449?q=80&w=800&auto=format&fit=crop"},
-    {"id":5, "common_name": "Ashwagandha", "species_name": "Withania_somnifera", "common_names": {"en": "Ashwagandha", "hi": "Ashwagandha"}, "description": "Powerful adaptogen for stress and stamina.", "image_url": "https://images.unsplash.com/photo-1611073114324-4c1bb38053f3?q=80&w=800&auto=format&fit=crop"},
-    {"id":6, "common_name": "Giloy", "species_name": "Tinospora_cordifolia", "common_names": {"en": "Giloy", "hi": "Guduchi"}, "description": "Immune booster and fever treatment.", "image_url": "https://images.unsplash.com/photo-1601641772186-538be2383861?q=80&w=800&auto=format&fit=crop"},
-    {"id":7, "common_name": "Turmeric", "species_name": "Curcuma_longa", "common_names": {"en": "Turmeric", "hi": "Haridra"}, "description": "Anti-inflammatory and antioxidant powerhouse.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
-    {"id":8, "common_name": "Brahmi", "species_name": "Bacopa_monnieri", "common_names": {"en": "Brahmi", "hi": "Brahmi"}, "description": "Cognitive booster and memory enhancer.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
-    {"id":9, "common_name": "Moringa", "species_name": "Moringa_oleifera", "common_names": {"en": "Moringa", "hi": "Shigru"}, "description": "The miracle tree, highly nutrient-dense.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
-    {"id":10, "common_name": "Ginger", "species_name": "Zingiber_officinale", "common_names": {"en": "Ginger", "hi": "Shunthi"}, "description": "Nausea, cold, and digestion aid.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
-    {"id":11, "common_name": "Hibiscus", "species_name": "Hibiscus_rosa-sinensis", "common_names": {"en": "Hibiscus", "hi": "Japa"}, "description": "Hair growth and blood pressure support.", "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop"},
-    {"id":12, "common_name": "Fenugreek", "species_name": "Trigonella_foenum-graecum", "common_names": {"en": "Fenugreek", "hi": "Methi"}, "description": "Diabetes and cholesterol management.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
-    {"id":13, "common_name": "Curry Leaves", "species_name": "Murraya_koenigii", "common_names": {"en": "Curry Leaves", "hi": "Meetha Neem"}, "description": "Digestive aid and hair health support.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
-    {"id":14, "common_name": "Lemongrass", "species_name": "Cymbopogon_citratus", "common_names": {"en": "Lemongrass", "hi": "Bhustrina"}, "description": "Calming tea for anxiety and fever.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
-    {"id":15, "common_name": "Peppermint", "species_name": "Mentha_piperita", "common_names": {"en": "Peppermint", "hi": "Pudina"}, "description": "IBS and headache relief.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
+    {"id": 4, "common_name": "Amla", "species_name": "Phyllanthus_emblica", "common_names": {"en": "Amla", "hi": "Amalaki"}, "description": "High Vitamin C fruit used for immunity and hair health.", "image_url": "https://images.unsplash.com/photo-1606830732731-97b5e4344449?q=80&w=800&auto=format&fit=crop"},
+    {"id": 5, "common_name": "Ashwagandha", "species_name": "Withania_somnifera", "common_names": {"en": "Ashwagandha", "hi": "Ashwagandha"}, "description": "Powerful adaptogen for stress and stamina.", "image_url": "https://images.unsplash.com/photo-1611073114324-4c1bb38053f3?q=80&w=800&auto=format&fit=crop"},
+    {"id": 6, "common_name": "Giloy", "species_name": "Tinospora_cordifolia", "common_names": {"en": "Giloy", "hi": "Guduchi"}, "description": "Immune booster and fever treatment.", "image_url": "https://images.unsplash.com/photo-1601641772186-538be2383861?q=80&w=800&auto=format&fit=crop"},
+    {"id": 7, "common_name": "Turmeric", "species_name": "Curcuma_longa", "common_names": {"en": "Turmeric", "hi": "Haridra"}, "description": "Anti-inflammatory and antioxidant powerhouse.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
+    {"id": 8, "common_name": "Brahmi", "species_name": "Bacopa_monnieri", "common_names": {"en": "Brahmi", "hi": "Brahmi"}, "description": "Cognitive booster and memory enhancer.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
+    {"id": 9, "common_name": "Moringa", "species_name": "Moringa_oleifera", "common_names": {"en": "Moringa", "hi": "Shigru"}, "description": "The miracle tree, highly nutrient-dense.", "image_url": "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=800&auto=format&fit=crop"},
+    {"id": 10, "common_name": "Ginger", "species_name": "Zingiber_officinale", "common_names": {"en": "Ginger", "hi": "Shunthi"}, "description": "Nausea, cold, and digestion aid.", "image_url": "https://images.unsplash.com/photo-1615485500704-8e990f9900f7?q=80&w=800&auto=format&fit=crop"},
+    {"id": 11, "common_name": "Hibiscus", "species_name": "Hibiscus_rosa-sinensis", "common_names": {"en": "Hibiscus", "hi": "Japa"}, "description": "Hair growth and blood pressure support.", "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop"},
+    {"id": 12, "common_name": "Fenugreek", "species_name": "Trigonella_foenum-graecum", "common_names": {"en": "Fenugreek", "hi": "Methi"}, "description": "Diabetes and cholesterol management.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
+    {"id": 13, "common_name": "Curry Leaves", "species_name": "Murraya_koenigii", "common_names": {"en": "Curry Leaves", "hi": "Meetha Neem"}, "description": "Digestive aid and hair health support.", "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop"},
+    {"id": 14, "common_name": "Lemongrass", "species_name": "Cymbopogon_citratus", "common_names": {"en": "Lemongrass", "hi": "Bhustrina"}, "description": "Calming tea for anxiety and fever.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
+    {"id": 15, "common_name": "Peppermint", "species_name": "Mentha_piperita", "common_names": {"en": "Peppermint", "hi": "Pudina"}, "description": "IBS and headache relief.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
 ]
 
 @router.get("/")
@@ -220,7 +220,7 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
     except Exception:
         pass
 
-    # Database empty or failed — use fallback (always works)
+    # Fallback logic
     result = PLANT_FALLBACK
     if search:
         result = [p for p in result if search.lower() in p.get("common_name", "").lower()
@@ -265,40 +265,37 @@ async def get_plant(plant_id: int, db: Session = Depends(get_db)):
                     }
                     for prop in properties
                 ],
-                "created_at": plant.created_at.isoformat() if plant.created_at else None,
                 "source": "database"
             }
     except Exception:
         # If DB query fails or plant not found in DB, try fallback
         pass
 
-    # Fallback logic if DB empty or plant not found
+    # Fallback logic
     fallback_plant = next((p for p in PLANT_FALLBACK if p["id"] == plant_id), None)
     if not fallback_plant:
-        # If not found in primary 3, return any fallback if ID is valid-ish
-        if plant_id <= len(PLANT_FALLBACK) and len(PLANT_FALLBACK) > 0:
-            fallback_plant = PLANT_FALLBACK[plant_id - 1] # Adjust for 0-based index
+        if 1 <= plant_id <= len(PLANT_FALLBACK):
+            fallback_plant = PLANT_FALLBACK[plant_id - 1]
         else:
-            raise HTTPException(status_code=404, detail="Plant not found (even in fallback)")
+            raise HTTPException(status_code=404, detail="Plant not found")
 
-    # Ensure format matches what Detail Page expects
+    # Map fallback to frontend structure
     return {
         "id": fallback_plant.get("id"),
-        "species_name": fallback_plant.get("species_name") or fallback_plant.get("scientific_name", "Unknown species"),
-        "common_names": fallback_plant.get("common_names", {"en": fallback_plant.get("common_name", "Unknown Plant")}),
-        "scientific_classification": fallback_plant.get("scientific_classification") or f"Family: {fallback_plant.get('family', 'Unknown')}",
+        "species_name": fallback_plant.get("species_name", "Unknown"),
+        "common_names": fallback_plant.get("common_names", {"en": fallback_plant.get("common_name", "Unknown")}),
+        "scientific_classification": fallback_plant.get("scientific_classification", "Botany"),
         "description": fallback_plant.get("description", "No description available in fallback."),
         "image_url": fallback_plant.get("image_url", "https://via.placeholder.com/800x600?text=No+Image"),
         "medicinal_properties": fallback_plant.get("medicinal_properties", [
             {
-                "ailment": fallback_plant.get("medicinal_uses", "General health and wellness"),
-                "usage": fallback_plant.get("parts_used", "Whole plant"),
-                "preparation": fallback_plant.get("preparation", "Standard decoction or infusion"),
-                "dosage": "As directed by a healthcare professional",
-                "precautions": fallback_plant.get("toxicity", "Always consult a qualified practitioner before use.")
+                "ailment": "General Wellness",
+                "usage": "Standard use",
+                "preparation": "Decoction",
+                "dosage": "As needed",
+                "precautions": "Consult professional"
             }
         ]),
-        "created_at": None,
         "source": "fallback"
     }
      
