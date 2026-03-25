@@ -157,9 +157,66 @@ async def seed_database(db: Session = Depends(get_db)):
 
 # Hardcoded fallback — survives ALL Render restarts, zero DB dependency
 PLANT_FALLBACK = [
-    {"id":1,"name":"Aloevera","scientific_name":"Aloe barbadensis miller","family":"Asphodelaceae","medicinal_uses":"Burns, wound healing, digestive disorders, anti-inflammatory, skin conditions","ayurvedic_name":"Kumari","parts_used":"Leaf gel, latex","preparation":"Gel applied topically; juice 20ml twice daily","toxicity":"Gel safe externally; latex avoid prolonged use","description":"Succulent plant with powerful healing gel used worldwide in medicine and cosmetics","active_compounds":"Aloin, acemannan, anthraquinones, vitamins A, C, E"},
-    {"id":2,"name":"Neem","scientific_name":"Azadirachta indica","family":"Meliaceae","medicinal_uses":"Antibacterial, antifungal, blood purifier, skin diseases, dental hygiene, malaria","ayurvedic_name":"Nimba","parts_used":"Leaves, bark, seeds, oil","preparation":"Leaf paste, decoction, oil, twig as toothbrush","toxicity":"Safe medicinally; seed oil toxic in high doses; avoid in pregnancy","description":"The village pharmacy of India — every part has documented medicinal value","active_compounds":"Nimbin, nimbidin, azadirachtin, quercetin, limonoids"},
-    {"id":3,"name":"Tulsi","scientific_name":"Ocimum tenuiflorum","family":"Lamiaceae","medicinal_uses":"Respiratory disorders, stress, fever, antibacterial, adaptogen, immunity","ayurvedic_name":"Tulasi","parts_used":"Leaves, seeds, roots, oil","preparation":"10 fresh leaves chewed daily; decoction as tea","toxicity":"Safe; avoid large doses in pregnancy; may slow clotting","description":"Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen","active_compounds":"Eugenol, rosmarinic acid, ursolic acid, linalool"},
+    {
+        "id": 1, 
+        "name": "Aloevera", 
+        "common_name": "Aloevera",
+        "common_names": {"en": "Aloevera", "hi": "Kumari", "ta": "Kattralai", "te": "Kalabanda", "bn": "Ghritakumari"},
+        "species_name": "Aloe_barbadensis_miller",
+        "scientific_classification": "Kingdom: Plantae, Order: Asparagales, Family: Asphodelaceae, Genus: Aloe, Species: A. vera",
+        "family": "Asphodelaceae", 
+        "medicinal_uses": "Burns, wound healing, digestive disorders, anti-inflammatory, skin conditions", 
+        "ayurvedic_name": "Kumari", 
+        "parts_used": "Leaf gel, latex", 
+        "preparation": "Gel applied topically; juice 20ml twice daily", 
+        "toxicity": "Gel safe externally; latex avoid prolonged use", 
+        "description": "Succulent plant with powerful healing gel used worldwide in medicine and cosmetics", 
+        "active_compounds": "Aloin, acemannan, anthraquinones, vitamins A, C, E",
+        "image_url": "https://images.unsplash.com/photo-1596541223130-5d31a57dd071?q=80&w=800&auto=format&fit=crop",
+        "medicinal_properties": [
+            {"ailment": "Skin Burns", "usage": "Apply fresh gel directly to the burn", "preparation": "Slice leaf and extract gel", "dosage": "As needed", "precautions": "Avoid if allergic to lily family"}
+        ]
+    },
+    {
+        "id": 2, 
+        "name": "Neem", 
+        "common_name": "Neem",
+        "common_names": {"en": "Neem", "hi": "Nimba", "ta": "Veppa-maram", "te": "Vepa", "bn": "Nim"},
+        "species_name": "Azadirachta_indica",
+        "scientific_classification": "Kingdom: Plantae, Order: Sapindales, Family: Meliaceae, Genus: Azadirachta, Species: A. indica",
+        "family": "Meliaceae", 
+        "medicinal_uses": "Antibacterial, antifungal, blood purifier, skin diseases, dental hygiene, malaria", 
+        "ayurvedic_name": "Nimba", 
+        "parts_used": "Leaves, bark, seeds, oil", 
+        "preparation": "Leaf paste, decoction, oil, twig as toothbrush", 
+        "toxicity": "Safe medicinally; seed oil toxic in high doses; avoid in pregnancy", 
+        "description": "The village pharmacy of India — every part has documented medicinal value", 
+        "active_compounds": "Nimbin, nimbidin, azadirachtin, quercetin, limonoids",
+        "image_url": "https://images.unsplash.com/photo-1628102431508-32f228cb61ed?q=80&w=800&auto=format&fit=crop",
+        "medicinal_properties": [
+            {"ailment": "Skin Disorders", "usage": "Apply paste of leaves or neem oil", "preparation": "Crush fresh leaves into a paste", "dosage": "Apply twice daily", "precautions": "Avoid internal use of oil in children"}
+        ]
+    },
+    {
+        "id": 3, 
+        "name": "Tulsi", 
+        "common_name": "Tulsi",
+        "common_names": {"en": "Tulsi", "hi": "Tulasi", "ta": "Thulasi", "te": "Tulasi", "bn": "Tulsi"},
+        "species_name": "Ocimum_tenuiflorum",
+        "scientific_classification": "Kingdom: Plantae, Order: Lamiales, Family: Lamiaceae, Genus: Ocimum, Species: O. tenuiflorum",
+        "family": "Lamiaceae", 
+        "medicinal_uses": "Respiratory disorders, stress, fever, antibacterial, adaptogen, immunity", 
+        "ayurvedic_name": "Tulasi", 
+        "parts_used": "Leaves, seeds, roots, oil", 
+        "preparation": "10 fresh leaves chewed daily; decoction as tea", 
+        "toxicity": "Safe; avoid large doses in pregnancy; may slow clotting", 
+        "description": "Queen of herbs in Ayurveda — sacred, aromatic, and clinically proven adaptogen", 
+        "active_compounds": "Eugenol, rosmarinic acid, ursolic acid, linalool",
+        "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop",
+        "medicinal_properties": [
+            {"ailment": "Common Cold", "usage": "Boil leaves in water and drink as tea", "preparation": "Boil 10-15 leaves in 2 cups water", "dosage": "1 cup twice daily", "precautions": "Safe for everyone"}
+        ]
+    },
     {"id":4,"name":"Amla","scientific_name":"Phyllanthus emblica","family":"Phyllanthaceae","medicinal_uses":"Vitamin C, hair growth, immunity, digestion, anti-aging, liver protection","ayurvedic_name":"Amalaki","parts_used":"Fruit, leaves, bark, seeds","preparation":"Raw fruit, juice, churna powder, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Contains as much Vitamin C as 20 oranges — heat stable due to protective tannins","active_compounds":"Emblicanin A and B, ascorbic acid, gallic acid, ellagic acid"},
     {"id":5,"name":"Ashwagandha","scientific_name":"Withania somnifera","family":"Solanaceae","medicinal_uses":"Adaptogen, anxiety, stamina, anti-inflammatory, testosterone, thyroid support","ayurvedic_name":"Ashwagandha","parts_used":"Root, leaves, berries","preparation":"Root powder in warm milk; 3-6g daily","toxicity":"Avoid in pregnancy and autoimmune conditions; interacts with thyroid meds","description":"3000-year-old Ayurvedic rejuvenator — one of the most studied adaptogenic herbs","active_compounds":"Withanolides, withaferin A, sitoindosides, alkaloids"},
     {"id":6,"name":"Giloy","scientific_name":"Tinospora cordifolia","family":"Menispermaceae","medicinal_uses":"Immune booster, fever, diabetes, antioxidant, liver protection, arthritis","ayurvedic_name":"Guduchi","parts_used":"Stem, roots, leaves","preparation":"Stem decoction, powder, juice, kadha","toxicity":"Safe; monitor blood sugar if diabetic; avoid in autoimmune disease","description":"Called Amrita — nectar of immortality — one of only 3 plants with Rasayana status","active_compounds":"Tinosporine, berberine, tinosporic acid, cordifolide"},
@@ -171,11 +228,7 @@ PLANT_FALLBACK = [
     {"id":12,"name":"Fenugreek","scientific_name":"Trigonella foenum-graecum","family":"Fabaceae","medicinal_uses":"Diabetes, cholesterol, digestion, lactation, testosterone, anti-inflammatory","ayurvedic_name":"Methi","parts_used":"Seeds, leaves","preparation":"Soaked seeds, powder, decoction, fresh leaves in food","toxicity":"Safe in food; high doses cause diarrhea; avoid in pregnancy","description":"Seeds contain compounds structurally similar to insulin — proven hypoglycemic effect","active_compounds":"Diosgenin, trigonelline, galactomannan, saponins"},
     {"id":13,"name":"Curry Leaves","scientific_name":"Murraya koenigii","family":"Rutaceae","medicinal_uses":"Diabetes, hair loss, digestion, cholesterol, antioxidant, antibacterial","ayurvedic_name":"Meetha Neem","parts_used":"Leaves, bark, roots","preparation":"Fresh leaves in food, decoction, hair oil","toxicity":"Non-toxic; safe for all ages","description":"Essential in South Indian cuisine — leaves contain alkaloids proven to lower blood sugar","active_compounds":"Mahanimbine, carbazole alkaloids, koenigine, murrayanol"},
     {"id":14,"name":"Lemongrass","scientific_name":"Cymbopogon citratus","family":"Poaceae","medicinal_uses":"Anxiety, fever, pain relief, antifungal, antibacterial, cholesterol, detox","ayurvedic_name":"Bhustrina","parts_used":"Stems, leaves, essential oil","preparation":"Tea, essential oil diffusion, decoction","toxicity":"Safe as tea; essential oil toxic if ingested; avoid in pregnancy","description":"Citral content provides powerful antimicrobial and anti-anxiety effects","active_compounds":"Citral, geraniol, limonene, myrcene, linalool"},
-<<<<<<< HEAD
-    {"id":15,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","ayurvedic_name":"Pudina","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","toxicity":"Safe as tea; essential oil toxic undiluted; never use on infants","description":"A natural hybrid that doesn't exist in the wild — crossed between watermint and spearmint","active_compounds":"Menthol, menthone, menthyl acetate, linalool"},
-=======
     {"id":15,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","ayurvedic_name":"Pudina","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","toxicity":"Safe as tea; essential oil toxic undiluted; never use on infants","description":"A natural hybrid that doesn't exist in the wild — crossed between watermint and spearmint","active_compounds":"Menthol, menthone, menthyl acetate, limonene"},
->>>>>>> 381b452bb68fcd83567a866ff7e8e5eb92cbb57c
 ]
 
 @router.get("/")
@@ -184,12 +237,15 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
     try:
         plants = db.query(Plant).all()
         if plants and len(plants) > 0:
-            db_list = [
-                {c.name: getattr(p, c.name) for c in p.__table__.columns}
-                for p in plants
-            ]
+            db_list = []
+            for p in plants:
+                item = {c.name: getattr(p, c.name) for c in p.__table__.columns}
+                # Harmonize for frontend: ensure common_name and species_name
+                item["common_name"] = item.get("common_name_en") or item.get("species_name")
+                db_list.append(item)
+                
             if search:
-                db_list = [p for p in db_list if search.lower() in p.get("name","").lower()]
+                db_list = [p for p in db_list if search.lower() in p.get("common_name","").lower()]
             return {"plants": db_list, "total": len(db_list), "source": "database"}
     except Exception:
         pass
@@ -197,7 +253,7 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
     # Database empty or failed — use fallback (always works)
     result = PLANT_FALLBACK
     if search:
-        result = [p for p in result if search.lower() in p["name"].lower()
+        result = [p for p in result if search.lower() in p.get("common_name", "").lower()
                   or search.lower() in p.get("medicinal_uses","").lower()]
     return {"plants": result, "total": len(result), "source": "fallback"}
 
@@ -206,52 +262,101 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
 async def get_plant(plant_id: int, db: Session = Depends(get_db)):
     """
     Get detailed information about a specific plant
-    
-    - **plant_id**: Plant ID
     """
     try:
         plant = db.query(Plant).filter(Plant.id == plant_id).first()
         
-        if not plant:
-            raise HTTPException(status_code=404, detail="Plant not found")
-        
-        # Get medicinal properties
-        properties = db.query(MedicinalProperty).filter(
-            MedicinalProperty.plant_id == plant_id
-        ).all()
-        
-        return {
-            "id": plant.id,
-            "species_name": plant.species_name,
-            "common_names": {
-                "en": plant.common_name_en,
-                "hi": plant.common_name_hi,
-                "ta": plant.common_name_ta,
-                "te": plant.common_name_te,
-                "bn": plant.common_name_bn
-            },
-            "scientific_classification": plant.scientific_classification,
-            "description": plant.description,
-            "image_url": plant.image_url,
-            "medicinal_properties": [
-                {
-                    "ailment": prop.ailment,
-                    "usage": prop.usage_description,
-                    "preparation": prop.preparation_method,
-                    "dosage": prop.dosage,
-                    "precautions": prop.precautions,
-                    "efficacy_rating": prop.efficacy_rating,
-                    "source": prop.source
-                }
-                for prop in properties
-            ],
-            "created_at": plant.created_at.isoformat() if plant.created_at else None
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get plant: {str(e)}")
+        if plant:
+            # Get medicinal properties from DB
+            properties = db.query(MedicinalProperty).filter(
+                MedicinalProperty.plant_id == plant_id
+            ).all()
+            
+            return {
+                "id": plant.id,
+                "species_name": plant.species_name,
+                "common_names": {
+                    "en": plant.common_name_en or plant.species_name,
+                    "hi": plant.common_name_hi or "",
+                    "ta": plant.common_name_ta or "",
+                    "te": plant.common_name_te or "",
+                    "bn": plant.common_name_bn or ""
+                },
+                "scientific_classification": plant.scientific_classification or "Not specified",
+                "description": plant.description or "No description available",
+                "image_url": plant.image_url or "https://via.placeholder.com/800x600?text=No+Image",
+                "medicinal_properties": [
+                    {
+                        "ailment": prop.ailment,
+                        "usage": prop.usage_description,
+                        "preparation": prop.preparation_method,
+                        "dosage": prop.dosage,
+                        "precautions": prop.precautions
+                    }
+                    for prop in properties
+                ],
+                "created_at": plant.created_at.isoformat() if plant.created_at else None,
+                "source": "database"
+            }
+    except Exception:
+        # If DB query fails or plant not found in DB, try fallback
+        pass
+
+    # Fallback logic if DB empty or plant not found
+    fallback_plant = next((p for p in PLANT_FALLBACK if p["id"] == plant_id), None)
+    if not fallback_plant:
+        # If not found in primary 3, return any fallback if ID is valid-ish
+        if plant_id <= len(PLANT_FALLBACK) and len(PLANT_FALLBACK) > 0:
+            fallback_plant = PLANT_FALLBACK[plant_id - 1] # Adjust for 0-based index
+        else:
+            raise HTTPException(status_code=404, detail="Plant not found (even in fallback)")
+
+    # Ensure format matches what Detail Page expects
+    # Map fallback data to the expected structure
+    return {
+        "id": fallback_plant.get("id"),
+        "species_name": fallback_plant.get("species_name", fallback_plant.get("scientific_name")),
+        "common_names": fallback_plant.get("common_names", {"en": fallback_plant.get("name"), "hi": fallback_plant.get("ayurvedic_name", "")}),
+        "scientific_classification": fallback_plant.get("scientific_classification", f"Family: {fallback_plant.get('family')}"),
+        "description": fallback_plant.get("description"),
+        "image_url": fallback_plant.get("image_url", "https://via.placeholder.com/800x600?text=No+Image"),
+        "medicinal_properties": fallback_plant.get("medicinal_properties", [
+            {
+                "ailment": fallback_plant.get("medicinal_uses"),
+                "usage": fallback_plant.get("parts_used"),
+                "preparation": fallback_plant.get("preparation"),
+                "dosage": "As needed", # Default if not specified in fallback
+                "precautions": fallback_plant.get("toxicity")
+            }
+        ]),
+        "created_at": None, # Fallback data doesn't have this
+        "source": "fallback"
+    }
+     
+    # The original except blocks are now redundant because the first try-except handles DB errors
+    # and the fallback logic handles not found cases.
+    # If an HTTPException is raised within the fallback logic, it will propagate.
+    # If any other unexpected error occurs in the fallback logic, it will also propagate.
+    # The structure of the provided instruction implies these should be removed or adjusted.
+    # Given the instruction, I'll remove the redundant outer try-except.
+    # The `except HTTPException` and `except Exception as e` were part of the original structure
+    # but the new code structure handles the exceptions differently.
+    # The instruction shows them *after* the new fallback logic, which is syntactically incorrect.
+    # I will assume the intent is to replace the original try-except block with the new logic.
+    # The `except HTTPException` and `except Exception as e` at the end of the instruction are misplaced.
+    # I will remove them as the new structure handles errors more granularly.
+    # The `try` block now only covers the DB access. If it fails, it falls through to the fallback.
+    # If the fallback fails to find a plant, it raises HTTPException.
+    # So, the outer try-except is no longer needed.
+    # I will remove the outer try-except and keep the inner one for DB access.
+    # The instruction has `except HTTPException: raise` and `except Exception as e: raise HTTPException`
+    # *after* the fallback return, which is syntactically impossible.
+    # I will interpret this as the user wanting to remove the outer try-except and let the
+    # HTTPException from the fallback propagate, and any other error in the fallback also propagate.
+    # The `try...except Exception` block around the DB query is sufficient.
+    # The `raise HTTPException(status_code=404, detail="Plant not found")` is now handled by the fallback.
+    # The `raise HTTPException(status_code=500, detail=f"Failed to get plant: {str(e)}")` is also handled by the `except Exception` block.
+    # So, the final `except` blocks in the instruction are indeed redundant and should be removed.
 
 
 @router.get("/{plant_id}/medicinal")
