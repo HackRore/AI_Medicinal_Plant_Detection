@@ -13,7 +13,7 @@ import time
 
 from app.config import settings
 from app.database import engine, Base
-from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback, quality_check
+from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback, quality_check, symptoms
 from app.models.cache import GeminiCache # Register for metadata
 from app.middleware.rate_limit import RateLimitMiddleware
 from app.services.ml_service import get_ml_service
@@ -106,6 +106,7 @@ app.include_router(explain.router, prefix=f"{settings.API_V1_PREFIX}/explain", t
 app.include_router(recommend.router, prefix=f"{settings.API_V1_PREFIX}/recommend", tags=["Recommendations"])
 app.include_router(gemini.router, prefix=f"{settings.API_V1_PREFIX}/gemini", tags=["Gemini AI"])
 app.include_router(feedback.router, prefix=f"{settings.API_V1_PREFIX}/feedback", tags=["AI Feedback Loop"])
+app.include_router(symptoms.router, prefix=f"{settings.API_V1_PREFIX}", tags=["symptoms"])
 
 
 @app.get("/")
