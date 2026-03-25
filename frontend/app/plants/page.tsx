@@ -41,12 +41,7 @@ export default function PlantsPage({
             const res = await fetch(url)
             if (!res.ok) throw new Error('Backend unavailable')
             const data = await res.json()
-
-            if (query) {
-                setPlants(data.results || [])
-            } else {
-                setPlants(data.plants || [])
-            }
+            setPlants(data.plants || data.results || data || [])
         } catch (error) {
             console.error('Failed to fetch plants:', error)
         } finally {
