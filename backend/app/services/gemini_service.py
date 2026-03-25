@@ -40,24 +40,19 @@ class GeminiService:
             logger.warning("Gemini API key not configured. Using mock responses.")
 
     def safe_parse_gemini(self, text: str) -> dict:
-        """Never crashes. Handles markdown fences, partial JSON, extra text."""
         if not text:
             return {}
-        # Strip markdown fences
         cleaned = re.sub(r'```(?:json)?\s*|\s*```', '', text).strip()
-        # Try direct parse
         try:
             return json.loads(cleaned)
         except Exception:
             pass
-        # Extract first JSON object from anywhere in the text
         match = re.search(r'\{[\s\S]*\}', cleaned)
         if match:
             try:
                 return json.loads(match.group())
             except Exception:
                 pass
-        # Safe fallback — never crash
         return {"gemini_note": "AI enrichment unavailable", "raw_preview": text[:100]}
 
     async def _call_gemini_api(self, image_bytes: bytes, plant_name: str = None, confidence: float = None) -> str:
@@ -80,7 +75,7 @@ class GeminiService:
                 "confidence_of_expert": "0-100%",
                 "safety_notes": "string"
             }}
-            CRITICAL: Always return valid JSON even if uncertain. Never return plain text. Never wrap in markdown.
+            CRITICAL: Return ONLY raw JSON. No markdown. No backticks. No explanation. If uncertain, still return JSON with your best assessment.
             """
         else:
             prompt = """
@@ -92,14 +87,13 @@ class GeminiService:
             4. State if it is safe for common use.
             
             Return ONLY a valid JSON object.
-            CRITICAL: Always return valid JSON even if uncertain. Never return plain text. Never wrap in markdown.
+            CRITICAL: Return ONLY raw JSON. No markdown. No backticks. No explanation. If uncertain, still return JSON with your best assessment.
             """
 
         response = self.model.generate_content([prompt, image_parts[0]])
         return response.text
 
-    async def get_gemini_analysis(self, image_bytes: bytes, plant_name: str, confidence: float) -> dict:
-        """Public method for plant enrichment with 12s timeout"""
+    async def get_gemini_analysis_safe(self, image_bytes: bytes, plant_name: str, confidence: float) -> dict:
         try:
             raw = await asyncio.wait_for(
                 self._call_gemini_api(image_bytes, plant_name, confidence),
@@ -109,7 +103,7 @@ class GeminiService:
         except asyncio.TimeoutError:
             return {"gemini_note": "Expert AI timed out — showing model result only"}
         except Exception as e:
-            return {"gemini_note": f"AI enrichment error: {str(e)[:60]}"}
+            return {"gemini_note": f"AI enrichment unavailable: {str(e)[:60]}"}
 
     async def identify_plant_from_image(
         self, 
@@ -149,14 +143,7 @@ class GeminiService:
             finally:
                 db.close()
 
-            # Prepare image for Gemini
-            raw_response = await asyncio.wait_for(
-                self._call_gemini_api(image_bytes),
-                timeout=12.0
-            )
-            
-            # Use robust parsing
-            parsed_result = self.safe_parse_gemini(raw_response)
+            parsed_result = await self.get_gemini_analysis_safe(image_bytes, None, 0.0)
             
             result = {
                 "identification_details": parsed_result,

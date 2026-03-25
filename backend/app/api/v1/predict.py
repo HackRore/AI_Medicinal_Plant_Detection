@@ -61,8 +61,8 @@ async def predict_plant(
         # --- PRO-GRADE INTELLIGENT STORAGE FILTER ---
         # We don't save the file yet. We analyze it in-memory first.
         
-        CONFIDENCE_THRESHOLD = 0.65 if not settings.SHOWCASE_MODE else 0.01
-        GAP_THRESHOLD = 0.15 if not settings.SHOWCASE_MODE else 0.0001
+        CONFIDENCE_THRESHOLD = 0.45
+        GAP_THRESHOLD = 0.05
         
         predicted_class = prediction_result["predicted_class"]
         confidence = prediction_result["confidence"]

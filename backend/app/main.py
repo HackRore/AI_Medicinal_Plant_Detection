@@ -67,6 +67,11 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "service": "PlantoAI", "models": "loaded"}
+
 # Process Time Middleware (Performance Tracking)
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
