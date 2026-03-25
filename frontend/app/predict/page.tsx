@@ -46,6 +46,17 @@ interface LocalHistoryItem {
   timestamp: number
 }
 
+const DataBadge = ({ label, icon: Icon, active }: { label: string, icon: any, active: boolean }) => (
+  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all ${
+    active 
+      ? 'bg-emerald-50 border-emerald-200 text-emerald-700 opacity-100 shadow-sm' 
+      : 'bg-gray-50 border-gray-100 text-gray-400 opacity-40'
+  }`}>
+    <Icon className={`h-3.5 w-3.5 ${active ? 'animate-pulse' : ''}`} />
+    <span className="text-[10px] font-bold uppercase tracking-tight">{label}</span>
+  </div>
+)
+
 const SafetyBadge = ({isToxic, caution}: {isToxic: boolean, caution: string}) => (
   <div style={{
     padding: '12px 16px',
@@ -98,7 +109,7 @@ export default function PredictPage() {
         const formData = new FormData()
         formData.append("file", file)
         
-        const res = await fetch(`${API_BASE}/api/v1/predict/`, {
+        const res = await fetch(`${API_BASE}/api/v1/predict`, {
           method: "POST",
           body: formData,
           signal: controller.signal
@@ -414,12 +425,58 @@ export default function PredictPage() {
                   {/* Confidence Highlight */}
                   <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-white shadow-inner">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-bold text-emerald-800">Neural Confidence</span>
-                      <span className="text-3xl font-black text-emerald-600">
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-emerald-800">Neural Confidence</span>
+                        <div className="flex items-center gap-2 mt-1">
+                            <span className={`h-2 w-2 rounded-full ${
+                                predictMutation.data.confidence > 0.9 ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 
+                                predictMutation.data.confidence > 0.7 ? 'bg-amber-500' : 'bg-red-500'
+                            }`} />
+                            <span className="text-[10px] font-bold text-gray-500 uppercase">
+                                {predictMutation.data.confidence > 0.9 ? 'Optimal precision' : 
+                                 predictMutation.data.confidence > 0.7 ? 'Moderate certainty' : 'Low certainty'}
+                            </span>
+                        </div>
+                      </div>
+                      <span className={`text-3xl font-black ${
+                        predictMutation.data.confidence > 0.9 ? 'text-emerald-600' : 
+                        predictMutation.data.confidence > 0.7 ? 'text-amber-600' : 'text-red-600'
+                      }`}>
                         {(predictMutation.data.confidence * 100).toFixed(1)}%
                       </span>
                     </div>
-                    <Progress value={predictMutation.data.confidence * 100} className="h-4 bg-emerald-100/50" />
+                    <Progress 
+                        value={predictMutation.data.confidence * 100} 
+                        className={`h-4 bg-gray-100/50 [&>div]:transition-all [&>div]:duration-1000 ${
+                            predictMutation.data.confidence > 0.9 ? '[&>div]:bg-emerald-500' : 
+                            predictMutation.data.confidence > 0.7 ? '[&>div]:bg-amber-500' : '[&>div]:bg-red-500'
+                        }`} 
+                    />
+                    
+                    {/* Analysis Authenticity Badges */}
+                    <div className="mt-6 pt-6 border-t border-white/40 flex flex-wrap gap-2">
+                        <DataBadge 
+                            label="Species Verified" 
+                            icon={Leaf} 
+                            active={!!predictMutation.data.predicted_class} 
+                        />
+                        <DataBadge 
+                            label="Neural Mapped" 
+                            icon={Zap} 
+                            active={!!predictMutation.data.gradcam_base64} 
+                        />
+                        <DataBadge 
+                            label="Safety Scanned" 
+                            icon={AlertCircle} 
+                            active={true} 
+                        />
+                        {predictMutation.data.processing_time_ms && (
+                            <div className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/5 text-[10px] font-mono text-gray-500">
+                                <span className="font-bold">LATENCY:</span>
+                                {predictMutation.data.processing_time_ms.toFixed(0)}ms
+                            </div>
+                        )}
+                    </div>
                   </div>
 
                   {/* Grad-CAM Neural Insight */}

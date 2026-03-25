@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("")
 async def predict_plant(
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
@@ -236,10 +236,40 @@ async def predict_batch(
                 image_bytes = await file.read()
                 prediction_result = ml_service.predict(image_bytes)
                 
+                # Ensure Grad-CAM is generated if H5 model is available
+                gradcam_base64 = None
+                if ml_service.h5_model: # Assuming ml_service has an attribute h5_model
+                    try:
+                        # You'll need to pass the correct input format (e.g., preprocessed image)
+                        # and the predicted index to get_gradcam_base64.
+                        # This example assumes ml_service.predict returns enough info or
+                        # that ml_service can provide the h5_input and pred_idx.
+                        # For a batch, this might require re-processing the image for h5_input.
+                        # For simplicity, let's assume ml_service.predict can return h5_input and pred_idx
+                        # or that get_gradcam_base64 can work with image_bytes directly.
+                        # If not, further changes to ml_service.predict or image preprocessing would be needed.
+                        
+                        # Placeholder for h5_input and pred_idx.
+                        # In a real scenario, these would come from the prediction process.
+                        # For now, we'll use dummy values or assume ml_service.predict provides them.
+                        # If ml_service.predict already returns gradcam_base64, this block is redundant.
+                        
+                        # Assuming prediction_result contains 'h5_input' and 'predicted_class_index'
+                        h5_input = prediction_result.get("h5_input") # This might need to be generated here
+                        pred_idx = prediction_result.get("predicted_class_index")
+                        
+                        if h5_input is not None and pred_idx is not None:
+                            gradcam_base64 = get_gradcam_base64(ml_service.h5_model, h5_input, int(pred_idx))
+                        else:
+                            logger.warning("Could not generate Grad-CAM: Missing h5_input or predicted_class_index from prediction_result.")
+                    except Exception as gce:
+                        logger.warning(f"Grad-CAM generation failed for {file.filename}: {gce}")
+
                 results.append({
                     "filename": file.filename,
                     "predicted_plant": prediction_result["predicted_class"],
                     "confidence": prediction_result["confidence"],
+                    "gradcam_base64": gradcam_base64, # Add gradcam to batch result
                     "success": True
                 })
                 

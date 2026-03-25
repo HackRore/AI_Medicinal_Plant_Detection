@@ -497,8 +497,11 @@ class MLService:
 
             med_info = get_medicinal_info(predicted_class)
             gradcam_base64 = None
-            if self.h5_model and model_version == self.h5_model_type:
-                gradcam_base64 = get_gradcam_base64(self.h5_model, h5_input, int(pred_idx))
+            if self.h5_model:
+                try:
+                    gradcam_base64 = get_gradcam_base64(self.h5_model, h5_input, int(pred_idx))
+                except Exception as ge:
+                    logger.warning(f"Grad-CAM generation failed: {ge}")
 
             return {
                 "predicted_class": predicted_class,

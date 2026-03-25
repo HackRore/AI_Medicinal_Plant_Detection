@@ -1,15 +1,13 @@
 # PlantoAI — AI Medicinal Plant Detection
 
 ## Features
-- 🔍 AI-powered medicinal plant identification from leaf photos (92.5% accuracy)
-- 📱 Live camera scan + multi-image upload (max 3)
-- ⚠️ Toxicity warnings for dangerous plants
-- 💊 Medicinal information cards with usage/precautions
-- 📊 Confidence scores and top alternatives
-- 💾 Detection history (localStorage + server)
-- 🎨 Demo mode with 5 sample plants
-- 🔄 Wrong result feedback loop
-- 📱 PWA ready for offline use
+- 🔍 **AI-powered identification** from leaf photos (92.5% accuracy) using EfficientNetV2.
+- 🧠 **Grad-CAM Explainability**: Real-time neural attention heatmaps showing AI focus areas.
+- 📚 **Botanical Library**: Full metadata for 81 medicinal species (Neem, Tulsi, Ashwagandha, etc.).
+- 📱 **Neural Performance**: Live latency and confidence tier tracking (Emerald, Amber, Crimson).
+- ⚠️ **Toxicity Intelligence**: Automated safety flagging for over 10+ hazardous plant species.
+- 💊 **Medicinal Insights**: Ayurvedic uses, preparation methods, and dosage guidance.
+- 📱 **PWA Ready**: Offline support and home-screen installer enabled.
 
 ## Quick Start
 
