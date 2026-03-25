@@ -1,10 +1,8 @@
-"""
-Gemini Service
-Google Gemini Vision API integration for natural language plant descriptions
-"""
-
 import os
 import logging
+import re
+import json
+import asyncio
 from typing import Dict, Optional, Any
 from app.config import settings
 import hashlib
@@ -40,7 +38,79 @@ class GeminiService:
                 self.initialized = False
         else:
             logger.warning("Gemini API key not configured. Using mock responses.")
-    
+
+    def safe_parse_gemini(self, text: str) -> dict:
+        """Never crashes. Handles markdown fences, partial JSON, extra text."""
+        if not text:
+            return {}
+        # Strip markdown fences
+        cleaned = re.sub(r'```(?:json)?\s*|\s*```', '', text).strip()
+        # Try direct parse
+        try:
+            return json.loads(cleaned)
+        except Exception:
+            pass
+        # Extract first JSON object from anywhere in the text
+        match = re.search(r'\{[\s\S]*\}', cleaned)
+        if match:
+            try:
+                return json.loads(match.group())
+            except Exception:
+                pass
+        # Safe fallback — never crash
+        return {"gemini_note": "AI enrichment unavailable", "raw_preview": text[:100]}
+
+    async def _call_gemini_api(self, image_bytes: bytes, plant_name: str = None, confidence: float = None) -> str:
+        """Internal method to perform the actual SDK call"""
+        if not self.initialized:
+            return "{}"
+
+        image_parts = [{"mime_type": "image/jpeg", "data": image_bytes}]
+        
+        if plant_name:
+            prompt = f"""
+            You are a master botanist. I have identified this plant as '{plant_name}' with {confidence*100:.1f}% confidence.
+            Verify this identification. If correct, provide medicinal details. If incorrect, suggest the right plant.
+            
+            Return ONLY a JSON object with:
+            {{
+                "verified_name": "string",
+                "is_correct": boolean,
+                "medicinal_properties": ["prop1", "prop2", "prop3"],
+                "confidence_of_expert": "0-100%",
+                "safety_notes": "string"
+            }}
+            CRITICAL: Always return valid JSON even if uncertain. Never return plain text. Never wrap in markdown.
+            """
+        else:
+            prompt = """
+            You are a master botanist and Ayurvedic/Medicinal plant expert. 
+            Analyze this leaf/plant image and:
+            1. Identify the common and scientific name.
+            2. List 3 key medicinal properties.
+            3. Provide a 'Confidence Score' from 0-100%.
+            4. State if it is safe for common use.
+            
+            Return ONLY a valid JSON object.
+            CRITICAL: Always return valid JSON even if uncertain. Never return plain text. Never wrap in markdown.
+            """
+
+        response = self.model.generate_content([prompt, image_parts[0]])
+        return response.text
+
+    async def get_gemini_analysis(self, image_bytes: bytes, plant_name: str, confidence: float) -> dict:
+        """Public method for plant enrichment with 12s timeout"""
+        try:
+            raw = await asyncio.wait_for(
+                self._call_gemini_api(image_bytes, plant_name, confidence),
+                timeout=12.0
+            )
+            return self.safe_parse_gemini(raw)
+        except asyncio.TimeoutError:
+            return {"gemini_note": "Expert AI timed out — showing model result only"}
+        except Exception as e:
+            return {"gemini_note": f"AI enrichment error: {str(e)[:60]}"}
+
     async def identify_plant_from_image(
         self, 
         image_bytes: bytes,
@@ -80,31 +150,16 @@ class GeminiService:
                 db.close()
 
             # Prepare image for Gemini
-            image_parts = [
-                {
-                    "mime_type": "image/jpeg",
-                    "data": image_bytes
-                }
-            ]
+            raw_response = await asyncio.wait_for(
+                self._call_gemini_api(image_bytes),
+                timeout=12.0
+            )
             
-            prompt = """
-            You are a master botanist and Ayurvedic/Medicinal plant expert. 
-            Analyze this leaf/plant image and:
-            1. Identify the common and scientific name.
-            2. List 3 key medicinal properties.
-            3. Provide a 'Confidence Score' from 0-100%.
-            4. State if it is safe for common use.
-            
-            Format the response as a clean JSON-like structure.
-            """
-            
-            if language != "en":
-                prompt += f" Please provide details in {self._get_language_name(language)}."
-                
-            response = self.model.generate_content([prompt, image_parts[0]])
+            # Use robust parsing
+            parsed_result = self.safe_parse_gemini(raw_response)
             
             result = {
-                "identification_details": response.text,
+                "identification_details": parsed_result,
                 "language": language,
                 "source": "Gemini AI Expert",
                 "status": "success"
