@@ -11,6 +11,7 @@ import { Button } from "../ui/Button";
 const navLinks = [
     { name: "Home", href: "/" },
     { name: "Neural Scanner", href: "/predict" },
+    { name: "Symptom Search", href: "/symptom-search" },
     { name: "Botanical DB", href: "/plants" },
     { name: "About", href: "/about" },
 ];
