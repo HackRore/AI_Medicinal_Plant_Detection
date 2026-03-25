@@ -20,6 +20,7 @@ from app.services.gemini_service import get_gemini_service
 from app.models.prediction import Prediction
 from app.models.plant import Plant
 from app.config import settings
+from app.core.fallback_data import PLANT_FALLBACK
 
 logger = logging.getLogger(__name__)
 
@@ -122,10 +123,15 @@ async def predict_plant(
                 Plant.species_name == predicted_class
             ).first()
             
+            # --- FALLBACK ENRICHMENT ---
+            fallback_details = None
+            if not plant:
+                fallback_details = next((p for p in PLANT_FALLBACK if p["species_name"] == predicted_class), None)
+            
             # Store prediction in database
             prediction_record = Prediction(
                 image_url=filepath,
-                predicted_plant_id=plant.id if plant else None,
+                predicted_plant_id=plant.id if plant else (fallback_details["id"] if fallback_details else None),
                 confidence_score=prediction_result["confidence"],
                 model_version=prediction_result["model_version"],
                 ensemble_used=prediction_result["ensemble_used"],
@@ -195,7 +201,7 @@ async def predict_plant(
             response["expert_verification_status"] = f"error: {str(gem_err)[:50]}"
             response["expert_notes"] = "Expert verification currently unavailable, using local model identification."
         
-        # Add plant details if found
+        # Add plant details (Database or Fallback)
         if plant:
             response["plant_details"] = {
                 "id": plant.id,
@@ -203,6 +209,14 @@ async def predict_plant(
                 "common_name": plant.common_name_en,
                 "description": plant.description,
                 "image_url": plant.image_url
+            }
+        elif fallback_details:
+             response["plant_details"] = {
+                "id": fallback_details["id"],
+                "species_name": fallback_details["species_name"],
+                "common_name": fallback_details["common_name"],
+                "description": fallback_details["description"],
+                "image_url": fallback_details["image_url"]
             }
         
         return response
