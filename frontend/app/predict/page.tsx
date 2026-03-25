@@ -520,6 +520,42 @@ export default function PredictPage() {
                         </motion.div>
                       )}
 
+                      {predictMutation.data.top_predictions && (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.3 }}
+                          className="mt-4 p-4 rounded-2xl border border-white/10 bg-black/30"
+                        >
+                          <p className="text-xs font-mono text-gray-400 uppercase tracking-widest mb-4">
+                            AI Confidence Analysis
+                          </p>
+                          {predictMutation.data.top_predictions.map((p: any, i: number) => (
+                            <div key={i} className="mb-3 last:mb-0">
+                              <div className="flex justify-between items-center mb-1">
+                                <span className={`text-sm ${i === 0 ? 'text-green-400 font-medium' : 'text-gray-400'}`}>
+                                  {p.plant}
+                                </span>
+                                <span className={`text-sm font-mono ${i === 0 ? 'text-green-400' : 'text-gray-500'}`}>
+                                  {p.confidence}%
+                                </span>
+                              </div>
+                              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${p.confidence}%` }}
+                                  transition={{ duration: 0.8, delay: i * 0.15, ease: "easeOut" }}
+                                  className={`h-full rounded-full ${
+                                    i === 0 ? 'bg-green-400' :
+                                    i === 1 ? 'bg-yellow-500' : 'bg-gray-600'
+                                  }`}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </motion.div>
+                      )}
+
                       <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
 
                       <div className="grid grid-cols-2 gap-4">

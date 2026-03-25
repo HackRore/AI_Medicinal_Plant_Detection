@@ -198,7 +198,14 @@ async def predict_plant(
             "predicted_class": predicted_class,
             "predicted_class_index": prediction_result.get("predicted_class_index"),
             "confidence": prediction_result["confidence"],
-            "top_predictions": prediction_result["top_predictions"],
+            "top_predictions": [
+                {
+                    "rank": i + 1,
+                    "plant": p["class_name"],
+                    "confidence": round(p["confidence"] * 100, 1)
+                }
+                for i, p in enumerate(prediction_result.get("top_predictions", [])[:3])
+            ],
             "processing_time_ms": processing_time,
             "model_version": prediction_result["model_version"],
             "plant_details": None,
