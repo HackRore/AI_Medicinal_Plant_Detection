@@ -125,13 +125,13 @@ export default function PlantsPage({
                                         </div>
                                         <div className="p-6 flex-1 flex flex-col">
                                             <h2 className="text-2xl font-bold text-gray-800 mb-2 group-hover:text-primary-600 transition-colors">
-                                                {plant.common_name || plant.species_name?.replace(/_/g, ' ')}
+                                                {plant.name || plant.common_name || plant.species_name?.replace(/_/g, ' ')}
                                             </h2>
                                             <p className="text-sm font-mono text-primary-500 mb-4">
-                                                {plant.species_name?.replace(/_/g, ' ')}
+                                                {plant.scientific_name || plant.species_name?.replace(/_/g, ' ')}
                                             </p>
                                             <p className="text-gray-600 line-clamp-3 mb-4 flex-1">
-                                                {plant.description}
+                                                {plant.description || plant.medicinal_uses}
                                             </p>
                                             <div className="text-primary-600 font-semibold flex items-center group-hover:translate-x-2 transition-transform">
                                                 Learn More →

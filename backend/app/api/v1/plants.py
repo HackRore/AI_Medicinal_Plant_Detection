@@ -203,7 +203,7 @@ PLANT_FALLBACK = [
 
 from sqlalchemy import text
 
-@router.get("/migrate")
+@router.post("/admin/migrate")
 def migrate_database(db: Session = Depends(get_db)):
     """
     Remote migration endpoint to seed the 81 plants into Supabase.

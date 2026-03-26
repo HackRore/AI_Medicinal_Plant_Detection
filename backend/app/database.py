@@ -9,8 +9,8 @@ if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 if not DATABASE_URL:
-    # Use the placeholder for now if env not set (for local fallback/migration)
-    DATABASE_URL = "postgresql://postgres:PlantoAi%405665@db.bcyiaopmtmpqrjijtygu.supabase.co:5432/postgres"
+    # Use environment variable; no hardcoded fallback for security
+    raise ValueError("DATABASE_URL environment variable is not set")
 
 engine = create_engine(
     DATABASE_URL,
