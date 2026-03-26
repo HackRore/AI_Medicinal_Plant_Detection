@@ -201,31 +201,62 @@ PLANT_FALLBACK = [
     {"id": 15, "common_name": "Peppermint", "species_name": "Mentha_piperita", "common_names": {"en": "Peppermint", "hi": "Pudina"}, "description": "IBS and headache relief.", "image_url": "https://images.unsplash.com/photo-1615485290382-441e4d049cb5?q=80&w=800&auto=format&fit=crop"},
 ]
 
+from sqlalchemy import text
+
+@router.post("/migrate")
+def migrate_database(db: Session = Depends(get_db)):
+    """
+    Remote migration endpoint to seed the 81 plants into Supabase.
+    Call via POST /api/v1/migrate
+    """
+    try:
+        from app.db.migrate import CREATE_TABLE, PLANTS_DATA
+        from sqlalchemy import text
+        
+        # Create Table
+        db.execute(text(CREATE_TABLE))
+        db.commit()
+        
+        # Seed Data
+        for p in PLANTS_DATA:
+            db.execute(text("""
+                INSERT INTO plants (name, scientific_name, family, ayurvedic_name,
+                    medicinal_uses, parts_used, preparation, active_compounds,
+                    toxicity, description, habitat)
+                VALUES (:name, :sci, :fam, :ayu, :med, :parts, :prep, :comp, :tox, :desc, :hab)
+                ON CONFLICT (name) DO UPDATE SET
+                    scientific_name = EXCLUDED.scientific_name,
+                    medicinal_uses = EXCLUDED.medicinal_uses,
+                    updated_at = NOW()
+            """), {
+                "name": p[0], "sci": p[1], "fam": p[2], "ayu": p[3],
+                "med": p[4], "parts": p[5], "prep": p[6], "comp": p[7],
+                "tox": p[8], "desc": p[9], "hab": p[10]
+            })
+        db.commit()
+        return {"status": "success", "message": f"Seeded {len(PLANTS_DATA)} plants successfully"}
+    except Exception as e:
+        db.rollback()
+        return {"status": "error", "message": str(e)}
+
 @router.get("/")
 def get_plants(search: str = "", db: Session = Depends(get_db)):
-    # Try database first
     try:
-        plants = db.query(Plant).all()
-        if plants and len(plants) > 0:
-            db_list = []
-            for p in plants:
-                item = {c.name: getattr(p, c.name) for c in p.__table__.columns}
-                # Harmonize for frontend: ensure common_name and species_name
-                item["common_name"] = item.get("common_name_en") or item.get("species_name")
-                db_list.append(item)
-                
-            if search:
-                db_list = [p for p in db_list if search.lower() in p.get("common_name","").lower()]
-            return {"plants": db_list, "total": len(db_list), "source": "database"}
-    except Exception:
-        pass
-
-    # Fallback logic
-    result = PLANT_FALLBACK
-    if search:
-        result = [p for p in result if search.lower() in p.get("common_name", "").lower()
-                  or search.lower() in p.get("description", "").lower()]
-    return {"plants": result, "total": len(result), "source": "fallback"}
+        if search:
+            result = db.execute(text(
+                "SELECT * FROM plants WHERE LOWER(name) LIKE :s OR LOWER(medicinal_uses) LIKE :s ORDER BY name"
+            ), {"s": f"%{search.lower()}%"})
+        else:
+            result = db.execute(text("SELECT * FROM plants ORDER BY name"))
+        rows = result.mappings().all()
+        plants = [dict(row) for row in rows]
+        return {"plants": plants, "total": len(plants), "source": "supabase"}
+    except Exception as e:
+        # Fallback to PLANT_FALLBACK if DB fails
+        result = PLANT_FALLBACK
+        if search:
+            result = [p for p in result if search.lower() in p["name"].lower()]
+        return {"plants": result, "total": len(result), "source": "fallback", "error": str(e)[:100]}
 
 
 @router.get("/{plant_id}")

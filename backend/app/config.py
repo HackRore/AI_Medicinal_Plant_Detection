@@ -69,7 +69,7 @@ class Settings(BaseSettings):
     
     # Google Gemini
     GEMINI_API_KEY: str | None = None
-    GEMINI_MODEL: str = "gemini-pro-vision"
+    GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # AWS S3 (Optional)
     USE_S3: bool = False

@@ -1,9 +1,23 @@
 from fastapi import APIRouter
 import google.generativeai as genai
-import os, re, json
+import os, re, json, logging, traceback
 from app.config import settings
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
+
+# Initialize Gemini at module level
+def init_gemini():
+    try:
+        api_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
+        if api_key:
+            genai.configure(api_key=api_key)
+            return genai.GenerativeModel("gemini-1.5-flash")
+    except Exception as e:
+        logger.error(f"Gemini Init Error: {e}")
+    return None
+
+model = init_gemini()
 
 AVAILABLE_PLANTS = [
     "Aloevera", "Amla", "Amruthaballi", "Ashwagandha", "Bamboo",
@@ -29,45 +43,50 @@ def safe_parse(text: str) -> dict:
 
 @router.post("/symptom-search")
 async def symptom_search(payload: dict):
+    global model
     symptoms = payload.get("symptoms", "").strip()
-    if len(symptoms) < 3:
-        return {"error": "Please describe your symptoms in more detail"}
+    if not symptoms:
+        return {"error": "Please describe your symptoms"}
+        
     try:
-        # Use settings.GEMINI_API_KEY if available, else fallback to env
-        api_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            return {"error": "Gemini API key not configured"}
-            
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        prompt = f"""You are a senior Ayurvedic physician with 30 years of clinical experience at an Indian medical institution.
+        if model is None:
+            model = init_gemini()
+            if model is None:
+                return {"error": "Gemini API key not configured"}
 
+        prompt = f"""You are a senior Ayurvedic physician.
 A patient describes: "{symptoms}"
-
-From this list of available medicinal plants only: {", ".join(AVAILABLE_PLANTS)}
-
-Recommend exactly 3 most appropriate plants. Return ONLY raw JSON, no markdown, no backticks:
+From this list only: {", ".join(AVAILABLE_PLANTS)}
+Recommend exactly 3 plants. Return ONLY raw JSON:
 {{
   "recommendations": [
     {{
       "plant": "Tulsi",
       "scientific_name": "Ocimum tenuiflorum",
       "ayurvedic_name": "Tulasi",
-      "why": "Primary Ayurvedic herb for respiratory infections and immune support",
-      "preparation": "Boil 10 fresh leaves in 200ml water for 5 minutes. Strain and drink.",
-      "dosage": "Twice daily, 30 minutes after meals",
-      "dosha_effect": "Pacifies Kapha and Vata doshas",
-      "active_compounds": "Eugenol, rosmarinic acid, ursolic acid",
-      "safety": "Generally safe. Avoid in high doses during pregnancy.",
-      "classical_reference": "Charaka Samhita, Sutrasthana 4.18"
+      "why": "Brief reason",
+      "preparation": "How to prepare",
+      "dosage": "Suggested dosage",
+      "dosha_effect": "Effect on doshas",
+      "active_compounds": "Key compounds",
+      "safety": "Safety notes",
+      "classical_reference": "Reference"
     }}
   ],
-  "lifestyle_advice": "One key Ayurvedic lifestyle recommendation for these symptoms",
-  "diet_tip": "One dietary recommendation from Ayurveda",
-  "warning": "These are traditional Ayurvedic remedies. Please consult a qualified physician for serious medical conditions."
+  "lifestyle_advice": "One tip",
+  "diet_tip": "One tip",
+  "warning": "Medical disclaimer"
 }}"""
-        response = model.generate_content(prompt)
+        # USE ASYNC GENERATION
+        response = await model.generate_content_async(prompt, request_options={"timeout": 60})
         result = safe_parse(response.text)
         return result
     except Exception as e:
-        return {"error": f"Service unavailable: {str(e)[:80]}"}
+        err_msg = traceback.format_exc()
+        logger.error(f"Gemini Route Error: {err_msg}")
+        print(f"DEBUG: Gemini Error Traceback:\n{err_msg}")
+        
+        message = str(e)
+        if "404" in message:
+            return {"error": "AI model not found. This key might not have access to gemini-1.5-flash."}
+        return {"error": f"Service unavailable: {message[:100]}"}
