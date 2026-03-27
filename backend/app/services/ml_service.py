@@ -200,3 +200,7 @@ def get_ml_service() -> MLService:
 
 def predict_plant(image_bytes: bytes) -> Dict:
     return ml_service.predict(image_bytes)
+
+def get_gradcam_base64(image_bytes: bytes) -> str:
+    """Helper for backward compatibility"""
+    return ml_service.generate_gradcam(image_bytes)
