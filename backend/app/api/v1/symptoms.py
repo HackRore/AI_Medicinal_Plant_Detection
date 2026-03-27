@@ -1,23 +1,10 @@
 from fastapi import APIRouter
-import google.generativeai as genai
 import os, re, json, logging, traceback
 from app.config import settings
+from app.services.gemini_service import get_gemini_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
-
-# Initialize Gemini at module level
-def init_gemini():
-    try:
-        api_key = settings.GEMINI_API_KEY or os.environ.get("GEMINI_API_KEY")
-        if api_key:
-            genai.configure(api_key=api_key)
-            return genai.GenerativeModel("gemini-1.5-flash")
-    except Exception as e:
-        logger.error(f"Gemini Init Error: {e}")
-    return None
-
-model = init_gemini()
 
 AVAILABLE_PLANTS = [
     "Aloevera", "Amla", "Amruthaballi", "Ashwagandha", "Bamboo",
@@ -28,6 +15,8 @@ AVAILABLE_PLANTS = [
 ]
 
 def safe_parse(text: str) -> dict:
+    if not text:
+        return {"error": "Empty response from AI"}
     try:
         cleaned = re.sub(r'```(?:json)?\s*|\s*```', '', text).strip()
         return json.loads(cleaned)
@@ -39,54 +28,51 @@ def safe_parse(text: str) -> dict:
             return json.loads(match.group())
     except Exception:
         pass
-    return {"error": "Could not parse response"}
+    return {"error": "Could not parse AI response", "raw": text[:100]}
 
 @router.post("/symptom-search")
 async def symptom_search(payload: dict):
-    global model
     symptoms = payload.get("symptoms", "").strip()
     if not symptoms:
         return {"error": "Please describe your symptoms"}
         
     try:
-        if model is None:
-            model = init_gemini()
-            if model is None:
-                return {"error": "Gemini API key not configured"}
+        gemini = get_gemini_service()
+        if not gemini.initialized:
+            return {"error": "Ayurvedic AI search is currently offline. Please configure GEMINI_API_KEY."}
 
-        prompt = f"""You are a senior Ayurvedic physician.
-A patient describes: "{symptoms}"
-From this list only: {", ".join(AVAILABLE_PLANTS)}
-Recommend exactly 3 plants. Return ONLY raw JSON:
+        prompt = f"""You are a senior Ayurvedic physician with 30 years of clinical experience.
+A patient describes their symptoms: "{symptoms}"
+
+Task: From this list of locally available medicinal plants ONLY: {", ".join(AVAILABLE_PLANTS)}
+Recommend exactly 3 plants that best address these symptoms according to Ayurvedic principles.
+
+Return ONLY a valid JSON object with the following structure:
 {{
   "recommendations": [
     {{
-      "plant": "Tulsi",
-      "scientific_name": "Ocimum tenuiflorum",
-      "ayurvedic_name": "Tulasi",
-      "why": "Brief reason",
-      "preparation": "How to prepare",
-      "dosage": "Suggested dosage",
-      "dosha_effect": "Effect on doshas",
-      "active_compounds": "Key compounds",
-      "safety": "Safety notes",
-      "classical_reference": "Reference"
+      "plant": "Plant Name",
+      "scientific_name": "Scientific Name",
+      "ayurvedic_name": "Sanskrit/Ayurvedic Name",
+      "why": "Specific reason for recommendation based on symptoms",
+      "preparation": "How to prepare the remedy (e.g., decoction, paste)",
+      "dosage": "Suggested frequency and timing",
+      "dosha_effect": "How it balances Vata, Pitta, or Kapha",
+      "active_compounds": "Key phytochemicals",
+      "safety": "Contraindications or precautions",
+      "classical_reference": "Ayurvedic text reference (e.g., Charaka Samhita)"
     }}
   ],
-  "lifestyle_advice": "One tip",
-  "diet_tip": "One tip",
-  "warning": "Medical disclaimer"
-}}"""
-        # USE ASYNC GENERATION
-        response = await model.generate_content_async(prompt, request_options={"timeout": 60})
-        result = safe_parse(response.text)
+  "lifestyle_advice": "One specific Ayurvedic lifestyle recommendation",
+  "diet_tip": "One seasonal/Ayurvedic dietary tip",
+  "warning": "Standard medical disclaimer"
+}}
+CRITICAL: Return ONLY raw JSON. No markdown backticks. No extra text."""
+
+        response_text = await gemini.generate_text(prompt, model_id="gemini-2.0-flash")
+        result = safe_parse(response_text)
         return result
-    except Exception as e:
-        err_msg = traceback.format_exc()
-        logger.error(f"Gemini Route Error: {err_msg}")
-        print(f"DEBUG: Gemini Error Traceback:\n{err_msg}")
         
-        message = str(e)
-        if "404" in message:
-            return {"error": "AI model not found. This key might not have access to gemini-1.5-flash."}
-        return {"error": f"Service unavailable: {message[:100]}"}
+    except Exception as e:
+        logger.error(f"Symptom Search Error: {e}")
+        return {"error": f"Service temporarily unavailable: {str(e)[:100]}"}

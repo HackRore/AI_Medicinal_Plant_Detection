@@ -3,9 +3,9 @@ import logging
 import re
 import json
 import asyncio
+import hashlib
 from typing import Dict, Optional, Any
 from app.config import settings
-import hashlib
 from app.database import SessionLocal
 from app.models.cache import GeminiCache
 
@@ -13,26 +13,27 @@ logger = logging.getLogger(__name__)
 
 # Try to import Gemini SDK
 try:
-    import google.generativeai as genai
+    from google import genai
+    from google.genai import types
     GEMINI_AVAILABLE = True
 except ImportError:
     GEMINI_AVAILABLE = False
-    logger.warning("Google Generative AI SDK not available. Install with: pip install google-generativeai")
+    logger.warning("Google GenAI SDK not available. Install with: pip install google-genai")
 
 
 class GeminiService:
-    """Service for Gemini Vision API interactions"""
+    """Service for Gemini API interactions using the modern google-genai SDK"""
     
     def __init__(self):
         self.initialized = False
-        self.model = None
+        self.client = None
+        self.model_id = "gemini-2.0-flash"
         
         if GEMINI_AVAILABLE and settings.GEMINI_API_KEY:
             try:
-                genai.configure(api_key=settings.GEMINI_API_KEY)
-                self.model = genai.GenerativeModel(settings.GEMINI_MODEL)
+                self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
                 self.initialized = True
-                logger.info("Gemini service initialized successfully")
+                logger.info("Gemini service (google-genai) initialized successfully")
             except Exception as e:
                 logger.error(f"Failed to initialize Gemini: {e}")
                 self.initialized = False
@@ -60,8 +61,6 @@ class GeminiService:
         if not self.initialized:
             return "{}"
 
-        image_parts = [{"mime_type": "image/jpeg", "data": image_bytes}]
-        
         if plant_name:
             prompt = f"""
             You are a master botanist. I have identified this plant as '{plant_name}' with {confidence*100:.1f}% confidence.
@@ -90,8 +89,89 @@ class GeminiService:
             CRITICAL: Return ONLY raw JSON. No markdown. No backticks. No explanation. If uncertain, still return JSON with your best assessment.
             """
 
-        response = self.model.generate_content([prompt, image_parts[0]])
-        return response.text
+        try:
+            # Use asyncio.to_thread because the genai client is synchronous
+            response = await asyncio.to_thread(
+                self.client.models.generate_content,
+                model=self.model_id,
+                contents=[
+                    types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg'),
+                    prompt
+                ]
+            )
+            return response.text
+        except Exception as e:
+            logger.error(f"Gemini API call failed: {e}")
+            return "{}"
+
+    async def generate_text(self, prompt: str, model_id: str = None) -> str:
+        """Generic text generation"""
+        if not self.initialized:
+            return ""
+        
+        try:
+            response = await asyncio.to_thread(
+                self.client.models.generate_content,
+                model=model_id or self.model_id,
+                contents=prompt
+            )
+            return response.text
+        except Exception as e:
+            logger.error(f"Gemini text generation failed: {e}")
+            return ""
+
+    async def get_ai_debate(self, image_bytes: bytes, cnn_prediction: str, cnn_confidence: float) -> dict:
+        """
+        Independent verification for AI Debate System (CNN vs Gemini)
+        """
+        if not self.initialized:
+            return {
+                "cnn_prediction": cnn_prediction,
+                "cnn_confidence": round(cnn_confidence * 100, 1),
+                "gemini_prediction": "Expert AI Offline",
+                "agreement": True,
+                "explanation": "Expert verification skip: service not initialized."
+            }
+
+        prompt = f"""
+        You are an independent botanical auditor.
+        I (the CNN model) have identified this plant as '{cnn_prediction}' with {cnn_confidence*100:.1f}% confidence.
+        
+        Analyze the image independently and decide if you agree.
+        
+        Return ONLY a JSON object:
+        {{
+            "cnn_prediction": "{cnn_prediction}",
+            "cnn_confidence": {round(cnn_confidence * 100, 1)},
+            "gemini_prediction": "Common Name",
+            "agreement": boolean,
+            "explanation": "1-2 sentence technical reason for agreement or disagreement based on leaf morphology."
+        }}
+        CRITICAL: Return ONLY raw JSON. No markdown.
+        """
+        
+        try:
+            response = await asyncio.wait_for(
+                asyncio.to_thread(
+                    self.client.models.generate_content,
+                    model=self.model_id,
+                    contents=[
+                        types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg'),
+                        prompt
+                    ]
+                ),
+                timeout=12.0
+            )
+            return self.safe_parse_gemini(response.text)
+        except Exception as e:
+            logger.error(f"AI Debate logic failure: {e}")
+            return {
+                "cnn_prediction": cnn_prediction,
+                "cnn_confidence": round(cnn_confidence * 100, 1),
+                "gemini_prediction": "Analysis Error",
+                "agreement": True,
+                "explanation": f"Expert audit failed to provide a timely response: {str(e)[:40]}"
+            }
 
     async def get_gemini_analysis_safe(self, image_bytes: bytes, plant_name: str, confidence: float) -> dict:
         try:
@@ -112,13 +192,6 @@ class GeminiService:
     ) -> Dict:
         """
         Identify medicinal plant directly from image using Gemini Vision
-        
-        Args:
-            image_bytes: Raw image bytes
-            language: Language code
-            
-        Returns:
-            Dictionary with identification result
         """
         if not self.initialized:
             return {
@@ -128,7 +201,7 @@ class GeminiService:
             }
         
         try:
-            # --- CACHE CHECK: Identify by image hash ---
+            # --- CACHE CHECK ---
             image_hash = hashlib.sha256(image_bytes).hexdigest()
             db = SessionLocal()
             try:
@@ -178,26 +251,18 @@ class GeminiService:
                 "source": "Gemini AI"
             }
 
-    def get_plant_description(
+    async def get_plant_description(
         self, 
         plant_name: str, 
         language: str = "en"
     ) -> Dict:
         """
         Get natural language description of a plant
-        
-        Args:
-            plant_name: Scientific or common name of the plant
-            language: Language code (en, hi, ta, te, bn)
-            
-        Returns:
-            Dictionary with plant description
         """
         if not self.initialized:
             return self._get_mock_description(plant_name, language)
         
         try:
-            # Create prompt based on language
             prompts = {
                 "en": f"Provide a detailed description of the medicinal plant '{plant_name}'. Include its appearance, medicinal properties, traditional uses, and any precautions. Keep it concise (3-4 paragraphs).",
                 "hi": f"औषधीय पौधे '{plant_name}' का विस्तृत विवरण प्रदान करें। इसकी उपस्थिति, औषधीय गुण, पारंपरिक उपयोग और सावधानियां शामिल करें।",
@@ -208,7 +273,11 @@ class GeminiService:
             
             prompt = prompts.get(language, prompts["en"])
             
-            response = self.model.generate_content(prompt)
+            response = await asyncio.to_thread(
+                self.client.models.generate_content,
+                model=self.model_id,
+                contents=prompt
+            )
             
             return {
                 "description": response.text,
@@ -221,7 +290,7 @@ class GeminiService:
             logger.error(f"Error getting Gemini description: {e}")
             return self._get_mock_description(plant_name, language)
     
-    def chat_about_plant(
+    async def chat_about_plant(
         self, 
         plant_name: str, 
         question: str,
@@ -229,14 +298,6 @@ class GeminiService:
     ) -> Dict:
         """
         Interactive chat about a specific plant
-        
-        Args:
-            plant_name: Name of the plant
-            question: User's question
-            language: Language code
-            
-        Returns:
-            Dictionary with answer
         """
         if not self.initialized:
             return self._get_mock_chat_response(plant_name, question, language)
@@ -247,7 +308,11 @@ class GeminiService:
             if language != "en":
                 prompt += f" Please respond in {self._get_language_name(language)}."
             
-            response = self.model.generate_content(prompt)
+            response = await asyncio.to_thread(
+                self.client.models.generate_content,
+                model=self.model_id,
+                contents=prompt
+            )
             
             return {
                 "answer": response.text,
@@ -264,22 +329,18 @@ class GeminiService:
     def _get_language_name(self, code: str) -> str:
         """Get full language name from code"""
         languages = {
-            "en": "English",
-            "hi": "Hindi",
-            "ta": "Tamil",
-            "te": "Telugu",
-            "bn": "Bengali"
+            "en": "English", "hi": "Hindi", "ta": "Tamil", "te": "Telugu", "bn": "Bengali"
         }
         return languages.get(code, "English")
     
     def _get_mock_description(self, plant_name: str, language: str) -> Dict:
         """Generate mock description when Gemini is not available"""
         descriptions = {
-            "en": f"{plant_name} is a medicinal plant with significant therapeutic properties. It has been used in traditional medicine for centuries to treat various ailments. The plant contains bioactive compounds that contribute to its medicinal effects. Common uses include treating digestive issues, skin conditions, and boosting immunity. Always consult a healthcare professional before use.",
-            "hi": f"{plant_name} एक औषधीय पौधा है जिसमें महत्वपूर्ण चिकित्सीय गुण हैं। इसका उपयोग सदियों से पारंपरिक चिकित्सा में विभिन्न बीमारियों के इलाज के लिए किया जाता रहा है।",
-            "ta": f"{plant_name} குறிப்பிடத்தக்க சிகிச்சை பண்புகளைக் கொண்ட ஒரு மருத்துவ தாவரம். பல்வேறு நோய்களுக்கு சிகிச்சையளிக்க பாரம்பரிய மருத்துவத்தில் பல நூற்றாண்டுகளாக இது பயன்படுத்தப்படுகிறது.",
-            "te": f"{plant_name} ముఖ్యమైన చికిత్సా లక్షణాలతో కూడిన ఔషధ మొక్క. వివిధ వ్యాధులకు చికిత్స చేయడానికి శతాబ్దాలుగా సాంప్రదాయ వైద్యంలో ఇది ఉపయోగించబడుతోంది.",
-            "bn": f"{plant_name} একটি ঔষধি উদ্ভিদ যার উল্লেখযোগ্য চিকিৎসা বৈশিষ্ট্য রয়েছে। বিভিন্ন রোগের চিকিৎসার জন্য শতাব্দী ধরে ঐতিহ্যবাহী চিকিৎসায় এটি ব্যবহৃত হয়ে আসছে।"
+            "en": f"{plant_name} is a medicinal plant with significant therapeutic properties. It has been used in traditional medicine for centuries to treat various ailments.",
+            "hi": f"{plant_name} एक औषधीय पौधा है जिसमें महत्वपूर्ण चिकित्सीय गुण हैं।",
+            "ta": f"{plant_name} குறிப்பிடத்தக்க சிகிச்சை பண்புகளைக் கொண்ட ஒரு மருத்துவ தாவரம்.",
+            "te": f"{plant_name} ముఖ్యమైన చికిత్సా లక్షణాలతో కూడిన ఔషధ మొక్క.",
+            "bn": f"{plant_name} একটি ঔষধি উদ্ভিদ যার উল্লেখযোগ্য চিকিৎসা বৈশিষ্ট্য রয়েছে।"
         }
         
         return {
@@ -289,12 +350,7 @@ class GeminiService:
             "plant_name": plant_name
         }
     
-    def _get_mock_chat_response(
-        self, 
-        plant_name: str, 
-        question: str, 
-        language: str
-    ) -> Dict:
+    def _get_mock_chat_response(self, plant_name: str, question: str, language: str) -> Dict:
         """Generate mock chat response"""
         return {
             "answer": f"This is a mock response about {plant_name}. To get real AI-powered answers, please configure the Gemini API key in your environment settings.",
@@ -312,3 +368,10 @@ gemini_service = GeminiService()
 def get_gemini_service() -> GeminiService:
     """Get Gemini service instance"""
     return gemini_service
+
+
+async def get_plant_analysis(plant_name: str, confidence: float, image_bytes: bytes) -> Dict:
+    """Compatibility wrapper for predict.py"""
+    service = get_gemini_service()
+    result = await service.get_gemini_analysis_safe(image_bytes, plant_name, confidence)
+    return result

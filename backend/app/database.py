@@ -12,12 +12,23 @@ if not DATABASE_URL:
     # Use environment variable; no hardcoded fallback for security
     raise ValueError("DATABASE_URL environment variable is not set")
 
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,
-    pool_recycle=300,
-    connect_args={"sslmode": "require"}
-)
+try:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        connect_args={"sslmode": "require"} if "postgresql" in DATABASE_URL else {}
+    )
+    # Test connection
+    with engine.connect() as conn:
+        pass
+except Exception as e:
+    print(f"Primary DB failed ({e}), falling back to SQLite for development.")
+    DATABASE_URL = "sqlite:///./plantoai_dev.db"
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
