@@ -8,59 +8,72 @@ import logging
 import time
 import hashlib
 from collections import OrderedDict
-
-import tensorflow as tf
-import cv2
 import base64
+import onnxruntime as ort
+import cv2
 from app.config import settings
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 class MLService:
-    """Production-grade ML service with TFLite and lazy loading"""
+    """Production-grade ML service using ONNX Runtime for stable CPU inference"""
     
     def __init__(self):
-        self.interpreter = None
-        self.input_details = None
-        self.output_details = None
+        self.session = None
+        self.input_name = None
         self.class_names = []
         self._cache = OrderedDict()
-        self.CACHE_SIZE = 10
+        self.CACHE_SIZE = 15
         self.initialized = False
+        
+        # Standard configs
+        self.INPUT_SIZE = 224
+        self.CONFIDENCE_THRESHOLD = 0.45
 
     def _get_image_hash(self, image_bytes: bytes) -> str:
         return hashlib.sha256(image_bytes).hexdigest()
 
     def load_resources(self):
-        """Lazy load TFLite model and class names"""
+        """Lazy load ONNX model and class names"""
         if self.initialized:
             return
 
         try:
-            # Load class names
-            if os.path.exists(settings.CLASS_NAMES_PATH):
-                with open(settings.CLASS_NAMES_PATH, 'r') as f:
+            # 1. Load class names
+            class_path = os.path.join(settings.MODEL_DIR, "class_names.json")
+            if os.path.exists(class_path):
+                with open(class_path, 'r') as f:
                     self.class_names = json.load(f)
             else:
                 self.class_names = [f"Species_{i}" for i in range(81)]
+            
+            # 2. Load ONNX model
+            # Priority: efficientnetv2.onnx -> model.tflite (if we had a runner) -> fallback
+            model_path = os.path.join(settings.MODEL_DIR, "efficientnetv2.onnx")
+            
+            if not os.path.exists(model_path):
+                # Check for candidates from settings or alternatives
+                candidates = [
+                    settings.VIT_MODEL_PATH,
+                    settings.MOBILENET_MODEL_PATH,
+                    settings.ENHANCED_MODEL_PATH
+                ]
+                for c in candidates:
+                    if os.path.exists(c):
+                        model_path = c
+                        break
 
-            # Load TFLite model
-            tflite_path = os.path.join(settings.MODEL_DIR, "model.tflite")
-            if os.path.exists(tflite_path):
-                self.interpreter = tf.lite.Interpreter(model_path=tflite_path)
-                self.interpreter.allocate_tensors()
-                self.input_details = self.interpreter.get_input_details()
-                self.output_details = self.interpreter.get_output_details()
-                print(f"ML Service: Loading TFLite model from {tflite_path} [TURBO MODE]")
+            if os.path.exists(model_path):
+                self.session = ort.InferenceSession(
+                    model_path, 
+                    providers=['CPUExecutionProvider']
+                )
+                self.input_name = self.session.get_inputs()[0].name
+                size_mb = os.path.getsize(model_path) / (1024 * 1024)
+                logger.info(f"🚀 ML Service: Loaded ONNX model {os.path.basename(model_path)} ({size_mb:.1f} MB)")
             else:
-                logger.warning(f"⚠️ TFLite model not found at {tflite_path}. Checking for .h5 fallback.")
-                model_path = os.path.join(settings.MODEL_DIR, "efficientnetv2_best.h5")
-                if os.path.exists(model_path):
-                    self.model = tf.keras.models.load_model(model_path, compile=False)
-                    logger.info("Loaded .h5 fallback model")
-                else:
-                    logger.error("❌ No model files found!")
+                logger.error("❌ Critical: No ONNX model found for inference!")
             
             self.initialized = True
         except Exception as e:
@@ -68,79 +81,76 @@ class MLService:
             self.initialized = True 
 
     def preprocess(self, image_bytes: bytes) -> np.ndarray:
-        image = Image.open(io.BytesIO(image_bytes))
-        if image.mode != 'RGB':
-            image = image.convert('RGB')
-        image = image.resize((224, 224), resample=Image.BILINEAR)
-        img_array = np.array(image, dtype=np.float32)
-        # TFLite for EfficientNet often expects [0, 255] or [-1, 1]
-        # We'll use the [-1, 1] normalization as consistent with current project
-        img_array = (img_array / 127.5) - 1.0
-        return np.expand_dims(img_array, axis=0)
+        """Preprocess for EfficientNetV2/MobileNetV2 style models"""
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img = img.resize((self.INPUT_SIZE, self.INPUT_SIZE), Image.LANCZOS)
+        arr = np.array(img, dtype=np.float32) / 255.0
+        
+        # ImageNet normalization
+        mean = np.array([0.485, 0.456, 0.406])
+        std = np.array([0.229, 0.224, 0.225])
+        arr = (arr - mean) / std
+        
+        return np.expand_dims(arr, axis=0).astype(np.float32)
 
     def predict(self, image_bytes: bytes) -> Dict:
-        """Prediction with granular timing and caching"""
+        """Prediction with timing and caching"""
         start_time = time.time()
         img_hash = self._get_image_hash(image_bytes)
 
-        # 1. Cache Check (Instant)
+        # 1. Cache Check
         if img_hash in self._cache:
             result = self._cache.pop(img_hash)
             self._cache[img_hash] = result
             result["cache_hit"] = True
-            result["inference_time"] = 0.0
-            result["preprocessing_time"] = 0.0
-            print(f"⚡ Cache Hit for {img_hash[:8]}")
             return result
 
         # 2. Lazy Load
         if not self.initialized:
-            load_start = time.time()
             self.load_resources()
-            print(f"🚀 Model initialized in {time.time() - load_start:.4f}s")
 
-        # 3. Preprocessing Timing
-        pre_start = time.time()
+        if self.session is None:
+            return {"error": "Model not loaded", "confidence": 0.0}
+
         try:
+            # 3. Preprocessing
+            pre_start = time.time()
             processed_img = self.preprocess(image_bytes)
             preprocessing_time = time.time() - pre_start
-            print(f"🎨 Preprocessing time: {preprocessing_time:.4f}s")
 
-            # 4. Inference Timing
+            # 4. Inference
             inf_start = time.time()
-            if self.interpreter:
-                self.interpreter.set_tensor(self.input_details[0]['index'], processed_img)
-                self.interpreter.invoke()
-                preds = self.interpreter.get_tensor(self.output_details[0]['index'])[0]
-            elif hasattr(self, 'model') and self.model:
-                preds = self.model.predict(processed_img, verbose=0)[0]
-            else:
-                return {"error": "No model loaded", "confidence": 0.0}
+            outputs = self.session.run(None, {self.input_name: processed_img})
+            raw_preds = outputs[0][0]
             
+            # Softmax
+            exp_preds = np.exp(raw_preds - np.max(raw_preds))
+            predictions = exp_preds / exp_preds.sum()
             inference_time = time.time() - inf_start
-            print(f"Inference time: {inference_time:.4f}s")
 
-            # 5. Result Construction
-            pred_idx = int(np.argmax(preds))
-            confidence = float(preds[pred_idx])
-            
-            top_k = np.argsort(preds)[::-1][:5]
+            # 5. Build Result
+            top_k_indices = np.argsort(predictions)[::-1][:5]
             top_predictions = []
-            for idx in top_k:
+            for idx in top_k_indices:
                 top_predictions.append({
                     "class_name": self.class_names[idx] if idx < len(self.class_names) else f"Unknown_{idx}",
-                    "confidence": float(preds[idx])
+                    "confidence": float(predictions[idx])
                 })
 
+            best_idx = top_k_indices[0]
+            confidence = float(predictions[best_idx])
+            plant_name = self.class_names[best_idx] if best_idx < len(self.class_names) else "Unknown"
+
             result = {
-                "predicted_class": self.class_names[pred_idx] if pred_idx < len(self.class_names) else "Unknown",
-                "predicted_class_index": pred_idx,
+                "predicted_class": plant_name,
+                "predicted_class_index": int(best_idx),
                 "confidence": confidence,
                 "top_predictions": top_predictions,
-                "model_version": "TFLite-Float16" if self.interpreter else "EfficientNetV2-Prod",
+                "model_version": "EfficientNetV2-ONNX",
                 "inference_time": inference_time,
                 "preprocessing_time": preprocessing_time,
-                "cache_hit": False
+                "cache_hit": False,
+                "identified": confidence >= self.CONFIDENCE_THRESHOLD
             }
 
             self._cache[img_hash] = result
@@ -150,38 +160,36 @@ class MLService:
             return result
 
         except Exception as e:
-            logger.error(f"Prediction logic failure: {e}")
+            logger.error(f"Prediction failure: {e}")
             return {"error": str(e), "confidence": 0.0}
 
     def generate_gradcam(self, image_bytes: bytes) -> str:
-        """Fast Feature Focus (TFLite compatible Grad-CAM alternative)"""
+        """Visual attention map using morphological saliency (TF-free)"""
         try:
-            image = Image.open(io.BytesIO(image_bytes))
-            if image.mode != 'RGB':
-                image = image.convert('RGB')
+            image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
             orig_img = np.array(image.resize((224, 224)))
             
-            # Use OpenCV to create a high-quality "Neural Saliency" map
-            # This highlights edges, textures, and venation patterns
+            # Saliency detection using OpenCV (Plant morphology focus)
             gray = cv2.cvtColor(orig_img, cv2.COLOR_RGB2GRAY)
             
-            # Saliency map based on high-frequency plant features
-            # (Venation, margins, trichomes)
-            grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
-            grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
-            mag = cv2.magnitude(grad_x, grad_y)
-            mag = cv2.GaussianBlur(mag, (15, 15), 0) # Smooth for heatmap look
+            # Get edges and textures
+            sob_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+            sob_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+            mag = cv2.magnitude(sob_x, sob_y)
             
-            heatmap = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
-            heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
+            # Gaussian blur to create 'heatmap' effect
+            heatmap = cv2.GaussianBlur(mag, (21, 21), 0)
+            heatmap = cv2.normalize(heatmap, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            heatmap_color = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
-            superimposed_img = cv2.addWeighted(orig_img, 0.6, heatmap, 0.4, 0)
+            # Overlay
+            superimposed = cv2.addWeighted(orig_img, 0.6, heatmap_color, 0.4, 0)
             
-            _, buffer = cv2.imencode('.jpg', cv2.cvtColor(superimposed_img, cv2.COLOR_RGB2BGR))
+            _, buffer = cv2.imencode('.jpg', cv2.cvtColor(superimposed, cv2.COLOR_RGB2BGR))
             return base64.b64encode(buffer).decode('utf-8')
             
         except Exception as e:
-            logger.error(f"Fast Visualization error: {e}")
+            logger.error(f"Visualization error: {e}")
             return None
 
 # Singleton instance
@@ -190,6 +198,5 @@ ml_service = MLService()
 def get_ml_service() -> MLService:
     return ml_service
 
-def get_gradcam_base64(image_bytes: bytes) -> str:
-    """Helper for backward compatibility"""
-    return ml_service.generate_gradcam(image_bytes)
+def predict_plant(image_bytes: bytes) -> Dict:
+    return ml_service.predict(image_bytes)
