@@ -31,7 +31,7 @@ export default function PlantsPage() {
             })
             .then(data => {
                 // Step 8: Fix setter
-                setPlants(data.plants || data || [])
+                setPlants(data.plants || data)
                 setLoading(false)
             })
             .catch(err => {
@@ -47,7 +47,7 @@ export default function PlantsPage() {
         fetch(`${API_URL}/api/v1/plants?search=${encodeURIComponent(search)}`)
             .then(res => res.json())
             .then(data => {
-                setPlants(data.plants || data || [])
+                setPlants(data.plants || data)
                 setLoading(false)
             })
             .catch(() => {
