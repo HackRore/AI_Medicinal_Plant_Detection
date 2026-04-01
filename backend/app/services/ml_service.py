@@ -60,13 +60,12 @@ class MLService:
                 from torchvision import models
                 import torch.nn as nn
                 
-                # Dynamic architecture reconstruction (MobileNet-V2 v3)
+                # Dynamic architecture reconstruction (MobileNetV2 v3)
                 self.torch_model = models.mobilenet_v2()
                 n_inputs = self.torch_model.classifier[1].in_features
                 self.torch_model.classifier[1] = nn.Sequential(
                     nn.Linear(n_inputs, 512),
                     nn.ELU(),
-                    nn.Dropout(0.2),
                     nn.Linear(512, len(self.class_names))
                 )
                 self.torch_model.load_state_dict(torch.load(v3_model_path, map_location='cpu'))
