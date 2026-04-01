@@ -53,7 +53,8 @@ class MLService:
             
             # 2. Load Model (Priority: PyTorch v3 -> ONNX -> Fallbacks)
             v3_model_path = os.path.join(settings.MODEL_DIR, "model_v3.pth")
-            onnx_path = os.path.join(settings.MODEL_DIR, "efficientnetv2.onnx")
+            v3_onnx_path = os.path.join(settings.MODEL_DIR, "model_v3.onnx")
+            onnx_path = v3_onnx_path if os.path.exists(v3_onnx_path) else os.path.join(settings.MODEL_DIR, "efficientnetv2.onnx")
             
             if os.path.exists(v3_model_path):
                 import torch
