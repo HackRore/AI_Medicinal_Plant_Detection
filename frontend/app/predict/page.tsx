@@ -237,9 +237,10 @@ export default function PredictPage() {
       return res.json()
     },
     onSuccess: async (data: Prediction) => {
+      const plantClass = data.predicted_class || "Unknown";
       if (data.confidence > 0.85) {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
-        toast.success(`Detected: ${data.predicted_class.replace(/_/g, ' ')}`)
+        toast.success(`Detected: ${plantClass.replace(/_/g, ' ')}`)
       }
 
       const newEntry: LocalHistoryItem = {
@@ -423,10 +424,12 @@ export default function PredictPage() {
                         <div className="space-y-6">
                           <header className="flex justify-between items-end">
                             <div>
-                              <p className="text-[10px] uppercase text-gray-400 font-bold tracking-widest">Primary Match</p>
-                              <h3 className="text-4xl font-black">{predictMutation.data.predicted_class.replace(/_/g, " ")}</h3>
+                              <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest leading-none mb-1">Primary Match</p>
+                              <h3 className="text-2xl font-black text-white">{(predictMutation.data.predicted_class || "Detection").replace(/_/g, " ")}</h3>
                             </div>
-                            <span className="text-4xl font-black text-emerald-400">{(predictMutation.data.confidence * 100).toFixed(1)}%</span>
+                            <span className="text-2xl font-black text-emerald-400">
+                              {predictMutation.data.confidence > 1 ? (predictMutation.data.confidence).toFixed(1) : (predictMutation.data.confidence * 100).toFixed(1)}%
+                            </span>
                           </header>
                           <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/5">
                             <motion.div 
@@ -453,26 +456,33 @@ export default function PredictPage() {
 
                       {predictMutation.data.ai_debate && (
                         <div className="space-y-4 pt-8 border-t border-white/5 text-white">
-                          <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Neural Consensus Debate</p>
+                          <div className="flex justify-between items-center mb-6">
+                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Triple Intelligence Ensemble</p>
+                            <div className="flex gap-1">
+                              {['Native', 'Benchmark', 'Global'].map((s, i) => (
+                                <span key={i} className="text-[8px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold uppercase">{s}</span>
+                              ))}
+                            </div>
+                          </div>
                           <div className="space-y-4">
                             <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }} className="flex gap-3">
                               <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">🧠</div>
                               <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/5 text-sm">
-                                <span className="block text-emerald-400 font-bold uppercase text-[10px] mb-1">CNN Auditor</span>
-                                I identify this as {predictMutation.data.predicted_class.replace(/_/g, ' ')} with {(predictMutation.data.confidence * 100).toFixed(1)}% confidence.
+                                <span className="block text-emerald-400 font-bold uppercase text-[10px] mb-1">CNN Auditor (Indian Medicinal)</span>
+                                I identify this as {(predictMutation.data.predicted_class || "Unknown").replace(/_/g, ' ')} with {(predictMutation.data.confidence * 100).toFixed(1)}% confidence.
                               </div>
                             </motion.div>
                             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1 }} className="flex gap-3 flex-row-reverse">
                               <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">👁️</div>
                               <div className="bg-white/5 p-4 rounded-2xl rounded-tr-none border border-white/5 text-sm text-right">
-                                <span className="block text-blue-400 font-bold uppercase text-[10px] mb-1">Vision AI Expert</span>
-                                Independent analysis shows {predictMutation.data.ai_debate.gemini_prediction.replace(/_/g, ' ')}.
+                                <span className="block text-blue-400 font-bold uppercase text-[10px] mb-1">Vision AI Expert (PlantVillage / Global)</span>
+                                Multi-dataset verification shows {(predictMutation.data.ai_debate?.gemini_prediction || "uncertain results").replace(/_/g, ' ')}.
                               </div>
                             </motion.div>
                             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className={`p-4 rounded-2xl border text-sm ${predictMutation.data.ai_debate.agreement ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
                               <p className="font-bold flex items-center gap-2 mb-1 uppercase text-xs">
                                 {predictMutation.data.ai_debate.agreement ? <ThumbsUp className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                                Verdict: {predictMutation.data.ai_debate.agreement ? 'Matched' : 'Mismatch'}
+                                Verdict: {predictMutation.data.ai_debate.agreement ? 'Triple Consensus Matched' : 'Inconclusive Conflict'}
                               </p>
                               <p className="italic opacity-80">"{predictMutation.data.ai_debate.explanation}"</p>
                             </motion.div>

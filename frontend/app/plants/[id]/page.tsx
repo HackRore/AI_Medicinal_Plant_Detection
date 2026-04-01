@@ -103,7 +103,7 @@ export default function PlantDetailPage() {
                                 {plant.common_names.en}
                             </h1>
                             <p className="text-xl font-mono opacity-90 italic">
-                                {plant.species_name.replace(/_/g, ' ')}
+                                {(plant.species_name || "Unknown Species").replace(/_/g, ' ')}
                             </p>
                         </div>
                     </div>

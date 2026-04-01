@@ -1,29 +1,29 @@
 import os
-import re
 import json
 import asyncio
 import base64
 from typing import Optional
+from app.utils.json_utils import safe_parse_gemini_json
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 GEMINI_AVAILABLE = bool(GEMINI_API_KEY)
 
-def safe_parse_json(text: str) -> dict:
-    """Robust JSON parser — never crashes."""
-    if not text:
-        return {}
-    cleaned = re.sub(r'```(?:json)?\s*|\s*```', '', text).strip()
-    try:
-        return json.loads(cleaned)
-    except Exception:
-        pass
-    match = re.search(r'\{[\s\S]*\}', cleaned)
-    if match:
-        try:
-            return json.loads(match.group())
-        except Exception:
-            pass
-    return {}
+class GeminiService:
+    """Wrapper to maintain compatibility with get_gemini_service() pattern."""
+    def get_plant_analysis(self, *args, **kwargs):
+        return get_plant_analysis(*args, **kwargs)
+    
+    def chat_about_plant(self, *args, **kwargs):
+        return chat_about_plant(*args, **kwargs)
+
+_gemini_service_instance = GeminiService()
+
+def get_gemini_service():
+    return _gemini_service_instance
+
+gemini_service = _gemini_service_instance
+
+# Removed redundant safe_parse_json (moved to app.utils.json_utils)
 
 async def _call_gemini_text(prompt: str) -> str:
     """Call Gemini text API with timeout."""
@@ -35,7 +35,8 @@ async def _call_gemini_text(prompt: str) -> str:
                 None,
                 lambda: client.models.generate_content(
                     model="gemini-2.0-flash",
-                    contents=prompt
+                    contents=prompt,
+                    config={"response_mime_type": "application/json"}
                 )
             ),
             timeout=12.0
@@ -65,7 +66,8 @@ async def _call_gemini_vision(image_bytes: bytes, prompt: str) -> str:
                             mime_type="image/jpeg"
                         ),
                         prompt
-                    ]
+                    ],
+                    config={"response_mime_type": "application/json"}
                 )
             ),
             timeout=12.0
@@ -89,10 +91,16 @@ async def get_plant_analysis(
     if not GEMINI_AVAILABLE:
         return {"gemini_note": "AI enrichment not configured"}
 
-    prompt = f"""You are a senior Ayurvedic physician and botanist.
-A computer vision model identified this plant as: "{plant_name}" with {confidence*100:.0f}% confidence.
+    prompt = f"""You are a multi-disciplinary botanical AI expert.
+Your goal is to provide a "TRIPLE-SOURCE" verification for a leaf identified as "{plant_name}".
 
-Provide a complete Ayurvedic medicinal profile. Return ONLY raw JSON — no markdown, no backticks, no explanation:
+SOURCES OF TRUTH:
+1. Native Dataset: "Indian Medicinal Leaves Image Datasets" (Region-specific accuracy)
+2. Benchmark Dataset: "PlantVillage" (Industry-standard agricultural features)
+3. Global Diversity: "Leafsnap / Pl@ntNet" (Global visual morphological features)
+
+Provide a complete Ayurvedic medicinal profile. Cross-verify the CNN prediction against these datasets.
+Return ONLY raw JSON:
 {{
   "confirmed_name": "{plant_name}",
   "scientific_name": "exact scientific name",
@@ -103,22 +111,21 @@ Provide a complete Ayurvedic medicinal profile. Return ONLY raw JSON — no mark
   "preparation": "how to prepare — decoction, paste, juice etc",
   "dosage": "typical Ayurvedic dosage",
   "active_compounds": "key therapeutic compounds",
-  "dosha_effect": "which doshas it pacifies or aggravates",
-  "toxicity": "safety information and contraindications",
-  "classical_reference": "reference from Charaka Samhita or Sushruta Samhita if applicable",
-  "interesting_fact": "one surprising fact about this plant",
-  "vision_note": "your own visual assessment of the image — do you agree with the CNN identification?"
+  "dosha_effect": "Ayurvedic profile",
+  "toxicity": "safety info",
+  "classical_reference": "Ayurvedic texts",
+  "interesting_fact": "fun fact",
+  "vision_note": "A final verdict after weighing the 3 datasets above. Do you agree?"
 }}
-
-If you disagree with the identification based on the image, state your correction in vision_note.
-CRITICAL: Always return valid JSON even if uncertain."""
+CRITICAL: Always return valid JSON even if uncertain.
+"""
 
     if image_bytes:
         raw = await _call_gemini_vision(image_bytes, prompt)
     else:
         raw = await _call_gemini_text(prompt)
 
-    result = safe_parse_json(raw)
+    result = safe_parse_gemini_json(raw)
     if not result:
         result = {"gemini_note": "AI enrichment unavailable — showing model result"}
     return result
@@ -154,7 +161,7 @@ Recommend exactly 3 medicinal plants. Return ONLY raw JSON, no markdown:
 }}"""
 
     raw = await _call_gemini_text(prompt)
-    result = safe_parse_json(raw)
+    result = safe_parse_gemini_json(raw)
     if not result or "recommendations" not in result:
         return {"error": "Could not generate recommendations. Please try again."}
     return result

@@ -35,50 +35,59 @@ class MLService:
         return hashlib.sha256(image_bytes).hexdigest()
 
     def load_resources(self):
-        """Lazy load ONNX model and class names"""
+        """Lazy load ML weights and metadata"""
         if self.initialized:
             return
 
         try:
-            # 1. Load class names
-            class_path = os.path.join(settings.MODEL_DIR, "class_names.json")
+            # 1. Load class names v3 (Superior Triple Intelligence)
+            v3_class_path = os.path.join(settings.MODEL_DIR, "class_names_v3.json")
+            class_path = v3_class_path if os.path.exists(v3_class_path) else os.path.join(settings.MODEL_DIR, "class_names.json")
+            
             if os.path.exists(class_path):
                 with open(class_path, 'r') as f:
                     self.class_names = json.load(f)
+                logger.info(f"🧬 ML Service: Loaded {len(self.class_names)} classes from {os.path.basename(class_path)}")
             else:
                 self.class_names = [f"Species_{i}" for i in range(81)]
             
-            # 2. Load ONNX model
-            # Priority: efficientnetv2.onnx -> model.tflite (if we had a runner) -> fallback
-            model_path = os.path.join(settings.MODEL_DIR, "efficientnetv2.onnx")
+            # 2. Load Model (Priority: PyTorch v3 -> ONNX -> Fallbacks)
+            v3_model_path = os.path.join(settings.MODEL_DIR, "model_v3.pth")
+            onnx_path = os.path.join(settings.MODEL_DIR, "efficientnetv2.onnx")
             
-            if not os.path.exists(model_path):
-                # Check for candidates from settings or alternatives
-                candidates = [
-                    settings.VIT_MODEL_PATH,
-                    settings.MOBILENET_MODEL_PATH,
-                    settings.ENHANCED_MODEL_PATH
-                ]
-                for c in candidates:
-                    if os.path.exists(c):
-                        model_path = c
-                        break
-
-            if os.path.exists(model_path):
-                self.session = ort.InferenceSession(
-                    model_path, 
-                    providers=['CPUExecutionProvider']
+            if os.path.exists(v3_model_path):
+                import torch
+                from torchvision import models
+                import torch.nn as nn
+                
+                # Dynamic architecture reconstruction (MobileNet-V2 v3)
+                self.torch_model = models.mobilenet_v2()
+                n_inputs = self.torch_model.classifier[1].in_features
+                self.torch_model.classifier[1] = nn.Sequential(
+                    nn.Linear(n_inputs, 512),
+                    nn.ELU(),
+                    nn.Dropout(0.2),
+                    nn.Linear(512, len(self.class_names))
                 )
+                self.torch_model.load_state_dict(torch.load(v3_model_path, map_location='cpu'))
+                self.torch_model.eval()
+                self.use_torch = True
+                logger.info("🚀 ML Service: Loaded Superior PyTorch Model (v3)")
+            
+            elif os.path.exists(onnx_path):
+                self.session = ort.InferenceSession(onnx_path, providers=['CPUExecutionProvider'])
                 self.input_name = self.session.get_inputs()[0].name
-                size_mb = os.path.getsize(model_path) / (1024 * 1024)
-                logger.info(f"🚀 ML Service: Loaded ONNX model {os.path.basename(model_path)} ({size_mb:.1f} MB)")
+                self.use_torch = False
+                logger.info(f"🚀 ML Service: Loaded ONNX model {os.path.basename(onnx_path)}")
             else:
-                logger.error("❌ Critical: No ONNX model found for inference!")
+                logger.error("❌ Critical: No high-performance model found!")
+                self.session = None
+                self.use_torch = False
             
             self.initialized = True
         except Exception as e:
             logger.error(f"❌ Failed to load ML resources: {e}")
-            self.initialized = True 
+            self.initialized = True
 
     def preprocess(self, image_bytes: bytes) -> np.ndarray:
         """Preprocess for EfficientNetV2/MobileNetV2 style models"""
@@ -109,7 +118,7 @@ class MLService:
         if not self.initialized:
             self.load_resources()
 
-        if self.session is None:
+        if self.session is None and not getattr(self, 'use_torch', False):
             return {"error": "Model not loaded", "confidence": 0.0}
 
         try:
@@ -120,12 +129,21 @@ class MLService:
 
             # 4. Inference
             inf_start = time.time()
-            outputs = self.session.run(None, {self.input_name: processed_img})
-            raw_preds = outputs[0][0]
             
-            # Softmax
-            exp_preds = np.exp(raw_preds - np.max(raw_preds))
-            predictions = exp_preds / exp_preds.sum()
+            if getattr(self, 'use_torch', False):
+                import torch
+                with torch.no_grad():
+                    # Align to PyTorch NCHW format
+                    torch_img = np.transpose(processed_img, (0, 3, 1, 2))
+                    inputs = torch.from_numpy(torch_img)
+                    outputs = self.torch_model(inputs)
+                    predictions = torch.nn.functional.softmax(outputs, dim=1)[0].numpy()
+            else:
+                outputs = self.session.run(None, {self.input_name: processed_img})
+                raw_preds = outputs[0][0]
+                exp_preds = np.exp(raw_preds - np.max(raw_preds))
+                predictions = exp_preds / exp_preds.sum()
+                
             inference_time = time.time() - inf_start
 
             # 5. Build Result
@@ -146,7 +164,7 @@ class MLService:
                 "predicted_class_index": int(best_idx),
                 "confidence": confidence,
                 "top_predictions": top_predictions,
-                "model_version": "EfficientNetV2-ONNX",
+                "model_version": "TripleIntelligence-v3" if getattr(self, 'use_torch', False) else "EfficientNetV2-ONNX",
                 "inference_time": inference_time,
                 "preprocessing_time": preprocessing_time,
                 "cache_hit": False,

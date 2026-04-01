@@ -1,20 +1,15 @@
-import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
+from app.config import settings
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+DATABASE_URL = settings.DATABASE_URL
 
 # Fix common URL prefix issue
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 if not DATABASE_URL:
-    # We raise RuntimeError as requested to ensure visibility in logs
-    raise RuntimeError(
-        "DATABASE_URL is not set. "
-        "Add it to Render environment variables: "
-        "postgresql://postgres:[PASSWORD]@db.bcyiaopmtmpqrjijtygu.supabase.co:5432/postgres"
-    )
+    raise RuntimeError("DATABASE_URL is not set in .env or settings.")
 
 engine = create_engine(
     DATABASE_URL,

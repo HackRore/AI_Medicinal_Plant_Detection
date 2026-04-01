@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Header
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from typing import Optional, List
@@ -21,11 +21,10 @@ PLANT_FALLBACK = [
     {"id":7,"name":"Amla","scientific_name":"Phyllanthus emblica","family":"Phyllanthaceae","ayurvedic_name":"Amalaki","medicinal_uses":"Vitamin C, hair growth, immunity, digestion, anti-aging, liver protection","parts_used":"Fruit, leaves, bark, seeds","preparation":"Raw fruit, juice, churna powder, hair oil","active_compounds":"Emblicanin A and B, ascorbic acid, gallic acid","toxicity":"Non-toxic; safe for all ages","description":"Contains as much Vitamin C as 20 oranges"},
     {"id":8,"name":"Brahmi","scientific_name":"Bacopa monnieri","family":"Plantaginaceae","ayurvedic_name":"Brahmi","medicinal_uses":"Memory, cognitive function, anxiety, ADHD, neuroprotection","parts_used":"Whole plant","preparation":"Fresh juice, powder, ghee infusion","active_compounds":"Bacosides A and B, brahmine, herpestine","toxicity":"Safe; nausea on empty stomach; avoid in hypothyroidism","description":"NASA studied for cognitive stress reduction"},
     {"id":9,"name":"Ginger","scientific_name":"Zingiber officinale","family":"Zingiberaceae","ayurvedic_name":"Shunthi","medicinal_uses":"Nausea, digestion, anti-inflammatory, cold and flu, pain relief","parts_used":"Rhizome","preparation":"Fresh juice, decoction, powder, tea","active_compounds":"Gingerols, shogaols, paradols, zingerone","toxicity":"Safe in food amounts; high doses cause heartburn","description":"Used for 5000 years across every medicine system"},
-    {"id":10,"name":"Moringa","scientific_name":"Moringa oleifera","family":"Moringaceae","ayurvedic_name":"Shigru","medicinal_uses":"Malnutrition, anti-inflammatory, blood sugar, antioxidant, lactation","parts_used":"Leaves, seeds, pods, roots","preparation":"Leaf powder, fresh leaves cooked, seed oil","active_compounds":"Isothiocyanates, quercetin, chlorogenic acid","toxicity":"Leaves and pods safe; root bark toxic","description":"7x Vitamin C of oranges, 4x calcium of milk"},
-    {"id":11,"name":"Neem","scientific_name":"Azadirachta indica","family":"Meliaceae","ayurvedic_name":"Nimba","medicinal_uses":"Skin diseases, blood purifier, antifungal, antibacterial, dental care","parts_used":"Leaves, bark, seeds, oil","preparation":"Leaf paste, decoction, twig as toothbrush","active_compounds":"Nimbin, azadirachtin, limonoids","toxicity":"Safe; avoid seed oil in large doses","description":"Sarva roga nivarini — curer of all ailments"},
-    {"id":12,"name":"Hibiscus","scientific_name":"Hibiscus rosa-sinensis","family":"Malvaceae","ayurvedic_name":"Japa","medicinal_uses":"Blood pressure, hair growth, liver protection, cholesterol","parts_used":"Flowers, leaves, roots","preparation":"Flower tea, hair oil, paste","active_compounds":"Anthocyanins, hibiscin, quercetin, vitamin C","toxicity":"Generally safe; avoid high doses in pregnancy","description":"Lowers blood pressure as effectively as some medications"},
+    {"id":10,"name":"Moringa","scientific_name":"Moringa oleifera","family":"Moringaceae","ayurvedic_name":"Shigru","medicinal_uses":"Malnutrition, anti-inflammatory, blood sugar, antioxidant, lactation","parts_used":"Leaves, seeds, pods, roots","preparation":"Leaf powder, fresh leaves cooked, seed oil","active_compounds":"Isothiocyanates, quercetin, chlorogenic acid","toxicity":"Leaves and pods safe; root bark toxic","description":"7x Vitamin C of oranges, 4x calcium of milk","habitat":"Tropical and subtropical regions"},
+    {"id":12,"name":"Hibiscus","scientific_name":"Hibiscus rosa-sinensis","family":"Malvaceae","ayurvedic_name":"Japa","medicinal_uses":"Blood pressure, hair growth, liver protection, cholesterol","parts_used":"Flowers, leaves, roots","preparation":"Flower tea, hair oil, paste","active_compounds":"Anthocyanins, hibiscin, quercetin, vitamin C","toxicity":"Generally safe; avoid high doses in pregnancy","description":"Lowers blood pressure as effectively as some medications","habitat":"Warm temperate, subtropical and tropical regions"},
     {"id":13,"name":"Lemongrass","scientific_name":"Cymbopogon citratus","family":"Poaceae","ayurvedic_name":"Bhustrina","medicinal_uses":"Anxiety, fever, pain relief, antifungal, antibacterial, cholesterol","parts_used":"Stems, leaves, essential oil","preparation":"Tea, essential oil diffusion, decoction","active_compounds":"Citral, geraniol, limonene, myrcene","toxicity":"Safe as tea; essential oil toxic if ingested","description":"Most potent natural antifungal agent"},
-    {"id":14,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","ayurvedic_name":"Pudina","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","active_compounds":"Menthol, m蛋白質","toxicity":"Safe as tea; never use essential oil on infants","description":"Natural hybrid — crossed between watermint and spearmint"},
+    {"id":14,"name":"Peppermint","scientific_name":"Mentha piperita","family":"Lamiaceae","ayurvedic_name":"Pudina","medicinal_uses":"IBS, headaches, nausea, decongestant, digestion, antispasmodic","parts_used":"Leaves, essential oil","preparation":"Tea, essential oil, fresh leaves, capsules","active_compounds":"Menthol, menthone, limonene, menthofuran","toxicity":"Safe as tea; never use essential oil on infants","description":"Natural hybrid — crossed between watermint and spearmint","habitat":"Wetlands and moist soils"},
     {"id":15,"name":"Fenugreek","scientific_name":"Trigonella foenum-graecum","family":"Fabaceae","ayurvedic_name":"Methi","medicinal_uses":"Diabetes, cholesterol, digestion, lactation, testosterone","parts_used":"Seeds, leaves","preparation":"Soaked seeds, powder, decoction, fresh leaves in food","active_compounds":"Diosgenin, trigonelline, galactomannan, saponins","toxicity":"Safe in food; high doses cause diarrhea; avoid in pregnancy","description":"Compounds structurally similar to insulin"},
 ]
 
@@ -58,8 +57,15 @@ def get_plants(search: str = "", db: Session = Depends(get_db)):
 
 # ── Administrative Endpoints ──────────────────────────────────────
 @router.post("/admin/migrate")
-def migrate_database(db: Session = Depends(get_db)):
+def migrate_database(
+    x_admin_token: Optional[str] = Header(None),
+    db: Session = Depends(get_db)
+):
     """Remote migration endpoint to seed plants into Supabase."""
+    # Basic protection using a secret from settings
+    from app.config import settings
+    if x_admin_token != settings.SECRET_KEY:
+        raise HTTPException(status_code=403, detail="Administrative access denied — Invalid Token")
     try:
         from app.db.migrate import CREATE_TABLE, PLANTS_DATA
         db.execute(text(CREATE_TABLE))

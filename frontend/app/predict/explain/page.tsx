@@ -104,7 +104,7 @@ export default function ExplainPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <p className="text-5xl font-black text-primary mb-2">
-                  {result.prediction.predicted_class.replace(/_/g, " ")}
+                  {(result.prediction?.predicted_class || "Unknown").replace(/_/g, " ")}
                 </p>
                 <p className="text-3xl font-bold text-green-500">
                   {(result.prediction.confidence * 100).toFixed(1)}% Confidence

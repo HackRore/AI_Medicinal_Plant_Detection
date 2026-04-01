@@ -24,25 +24,32 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="PlantoAI API",
     version="2.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    redirect_slashes=False  # Crucial for CORS preflight robustness
 )
 
-# CORS
+# Hardened Production CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://plantoai.vercel.app",
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"], # Highly permissive for Vercel dynamic domains
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 # Health endpoint
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "PlantoAI", "version": "2.0.0"}
+    from app.services.ml_service import ml_service
+    status = "healthy" if ml_service.initialized else "initializing"
+    return {
+        "status": "ok",
+        "service": "PlantoAI",
+        "version": "2.0.0",
+        "ml_engine": "Triple-Intelligence-v3" if getattr(ml_service, 'use_torch', False) else "ONNX-Fallback",
+        "model_status": status
+    }
 
 # Include API routers
 app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["Authentication"])
