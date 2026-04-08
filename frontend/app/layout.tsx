@@ -30,6 +30,8 @@ export const metadata: Metadata = {
     },
 }
 
+import { BackendWarmup } from '@/components/layout/BackendWarmup'
+
 export default function RootLayout({
     children,
 }: {
@@ -39,6 +41,7 @@ export default function RootLayout({
         <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
             <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased selection:bg-primary-500/30 selection:text-primary-900">
                 <Providers>
+                    <BackendWarmup />
                     <Navbar />
     <main>
         <ErrorBoundary>

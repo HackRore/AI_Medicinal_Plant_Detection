@@ -1,10 +1,33 @@
 "use client";
 // Force deployment sync: 1774266800
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export const StatsSection = () => {
+    const [stats, setStats] = useState({
+        species: "13",
+        accuracy: "96.4%",
+        speed: "< 2s",
+        models: "5",
+        status: "Live"
+    });
+
+    useEffect(() => {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/stats`)
+            .then(r => r.json())
+            .then(data => {
+                setStats({
+                    species: data.class_count || data.num_classes || "13",
+                    accuracy: (data.precision_parity || data.top1_accuracy || 96.4) + "%",
+                    speed: "< 2s",
+                    models: "5",
+                    status: "Spec v2.0"
+                });
+            })
+            .catch(() => {});
+    }, []);
+
     return (
         <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 w-1/2 h-full bg-primary-900/10 skew-x-12 translate-x-1/4" />
@@ -13,11 +36,11 @@ export const StatsSection = () => {
                 <div className="overflow-x-auto pb-4 hide-scrollbar">
                     <div className="flex justify-between items-center min-w-[800px] md:min-w-0 md:grid md:grid-cols-5 gap-8 bg-black/40 p-8 rounded-[32px] border border-white/5 backdrop-blur-xl">
                         {[
-                            { value: "81", label: "Medicinal Species" },
-                            { value: "92.5%", label: "System Accuracy" },
-                            { value: "< 2s", label: "Inference Speed" },
-                            { value: "5", label: "AI Neural Models" },
-                            { value: "Free", label: "Forever Open-Source" }
+                            { value: stats.species, label: "Medicinal Species" },
+                            { value: stats.accuracy, label: "System Accuracy" },
+                            { value: stats.speed, label: "Inference Speed" },
+                            { value: stats.models, label: "AI Neural Models" },
+                            { value: stats.status, label: "Build Target" }
                         ].map((stat, idx) => (
                             <motion.div 
                                 key={idx}

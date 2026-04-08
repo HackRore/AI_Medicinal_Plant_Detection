@@ -1,9 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Leaf, Info, Zap, AlertTriangle } from 'lucide-react'
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://plantoai-backend.onrender.com'
+import { motion } from 'framer-motion'
+import { Search, Leaf, Info, Zap } from 'lucide-react'
 
 export default function PlantsPage() {
     const [plants, setPlants] = useState<any[]>([])
@@ -12,32 +10,16 @@ export default function PlantsPage() {
     const [search, setSearch] = useState('')
 
     useEffect(() => {
-        let cancelled = false
-        const fetchPlants = async () => {
-            setLoading(true)
-            try {
-                const res = await fetch(`${API_URL}/api/v1/plants`)
-                if (!res.ok) throw new Error(`HTTP ${res.status}`)
-                const data = await res.json()
-                if (!cancelled) {
-                    // Handle both direct array and nested {plants: []} responses
-                    const plantArray = data.plants || data || []
-                    setPlants(Array.isArray(plantArray) ? plantArray : [])
-                    setLoading(false)
-                }
-            } catch (err) {
-                if (!cancelled) {
-                    setError('Could not load botanical database. Please refresh.')
-                    setLoading(false)
-                    console.error('Plants error:', err)
-                }
-            }
-        }
-        fetchPlants()
-        return () => { cancelled = true }
-    }, [])
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/plants`)
+            .then(r => { if (!r.ok) throw new Error("Backend offline"); return r.json(); })
+            .then(d => { setPlants(d.plants ?? d); setLoading(false); })
+            .catch(() => {
+                setError("AI engine is starting up — please wait 30 seconds and refresh.");
+                setLoading(false);
+            });
+    }, []);
 
-    const filtered = plants.filter(p => {
+    const filtered = (Array.isArray(plants) ? plants : []).filter(p => {
         if (!p) return false;
         const s = (search || "").toLowerCase();
         return (
@@ -48,9 +30,23 @@ export default function PlantsPage() {
         );
     })
 
+    if (loading) return (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", padding: "2rem" }}>
+            {Array(12).fill(0).map((_, i) => (
+                <div key={i} style={{ height: 180, background: "#1a1f2e", borderRadius: 12, animation: "pulse 1.5s infinite" }} />
+            ))}
+        </div>
+    );
+
+    if (error) return (
+        <div style={{ padding: "2rem", textAlign: "center", color: "#f59e0b" }}>
+            <p>{error}</p>
+            <button onClick={() => window.location.reload()}>Retry</button>
+        </div>
+    );
+
     return (
         <main className="min-h-screen bg-[#050805] text-white selection:bg-emerald-500/30">
-            {/* Header Section */}
             <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -66,7 +62,7 @@ export default function PlantsPage() {
                             LEAF<span className="text-emerald-500 not-italic">DB</span>
                         </h1>
                         <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
-                            A curated repository of <span className="text-white font-medium">{plants.length} medicinal species</span>, synchronized with our CNN neural network and Gemini Vision AI.
+                            A curated repository of <span className="text-white font-medium">{plants.length} medicinal species</span>, synchronized with our CNN neural network.
                         </p>
                     </div>
 
@@ -82,32 +78,6 @@ export default function PlantsPage() {
                     </div>
                 </motion.div>
 
-                {/* Status Messages */}
-                <AnimatePresence>
-                    {loading && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
-                            exit={{ opacity: 0 }}
-                            className="flex items-center gap-3 text-emerald-500/80 font-mono text-sm mb-8"
-                        >
-                            <div className="h-4 w-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                            Synchronizing local cache with Supabase...
-                        </motion.div>
-                    )}
-                    {error && (
-                        <motion.div 
-                            initial={{ opacity: 0 }} 
-                            animate={{ opacity: 1 }} 
-                            className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl flex items-center gap-3 mb-8"
-                        >
-                            <AlertTriangle className="h-5 w-5" />
-                            {error}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Grid Section */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                     {filtered.map((plant, i) => (
                         <motion.div
@@ -127,26 +97,14 @@ export default function PlantsPage() {
                                         {plant.family || 'PlantoAI'}
                                     </span>
                                 </div>
-                                
                                 <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
                                     {plant.name}
                                 </h3>
-                                
                                 <p className="text-emerald-500/60 font-mono text-[11px] mb-4 italic truncate">
                                     {plant.scientific_name || 'Species unidentified'}
                                 </p>
-
-                                {plant.ayurvedic_name && (
-                                    <div className="flex items-center gap-2 mb-4 opacity-70">
-                                        <Zap className="h-3 w-3 text-amber-500 fill-amber-500" />
-                                        <span className="text-[10px] font-bold text-amber-200 uppercase tracking-tighter">
-                                            Ayurvedic: {plant.ayurvedic_name}
-                                        </span>
-                                    </div>
-                                )}
-
                                 <p className="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-6">
-                                    {plant.medicinal_uses || plant.description || 'Rich history of medicinal use in traditional Ayurvedic texts. Known for therapeutic properties.'}
+                                    {plant.medicinal_uses || plant.description || 'Rich history of medicinal use in traditional Ayurvedic texts.'}
                                 </p>
                             </div>
 
@@ -157,14 +115,6 @@ export default function PlantsPage() {
                         </motion.div>
                     ))}
                 </div>
-
-                {!loading && !error && filtered.length === 0 && (
-                    <div className="text-center py-24 border border-dashed border-white/5 rounded-[3rem]">
-                        <p className="text-gray-600 font-mono italic">
-                            No match found for "{search}" in our botanical index.
-                        </p>
-                    </div>
-                )}
             </div>
         </main>
     )

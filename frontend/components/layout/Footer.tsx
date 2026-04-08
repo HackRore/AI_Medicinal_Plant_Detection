@@ -47,16 +47,26 @@ export const Footer = () => {
                         <ul className="space-y-4 text-sm text-gray-400">
                             <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Documentation</a></li>
                             <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Technical Report</a></li>
-                            <li><a href="https://www.kaggle.com/datasets/rizkikecek/dataset-herbal-leaves" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Training Dataset</a></li>
+                            <li><a href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Training Dataset</a></li>
+                            <li><a href="/about" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Research Paper (Coming Soon)</a></li>
                         </ul>
                     </div>
 
                     <div>
                         <h4 className="font-bold text-white mb-6">Project Info</h4>
-                        <div className="p-6 bg-white/5 rounded-2xl border border-white/10">
+                        <div className="p-6 bg-white/5 rounded-2xl border border-white/10 relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-2 bg-emerald-500/20 text-[8px] text-emerald-400 font-bold uppercase tracking-widest border-b border-l border-emerald-500/30 rounded-bl-xl">
+                                Spec v2.0
+                            </div>
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Developed By</p>
-                            <p className="text-white font-bold mb-1">Group G9</p>
-                            <p className="text-xs text-gray-400">Dr. DY Patil College of Eng. and Innovation, Varale (Talegaon)</p>
+                            <p className="text-white font-black mb-1">Group G9 (Botanical Engine Team)</p>
+                            <p className="text-[10px] text-gray-400 uppercase tracking-tight leading-relaxed">
+                                Dr. DY Patil College of Engineering<br/>and Innovation, Varale (Talegaon)
+                            </p>
+                            <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
+                                <span className="text-[9px] text-emerald-500 font-bold uppercase">Status: Production</span>
+                                <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                            </div>
                         </div>
                     </div>
                 </div>

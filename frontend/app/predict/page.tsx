@@ -82,9 +82,9 @@ const SafetyBadge = ({isToxic, caution}: {isToxic: boolean, caution: string}) =>
 const THINKING_STEPS = [
   { icon: "🔬", text: "Detecting leaf edges and boundaries..." },
   { icon: "🌿", text: "Analyzing venation patterns and texture..." },
-  { icon: "🧬", text: "Comparing against 81 medicinal species..." },
-  { icon: "🤖", text: "Cross-verifying with Gemini Vision AI..." },
-  { icon: "📚", text: "Generating Ayurvedic knowledge profile..." },
+  { icon: "🧬", text: "Matching against 12 G9-Verified Species..." },
+  { icon: "🧪", text: "Generating Grad-CAM morphological proof..." },
+  { icon: "📚", text: "Syncing Ayurvedic Knowledge Base..." },
 ]
 
 function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
@@ -412,8 +412,16 @@ export default function PredictPage() {
                       <img src={preview || ''} className="w-full h-full object-cover" alt="Uploaded plant" />
                     </div>
                     <div className="relative rounded-3xl overflow-hidden bg-black aspect-square shadow-2xl border border-white/5">
-                      {predictMutation.data.gradcam_base64 && (
-                        <img src={`data:image/jpeg;base64,${predictMutation.data.gradcam_base64}`} className="w-full h-full object-cover" alt="Neural focus" />
+                      {predictMutation.data.gradcam ? (
+                        <div className="relative w-full h-full">
+                          <img src={`data:image/jpeg;base64,${predictMutation.data.gradcam}`} className="w-full h-full object-cover" alt="Neural focus" />
+                          <div className="absolute top-2 left-2 bg-emerald-600/80 text-[8px] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Scientific Proof</div>
+                        </div>
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 p-8 text-center bg-gray-900/50">
+                           <ShieldAlert className="h-8 w-8 mb-2 opacity-20" />
+                           <span className="text-[10px] uppercase font-bold tracking-tighter opacity-40">Morphological Data Syncing...</span>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -425,10 +433,13 @@ export default function PredictPage() {
                           <header className="flex justify-between items-end">
                             <div>
                               <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest leading-none mb-1">Primary Match</p>
-                              <h3 className="text-2xl font-black text-white">{(predictMutation.data.predicted_class || "Detection").replace(/_/g, " ")}</h3>
+                              <h3 className="text-2xl font-black text-white">{(predictMutation.data.plant_name || "Detection").replace(/_/g, " ")}</h3>
+                              {predictMutation.data.botanical_details?.sanskrit_name && (
+                                <p className="text-emerald-400 text-xs font-bold font-serif italic mb-1">{predictMutation.data.botanical_details.sanskrit_name}</p>
+                              )}
                             </div>
                             <span className="text-2xl font-black text-emerald-400">
-                              {predictMutation.data.confidence > 1 ? (predictMutation.data.confidence).toFixed(1) : (predictMutation.data.confidence * 100).toFixed(1)}%
+                              {(predictMutation.data.confidence).toFixed(1)}%
                             </span>
                           </header>
                           <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/5">
@@ -454,38 +465,34 @@ export default function PredictPage() {
 
                       <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
 
-                      {predictMutation.data.ai_debate && (
-                        <div className="space-y-4 pt-8 border-t border-white/5 text-white">
-                          <div className="flex justify-between items-center mb-6">
-                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Triple Intelligence Ensemble</p>
-                            <div className="flex gap-1">
-                              {['Native', 'Benchmark', 'Global'].map((s, i) => (
-                                <span key={i} className="text-[8px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold uppercase">{s}</span>
-                              ))}
+                      {predictMutation.data.botanical_details && (
+                        <div className="space-y-6 pt-8 border-t border-white/5 text-white">
+                          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 space-y-4 shadow-inner">
+                            <div className="flex items-center gap-2 mb-2">
+                               <Leaf className="h-4 w-4 text-emerald-400" />
+                               <span className="text-xs font-black uppercase text-emerald-400 tracking-widest">Botanical Herbarium Data</span>
                             </div>
-                          </div>
-                          <div className="space-y-4">
-                            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 }} className="flex gap-3">
-                              <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">🧠</div>
-                              <div className="bg-white/5 p-4 rounded-2xl rounded-tl-none border border-white/5 text-sm">
-                                <span className="block text-emerald-400 font-bold uppercase text-[10px] mb-1">CNN Auditor (Indian Medicinal)</span>
-                                I identify this as {(predictMutation.data.predicted_class || "Unknown").replace(/_/g, ' ')} with {(predictMutation.data.confidence * 100).toFixed(1)}% confidence.
-                              </div>
-                            </motion.div>
-                            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1 }} className="flex gap-3 flex-row-reverse">
-                              <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">👁️</div>
-                              <div className="bg-white/5 p-4 rounded-2xl rounded-tr-none border border-white/5 text-sm text-right">
-                                <span className="block text-blue-400 font-bold uppercase text-[10px] mb-1">Vision AI Expert (PlantVillage / Global)</span>
-                                Multi-dataset verification shows {(predictMutation.data.ai_debate?.gemini_prediction || "uncertain results").replace(/_/g, ' ')}.
-                              </div>
-                            </motion.div>
-                            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }} className={`p-4 rounded-2xl border text-sm ${predictMutation.data.ai_debate.agreement ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-amber-500/10 border-amber-500/20'}`}>
-                              <p className="font-bold flex items-center gap-2 mb-1 uppercase text-xs">
-                                {predictMutation.data.ai_debate.agreement ? <ThumbsUp className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-                                Verdict: {predictMutation.data.ai_debate.agreement ? 'Triple Consensus Matched' : 'Inconclusive Conflict'}
-                              </p>
-                              <p className="italic opacity-80">"{predictMutation.data.ai_debate.explanation}"</p>
-                            </motion.div>
+                            
+                            <div className="grid md:grid-cols-2 gap-6 text-sm">
+                               <div>
+                                  <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Scientific Name</span>
+                                  <p className="font-mono text-emerald-200">{predictMutation.data.botanical_details.sc_name}</p>
+                               </div>
+                               <div>
+                                  <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Habitat</span>
+                                  <p className="text-gray-300">{predictMutation.data.botanical_details.habitat}</p>
+                               </div>
+                            </div>
+                            
+                            <div>
+                               <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Ayurvedic Uses</span>
+                               <p className="text-gray-200 leading-relaxed">{predictMutation.data.botanical_details.uses}</p>
+                            </div>
+                            
+                            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
+                               <span className="block text-[10px] text-emerald-500 font-bold uppercase mb-2">Traditional Preparation</span>
+                               <p className="text-xs text-emerald-100 italic">"{predictMutation.data.botanical_details.preparation}"</p>
+                            </div>
                           </div>
                         </div>
                       )}

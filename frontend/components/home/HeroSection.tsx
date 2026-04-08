@@ -22,7 +22,7 @@ export const HeroSection = () => {
                     className="mb-6 inline-block"
                 >
                     <span className="px-4 py-2 rounded-full bg-primary-900 text-white text-[10px] font-mono tracking-[0.3em] uppercase border border-white/10 shadow-2xl">
-                        Powered by EfficientNetV2 + Gemini Vision
+                        India's Most Advanced Medicinal Plant Detection Pipeline
                     </span>
                 </motion.div>
 

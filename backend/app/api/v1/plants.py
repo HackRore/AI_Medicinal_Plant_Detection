@@ -30,76 +30,37 @@ PLANT_FALLBACK = [
 
 @router.get("/")
 def get_plants(search: str = "", db: Session = Depends(get_db)):
-    """Get all plants — tries Supabase first, falls back to local data."""
+    """Source from the G9-Verified Botanical Knowledge Base."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    kb_path = os.path.join(base_dir, "data", "medicinal_knowledge.json")
     try:
-        from sqlalchemy import text
-        if search:
-            result = db.execute(
-                text("SELECT * FROM plants WHERE LOWER(name) LIKE :s OR LOWER(medicinal_uses) LIKE :s ORDER BY name"),
-                {"s": f"%{search.lower()}%"}
-            )
-        else:
-            result = db.execute(text("SELECT * FROM plants ORDER BY name"))
-        rows = result.mappings().all()
-        plants = [dict(row) for row in rows]
-        if plants:
-            return {"plants": plants, "total": len(plants), "source": "supabase"}
-    except Exception as e:
-        print(f"DB error, using fallback: {e}")
-
-    # Fallback — always works
-    result = PLANT_FALLBACK
-    if search:
-        result = [p for p in result if
-                  search.lower() in p["name"].lower() or
-                  search.lower() in p.get("medicinal_uses", "").lower()]
-    return {"plants": result, "total": len(result), "source": "fallback"}
-
-# ── Administrative Endpoints ──────────────────────────────────────
-@router.post("/admin/migrate")
-def migrate_database(
-    x_admin_token: Optional[str] = Header(None),
-    db: Session = Depends(get_db)
-):
-    """Remote migration endpoint to seed plants into Supabase."""
-    # Basic protection using a secret from settings
-    from app.config import settings
-    if x_admin_token != settings.SECRET_KEY:
-        raise HTTPException(status_code=403, detail="Administrative access denied — Invalid Token")
-    try:
-        from app.db.migrate import CREATE_TABLE, PLANTS_DATA
-        db.execute(text(CREATE_TABLE))
-        db.commit()
+        with open(kb_path, 'r') as f:
+            kb = json.load(f)
         
-        for p in PLANTS_DATA:
-            db.execute(text("""
-                INSERT INTO plants (name, scientific_name, family, ayurvedic_name,
-                    medicinal_uses, parts_used, preparation, active_compounds,
-                    toxicity, description, habitat)
-                VALUES (:name, :sci, :fam, :ayu, :med, :parts, :prep, :comp, :tox, :desc, :hab)
-                ON CONFLICT (name) DO UPDATE SET
-                    scientific_name = EXCLUDED.scientific_name,
-                    medicinal_uses = EXCLUDED.medicinal_uses,
-                    updated_at = NOW()
-            """), {
-                "name": p[0], "sci": p[1], "fam": p[2], "ayu": p[3],
-                "med": p[4], "parts": p[5], "prep": p[6], "comp": p[7],
-                "tox": p[8], "desc": p[9], "hab": p[10]
-            })
-        db.commit()
-        return {"status": "success", "message": f"Seeded {len(PLANTS_DATA)} plants"}
+        plants = []
+        for i, (name, details) in enumerate(kb.items()):
+            plant_doc = {"id": i+1, "name": name, **details}
+            if not search or search.lower() in name.lower() or search.lower() in details.get("uses", "").lower():
+                plants.append(plant_doc)
+        
+        return {"plants": plants, "total": len(plants), "source": "medicinal_knowledge_json"}
     except Exception as e:
-        db.rollback()
-        return {"status": "error", "message": str(e)}
+        # Fallback to the hardcoded list if file missing
+        print(f"KB Error: {e}")
+        return {"plants": PLANT_FALLBACK, "total": len(PLANT_FALLBACK), "source": "fallback"}
 
 @router.get("/{plant_id}")
 async def get_plant_detail(plant_id: int, db: Session = Depends(get_db)):
-    """Get detail for a specific plant (DB with fallback)"""
+    """Get detail for a specific plant from verified knowledge base."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    kb_path = os.path.join(base_dir, "data", "medicinal_knowledge.json")
     try:
-        plant = db.query(Plant).filter(Plant.id == plant_id).first()
-        if plant: return plant
+        with open(kb_path, 'r') as f:
+            kb = json.load(f)
+        
+        for i, (name, details) in enumerate(kb.items()):
+            if i+1 == plant_id:
+                return {"id": i+1, "name": name, **details}
     except: pass
     
-    for p in PLANT_FALLBACK:
-        if p["id"] == plant_id: return p
-    raise HTTPException(status_code=404, detail="Plant not found")
+    raise HTTPException(status_code=404, detail="Medicinal species not found")
