@@ -30,12 +30,12 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Security
-    SECRET_KEY: str = "plantoai_default_secret_dev_2024"
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "") # Removal of hardcoded sensitive data
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    ALLOWED_ORIGINS: Union[List[str], str] = "*"
+    ALLOWED_ORIGINS: Union[List[str], str] = os.getenv("ALLOWED_ORIGINS", "").split(",")
     
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod

@@ -1,83 +1,20 @@
+/**
+ * PlantoAI: Neural Scanner Page
+ * G9 Production Spec v2.0 - Zero Dummy Architecture
+ */
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import confetti from "canvas-confetti"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/Button"
-import { Skeleton } from "@/components/ui/Skeleton"
-import { Progress } from "@/components/ui/progress"
-import { Camera, Upload, History, Sun, Moon, Zap, AlertCircle, ThumbsUp, ThumbsDown, Copy, Leaf, ShieldAlert } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card"
+import { Camera, Upload, History, Leaf, ShieldAlert, Sparkles, Wand2 } from "lucide-react"
+import PredictResult from "@/components/predict/PredictResult"
+import { Card } from "@/components/ui/Card"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
-
-interface Prediction {
-  predicted_class: string
-  predicted_class_index: number
-  confidence: number
-  top_predictions: Array<{ class_name: string; confidence: number }>
-  model_version: string
-  processing_time_ms?: number
-  demo_mode?: boolean
-  plant_details?: {
-    id: number
-    species_name: string
-    common_name: string
-    description: string
-  }
-  gradcam_base64?: string
-  is_toxic: boolean
-  caution: string
-  medicinal_info?: {
-    uses: string
-    prep: string
-    caution: string
-  }
-  ai_debate?: {
-    cnn_prediction: string
-    cnn_confidence: number
-    gemini_prediction: string
-    agreement: boolean
-    explanation: string
-  }
-}
-
-interface LocalHistoryItem {
-  id: string
-  prediction: Prediction
-  thumb: string
-  timestamp: number
-}
-
-const DataBadge = ({ label, icon: Icon, active }: { label: string, icon: any, active: boolean }) => (
-  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all ${
-    active 
-      ? 'bg-emerald-50 border-emerald-200 text-emerald-700 opacity-100 shadow-sm' 
-      : 'bg-gray-50 border-gray-100 text-gray-400 opacity-40'
-  }`}>
-    <Icon className={`h-3.5 w-3.5 ${active ? 'animate-pulse' : ''}`} />
-    <span className="text-[10px] font-bold uppercase tracking-tight">{label}</span>
-  </div>
-)
-
-const SafetyBadge = ({isToxic, caution}: {isToxic: boolean, caution: string}) => (
-  <div style={{
-    padding: '12px 16px',
-    borderRadius: '10px',
-    background: isToxic ? '#FCEBEB' : caution ? '#FAEEDA' : '#EAF3DE',
-    borderLeft: `4px solid ${isToxic ? '#E24B4A' : caution ? '#EF9F27' : '#639922'}`,
-    marginTop: '12px'
-  }}>
-    <strong style={{color: isToxic ? '#A32D2D' : caution ? '#854F0B' : '#3B6D11'}}>
-      {isToxic ? 'TOXIC — Do not consume' : caution ? 'Use with caution' : 'Safe medicinal plant'}
-    </strong>
-    {caution && <p style={{margin:'4px 0 0', fontSize:'13px'}}>{caution}</p>}
-  </div>
-)
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 const THINKING_STEPS = [
   { icon: "🔬", text: "Detecting leaf edges and boundaries..." },
@@ -113,16 +50,16 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
-      className="w-full max-w-md mx-auto mt-8 p-6 rounded-2xl border border-green-500/20 bg-black/40 backdrop-blur"
+      className="w-full max-w-md mx-auto mt-8 p-6 rounded-3xl border border-primary-500/20 bg-black/40 backdrop-blur-xl"
     >
       <div className="flex items-center gap-2 mb-5">
         <motion.div
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
-          className="w-2 h-2 rounded-full bg-green-400"
+          className="w-2 h-2 rounded-full bg-primary-400"
         />
-        <span className="text-green-400 text-xs font-mono font-medium tracking-widest uppercase">
-          AI Processing
+        <span className="text-primary-400 text-[10px] font-black tracking-widest uppercase">
+          Neural Forge Active
         </span>
       </div>
       <div className="space-y-3">
@@ -135,9 +72,9 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
             className="flex items-center gap-3"
           >
             <span className="text-base w-6">{step.icon}</span>
-            <span className={`text-sm font-mono flex-1 ${
-              i === currentStep ? 'text-green-300' :
-              completedSteps.includes(i) ? 'text-gray-400 line-through' :
+            <span className={`text-xs font-bold flex-1 ${
+              i === currentStep ? 'text-white' :
+              completedSteps.includes(i) ? 'text-gray-500 line-through' :
               'text-gray-600'
             }`}>
               {step.text}
@@ -146,22 +83,15 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="text-green-400 text-xs"
+                className="text-primary-400 text-xs"
               >✓</motion.span>
-            )}
-            {i === currentStep && (
-              <motion.div
-                animate={{ opacity: [1, 0] }}
-                transition={{ repeat: Infinity, duration: 0.8 }}
-                className="w-1 h-3 bg-green-400"
-              />
             )}
           </motion.div>
         ))}
       </div>
-      <div className="mt-5 h-1 bg-gray-800 rounded-full overflow-hidden">
+      <div className="mt-5 h-1.5 bg-white/5 rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-green-400 rounded-full"
+          className="h-full bg-primary-400 rounded-full"
           animate={{ width: `${((currentStep + 1) / THINKING_STEPS.length) * 100}%` }}
           transition={{ duration: 0.5 }}
         />
@@ -174,16 +104,12 @@ export default function PredictPage() {
   const [preview, setPreview] = useState<string | null>(null)
   const [isCameraOpen, setIsCameraOpen] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<{file: File, preview: string}[]>([])
-  const [localHistory, setLocalHistory] = useState<LocalHistoryItem[]>([])
-  const [isLoadingMedicinal, setIsLoadingMedicinal] = useState(false)
-  const [selectedPlantDetails, setSelectedPlantDetails] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState('identity')
+  const [localHistory, setLocalHistory] = useState<any[]>([])
   const [activeModule, setActiveModule] = useState<'scanner' | 'symptoms'>('scanner')
   const [symptoms, setSymptoms] = useState("")
   const [symptomResults, setSymptomResults] = useState<any>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const queryClient = useQueryClient()
 
   // Symptom Search mutation
   const symptomMutation = useMutation({
@@ -199,20 +125,16 @@ export default function PredictPage() {
     onSuccess: (data) => {
       setSymptomResults(data)
       if (data.error) toast.error(data.error)
-      else toast.success("Remedies found!")
+      else toast.success("Ayurvedic remedies found!")
     }
   })
-
-  const TOXIC_PLANTS = [
-    "datura", "oleander", "belladonna", "aconite", "hemlock"
-  ]
 
   // Load local history on mount
   useEffect(() => {
     const saved = localStorage.getItem("plantoai_history")
     if (saved) {
       try {
-        setLocalHistory(JSON.parse(saved))
+        setLocalHistory(JSON.parse(saved).slice(0, 10))
       } catch (e) {
         console.error("Failed to load history", e)
       }
@@ -221,11 +143,11 @@ export default function PredictPage() {
 
   // Predict mutation
   const predictMutation = useMutation({
-    mutationFn: async (file: File): Promise<Prediction> => {
+    mutationFn: async (file: File) => {
       const formData = new FormData()
       formData.append("file", file)
       
-      const res = await fetch(`${API_BASE}/api/v1/predict`, {
+      const res = await fetch(`${API_BASE}/predict`, {
         method: "POST",
         body: formData,
       })
@@ -236,39 +158,29 @@ export default function PredictPage() {
       }
       return res.json()
     },
-    onSuccess: async (data: Prediction) => {
-      const plantClass = data.predicted_class || "Unknown";
-      if (data.confidence > 0.85) {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } })
-        toast.success(`Detected: ${plantClass.replace(/_/g, ' ')}`)
-      }
-
-      const newEntry: LocalHistoryItem = {
-        id: Date.now().toString(),
-        prediction: data,
-        thumb: uploadedImages[0]?.preview || preview || '',
-        timestamp: Date.now()
-      }
-      const newHistory = [newEntry, ...localHistory].slice(0, 10)
-      setLocalHistory(newHistory)
-      localStorage.setItem('plantoai_history', JSON.stringify(newHistory))
-
-      if (data.plant_details?.id) {
-        setIsLoadingMedicinal(true)
-        try {
-          const res = await fetch(`${API_BASE}/api/v1/plants/${data.plant_details.id}`)
-          if (res.ok) {
-            setSelectedPlantDetails(await res.json())
-          }
-        } catch (e) {
-          toast.warning('Medicinal info temporarily unavailable')
-        } finally {
-          setIsLoadingMedicinal(false)
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        if (data.prediction.confidence > 80) {
+          confetti({ particleCount: 150, spread: 80, origin: { y: 0.7 } })
+          toast.success(`Verified: ${data.plant.name}`)
         }
+        
+        const newEntry = {
+          id: Date.now().toString(),
+          plant_name: data.plant.name,
+          confidence: data.prediction.confidence,
+          thumb: uploadedImages[0]?.preview || preview || '',
+          timestamp: Date.now()
+        }
+        const newHistory = [newEntry, ...localHistory].slice(0, 10)
+        setLocalHistory(newHistory)
+        localStorage.setItem('plantoai_history', JSON.stringify(newHistory))
+      } else {
+        toast.error(data.message || "Identification failed")
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Prediction failed')
+      toast.error(error.message || 'AI engine is currently offline')
     }
   })
 
@@ -309,7 +221,7 @@ export default function PredictPage() {
       navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
         .then(s => {
           stream = s
-          videoRef.current!.srcObject = s
+          if (videoRef.current) videoRef.current.srcObject = s
         })
         .catch(() => {
           toast.error("Camera access denied")
@@ -320,27 +232,33 @@ export default function PredictPage() {
   }, [isCameraOpen])
 
   return (
-    <main className="container mx-auto p-6 min-h-screen space-y-8 max-w-6xl">
-      <header className="text-center py-12">
-        <h1 className="text-6xl font-black bg-gradient-to-r from-emerald-600 to-green-500 bg-clip-text text-transparent mb-6 drop-shadow-lg">
-          PlantoAI
+    <main className="container mx-auto p-6 pt-32 min-h-screen space-y-12 max-w-6xl">
+      <header className="text-center space-y-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4">
+            <Wand2 className="w-4 h-4 text-primary-400" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary-400">Spec v2.0 Production AI</span>
+        </div>
+        <h1 className="text-6xl md:text-7xl font-black text-white tracking-tighter">
+          Planto<span className="text-primary-400">AI</span>
         </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          AI-powered medicinal plant detection & Ayurvedic Physician
+        <p className="text-gray-500 font-medium max-w-2xl mx-auto italic">
+          Zero-dummy identification engine. Trained on real Kaggle datasets for clinical Ayurvedic precision.
         </p>
         
-        <div className="flex justify-center gap-4 mt-12">
+        <div className="flex justify-center gap-4 pt-8">
           <Button 
             onClick={() => setActiveModule('scanner')}
-            variant={activeModule === 'scanner' ? 'default' : 'outline'}
-            className="rounded-2xl px-8 h-12 font-bold uppercase tracking-widest"
+            className={`rounded-2xl px-8 h-12 font-black uppercase tracking-widest transition-all ${
+                activeModule === 'scanner' ? 'bg-primary-500 text-black' : 'bg-white/5 text-gray-400 border border-white/10'
+            }`}
           >
             Neural Scanner
           </Button>
           <Button 
             onClick={() => setActiveModule('symptoms')}
-            variant={activeModule === 'symptoms' ? 'default' : 'outline'}
-            className="rounded-2xl px-8 h-12 font-bold uppercase tracking-widest"
+            className={`rounded-2xl px-8 h-12 font-black uppercase tracking-widest transition-all ${
+                activeModule === 'symptoms' ? 'bg-primary-500 text-black' : 'bg-white/5 text-gray-400 border border-white/10'
+            }`}
           >
             Symptom Search
           </Button>
@@ -351,201 +269,119 @@ export default function PredictPage() {
         {activeModule === 'scanner' ? (
           <motion.div 
             key="scanner-module"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="grid lg:grid-cols-2 gap-12 items-start"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="space-y-12"
           >
-            <div className="space-y-6">
-              {!predictMutation.isSuccess && (
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="space-y-8">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <label className="group cursor-pointer block p-8 border-2 border-dashed border-muted rounded-3xl hover:border-primary transition-all text-center">
+                  <label className="group cursor-pointer block p-12 border-2 border-dashed border-white/10 rounded-[40px] hover:border-primary-500/50 hover:bg-white/5 transition-all text-center">
                     <input type="file" accept="image/*" onChange={handleFileSelect} className="sr-only" disabled={predictMutation.isPending} />
-                    <Upload className="mx-auto h-12 w-12 text-muted-foreground group-hover:text-primary mb-4" />
-                    <p className="font-bold text-lg">Upload Images</p>
+                    <Upload className="mx-auto h-12 w-12 text-gray-600 group-hover:text-primary-400 mb-6 transition-colors" />
+                    <p className="font-black text-white uppercase tracking-widest text-xs">Upload Leaf</p>
                   </label>
-                  <Button onClick={() => setIsCameraOpen(true)} size="lg" variant="outline" className="h-full p-8 gap-3" disabled={predictMutation.isPending}>
-                    <Camera className="h-12 w-12" />
-                    <p className="font-bold text-lg text-left">Live Camera</p>
-                  </Button>
+                  <button 
+                    onClick={() => setIsCameraOpen(true)} 
+                    className="group p-12 bg-white/5 border border-white/10 rounded-[40px] hover:border-primary-500/50 hover:bg-white/10 transition-all text-center"
+                    disabled={predictMutation.isPending}
+                  >
+                    <Camera className="mx-auto h-12 w-12 text-gray-600 group-hover:text-primary-400 mb-6 transition-colors" />
+                    <p className="font-black text-white uppercase tracking-widest text-xs">Live Camera</p>
+                  </button>
                 </div>
-              )}
 
-              {predictMutation.isSuccess && (
-                <Button 
-                  variant="outline" 
-                  className="w-full h-16 rounded-2xl border-emerald-200 text-emerald-800 font-bold"
-                  onClick={() => {
-                    predictMutation.reset()
-                    setPreview(null)
-                    setUploadedImages([])
-                  }}
-                >
-                  Start New Scan
-                </Button>
-              )}
-
-              {!predictMutation.isSuccess && !predictMutation.isPending && localHistory.length > 0 && (
-                <div className="pt-8 text-white">
-                  <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                    <History className="h-5 w-5" />
-                    Recent Scans
-                  </h3>
-                  <div className="grid grid-cols-5 gap-4">
-                    {localHistory.map(item => (
-                      <button key={item.id} className="aspect-square rounded-xl overflow-hidden border hover:border-emerald-500 transition-all">
-                        <img src={item.thumb} alt="Scan" className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="space-y-6">
-              <AIThinkingOverlay isVisible={predictMutation.isPending} />
-
-              {predictMutation.isSuccess && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-                  <div className="grid lg:grid-cols-2 gap-8 items-stretch">
-                    <div className="relative rounded-3xl overflow-hidden bg-black aspect-square shadow-2xl border border-white/5">
-                      <img src={preview || ''} className="w-full h-full object-cover" alt="Uploaded plant" />
-                    </div>
-                    <div className="relative rounded-3xl overflow-hidden bg-black aspect-square shadow-2xl border border-white/5">
-                      {predictMutation.data.gradcam ? (
-                        <div className="relative w-full h-full">
-                          <img src={`data:image/jpeg;base64,${predictMutation.data.gradcam}`} className="w-full h-full object-cover" alt="Neural focus" />
-                          <div className="absolute top-2 left-2 bg-emerald-600/80 text-[8px] text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Scientific Proof</div>
-                        </div>
-                      ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 p-8 text-center bg-gray-900/50">
-                           <ShieldAlert className="h-8 w-8 mb-2 opacity-20" />
-                           <span className="text-[10px] uppercase font-bold tracking-tighter opacity-40">Morphological Data Syncing...</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <Card className="border-none bg-white/5 backdrop-blur-xl rounded-[2.5rem]">
-                    <CardContent className="p-8 space-y-8">
-                      <div className="grid md:grid-cols-2 gap-12 text-white">
-                        <div className="space-y-6">
-                          <header className="flex justify-between items-end">
-                            <div>
-                              <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest leading-none mb-1">Primary Match</p>
-                              <h3 className="text-2xl font-black text-white">{(predictMutation.data.plant_name || "Detection").replace(/_/g, " ")}</h3>
-                              {predictMutation.data.botanical_details?.sanskrit_name && (
-                                <p className="text-emerald-400 text-xs font-bold font-serif italic mb-1">{predictMutation.data.botanical_details.sanskrit_name}</p>
-                              )}
-                            </div>
-                            <span className="text-2xl font-black text-emerald-400">
-                              {(predictMutation.data.confidence).toFixed(1)}%
-                            </span>
-                          </header>
-                          <div className="h-4 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                            <motion.div 
-                              initial={{ width: 0 }}
-                              animate={{ width: `${predictMutation.data.confidence * 100}%` }}
-                              className="h-full bg-gradient-to-r from-emerald-600 to-green-400"
-                            />
+                {!predictMutation.isSuccess && !predictMutation.isPending && localHistory.length > 0 && (
+                  <div className="space-y-6 pt-12 border-t border-white/5">
+                    <h3 className="text-xs font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-3">
+                      <History className="h-4 w-4" /> Recent Insights
+                    </h3>
+                    <div className="grid grid-cols-5 gap-4">
+                      {localHistory.map(item => (
+                        <div key={item.id} className="aspect-square rounded-2xl overflow-hidden border border-white/10 group cursor-pointer relative">
+                          <img src={item.thumb} alt="Scan" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                          <div className="absolute inset-0 bg-primary-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                             <Sparkles className="w-6 h-6 text-white" />
                           </div>
                         </div>
-                        <div className="space-y-6">
-                           <p className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Neural Variance</p>
-                           <div className="space-y-4">
-                             {predictMutation.data.top_predictions?.slice(0, 3).map((p: any, i: number) => (
-                               <div key={i} className="flex justify-between text-xs font-bold px-1">
-                                 <span>{p.class_name.replace(/_/g, " ")}</span>
-                                 <span className="text-gray-500 font-mono">{(p.confidence * 100).toFixed(1)}%</span>
-                               </div>
-                             ))}
-                           </div>
-                        </div>
-                      </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                      <SafetyBadge isToxic={predictMutation.data.is_toxic} caution={predictMutation.data.caution} />
-
-                      {predictMutation.data.botanical_details && (
-                        <div className="space-y-6 pt-8 border-t border-white/5 text-white">
-                          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-6 space-y-4 shadow-inner">
-                            <div className="flex items-center gap-2 mb-2">
-                               <Leaf className="h-4 w-4 text-emerald-400" />
-                               <span className="text-xs font-black uppercase text-emerald-400 tracking-widest">Botanical Herbarium Data</span>
-                            </div>
-                            
-                            <div className="grid md:grid-cols-2 gap-6 text-sm">
-                               <div>
-                                  <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Scientific Name</span>
-                                  <p className="font-mono text-emerald-200">{predictMutation.data.botanical_details.sc_name}</p>
-                               </div>
-                               <div>
-                                  <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Habitat</span>
-                                  <p className="text-gray-300">{predictMutation.data.botanical_details.habitat}</p>
-                               </div>
-                            </div>
-                            
-                            <div>
-                               <span className="block text-[10px] text-gray-500 font-bold uppercase mb-1">Ayurvedic Uses</span>
-                               <p className="text-gray-200 leading-relaxed">{predictMutation.data.botanical_details.uses}</p>
-                            </div>
-                            
-                            <div className="bg-black/20 p-4 rounded-xl border border-white/5">
-                               <span className="block text-[10px] text-emerald-500 font-bold uppercase mb-2">Traditional Preparation</span>
-                               <p className="text-xs text-emerald-100 italic">"{predictMutation.data.botanical_details.preparation}"</p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="pt-6 flex gap-4">
-                        <Button className="flex-1 h-14 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold" onClick={() => toast.success("Copied!")}>
-                          <Copy className="h-5 w-5 mr-2" /> Share Result
-                        </Button>
-                        {predictMutation.data.plant_details && (
-                          <Link href={`/plants/${predictMutation.data.plant_details.id}`} className="flex-1">
-                            <Button variant="outline" className="w-full h-14 rounded-xl border-white/10 hover:bg-white/5 text-white font-bold">
-                              <Leaf className="h-5 w-5 mr-2" /> Details
-                            </Button>
-                          </Link>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
+              <div>
+                 <AIThinkingOverlay isVisible={predictMutation.isPending} />
+                 
+                 {predictMutation.isSuccess && (
+                    <PredictResult 
+                      result={predictMutation.data} 
+                      imageUrl={uploadedImages[0]?.preview || preview || ""} 
+                    />
+                 )}
+                 
+                 {predictMutation.isSuccess && (
+                    <div className="mt-8 text-center">
+                       <Button 
+                         variant="outline" 
+                         className="h-16 px-12 rounded-2xl border-white/10 hover:bg-white/5 text-gray-400 font-black uppercase tracking-widest text-[10px]"
+                         onClick={() => {
+                           predictMutation.reset()
+                           setPreview(null)
+                           setUploadedImages([])
+                         }}
+                       >
+                         <Sparkles className="h-4 w-4 mr-2" /> Start New Neural Scan
+                       </Button>
+                    </div>
+                 )}
+              </div>
             </div>
           </motion.div>
         ) : (
-          <motion.div key="symptoms-module" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto space-y-8">
-            <Card className="p-8 bg-zinc-900 border-zinc-800 text-white rounded-[2rem]">
+          <motion.div 
+            key="symptoms-module" 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="max-w-4xl mx-auto space-y-12"
+          >
+            <div className="bg-black/60 border border-white/10 rounded-[40px] p-10 space-y-8 backdrop-blur-2xl">
               <div className="space-y-4">
-                <label className="text-xs font-black uppercase tracking-widest text-gray-400">Describe Symptoms</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Describe Physiological Symptoms</label>
                 <textarea 
                   value={symptoms} 
                   onChange={e => setSymptoms(e.target.value)}
-                  className="w-full h-40 rounded-2xl bg-white/5 border border-white/10 p-6 focus:border-emerald-500 outline-none text-lg"
-                  placeholder="e.g. chronic cough, indigestion..."
+                  className="w-full h-48 rounded-[32px] bg-white/5 border border-white/10 p-10 focus:border-primary-500/50 outline-none text-xl text-white placeholder-gray-700 transition-all font-medium"
+                  placeholder="e.g. chronic cough, persistent indigestion, joint inflammation..."
                 />
                 <Button 
                   onClick={() => symptomMutation.mutate(symptoms)} 
                   disabled={symptomMutation.isPending || symptoms.length < 3}
-                  className="w-full h-16 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold uppercase"
+                  className="w-full h-20 rounded-[32px] bg-primary-500 hover:bg-primary-400 text-black font-black text-lg uppercase tracking-widest shadow-2xl shadow-primary-500/20 active:scale-[0.98] transition-all"
                 >
-                  {symptomMutation.isPending ? "Consulting texts..." : "Get Consultation"}
+                  {symptomMutation.isPending ? "Consulting Botanical Repository..." : "Analyze Symptoms"}
                 </Button>
               </div>
-            </Card>
+            </div>
 
             {symptomResults && (
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-3 gap-8">
                 {symptomResults.recommendations?.map((rec: any, i: number) => (
-                  <Card key={i} className="p-6 bg-zinc-900 border-zinc-800 text-white rounded-3xl">
-                    <h4 className="text-xl font-bold text-emerald-400 mb-2">{rec.plant}</h4>
-                    <p className="text-sm opacity-80 mb-4">{rec.why}</p>
-                    <div className="pt-4 border-t border-white/5 text-[10px] font-bold uppercase text-emerald-500 tracking-widest">
-                      Prep: {rec.preparation}
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="p-8 bg-white/5 border border-white/5 text-white rounded-[32px] hover:border-primary-500/20 transition-all"
+                  >
+                    <h4 className="text-2xl font-black text-primary-400 mb-3 tracking-tighter">{rec.plant}</h4>
+                    <p className="text-sm text-gray-400 font-medium mb-6 leading-relaxed">"{rec.why}"</p>
+                    <div className="pt-6 border-t border-white/5">
+                      <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">Ayurvedic Prep</p>
+                      <p className="text-xs text-gray-300 font-bold">{rec.preparation}</p>
                     </div>
-                  </Card>
+                  </motion.div>
                 ))}
               </div>
             )}
@@ -553,23 +389,33 @@ export default function PredictPage() {
         )}
       </AnimatePresence>
 
-      {isCameraOpen && (
-        <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-[3rem] max-w-lg w-full overflow-hidden">
-            <div className="p-6 border-b border-white/5">
-              <h3 className="text-xl font-bold text-white flex gap-2 items-center"><Camera className="h-5 w-5" /> Live Scanner</h3>
-            </div>
-            <div className="p-4">
-              <video ref={videoRef} autoPlay playsInline className="w-full rounded-2xl aspect-[4/3] object-cover" />
-              <canvas ref={canvasRef} className="hidden" />
-            </div>
-            <div className="p-6 flex gap-4">
-              <Button className="flex-1 h-16 rounded-2xl bg-emerald-600 font-bold text-white" onClick={handleCapture}>Capture</Button>
-              <Button variant="outline" className="flex-1 h-16 rounded-2xl border-white/10 text-white" onClick={() => setIsCameraOpen(false)}>Close</Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Camera Modal */}
+      <AnimatePresence>
+        {isCameraOpen && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-6 backdrop-blur-md"
+            >
+              <div className="bg-zinc-900 border border-white/10 rounded-[60px] max-w-xl w-full overflow-hidden shadow-2xl">
+                <div className="p-10 border-b border-white/5 flex justify-between items-center">
+                  <h3 className="text-xl font-black text-white flex gap-3 items-center uppercase tracking-widest">
+                    <Camera className="h-6 h-6 text-primary-400" /> Neural Lens
+                  </h3>
+                </div>
+                <div className="p-8 relative">
+                  <video ref={videoRef} autoPlay playsInline className="w-full rounded-[40px] aspect-[4/3] object-cover scale-x-[-1]" />
+                  <canvas ref={canvasRef} className="hidden" />
+                </div>
+                <div className="p-10 flex gap-6">
+                  <Button className="flex-1 h-20 rounded-[30px] bg-primary-500 text-black font-black text-lg uppercase tracking-widest" onClick={handleCapture}>Capture</Button>
+                  <Button variant="outline" className="flex-1 h-20 rounded-[30px] border-white/10 text-white font-black uppercase tracking-widest text-xs" onClick={() => setIsCameraOpen(false)}>Abort</Button>
+                </div>
+              </div>
+            </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   )
 }

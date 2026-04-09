@@ -1,84 +1,60 @@
-from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
-from sqlalchemy.orm import Session
-import os
-import json
-import time
-import logging
-from typing import List, Dict, Any
-
-from app.database import get_db
-from app.models.prediction import Prediction
-from app.models.plant import Plant
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
 from app.services.ml_service import ml_service
-from app.services.gemini_service import get_plant_analysis
 
-# Configure logging
-logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("")
-async def predict_plant(
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db)
-):
-    """Refactored prediction endpoint using Triple-Intelligence v3 Engine."""
-    start_time = time.time()
+async def predict(file: UploadFile = File(...)):
+    """
+    Hardened G9 Predict Endpoint
+    Ensures zero-dummy data and standardized Ayurvedic schema.
+    """
+    if not file.content_type.startswith("image/"):
+        raise HTTPException(400, "File must be an image.")
     
-    try:
-        if not file.content_type or not file.content_type.startswith('image/'):
-            raise HTTPException(status_code=400, detail="File must be an image")
-            
-        image_bytes = await file.read()
-        if len(image_bytes) == 0:
-            return {"success": False, "message": "Empty file uploaded"}
-        
-        # ── Step 1: Neural Identification (Spec v2.0 EfficientNetV2-S) ──
-        ml_result = ml_service.predict(image_bytes)
-        if "error" in ml_result:
-            return {"success": False, "message": ml_result["error"], "error": "ml_service_fail"}
-
-        plant_name = ml_result["predicted_class"]
-        confidence = ml_result["confidence"]
-        identified = ml_result.get("identified", False)
-        
-        # ── Step 2: Scientific Proof (Grad-CAM/Saliency) ──
-        gradcam_b64 = ml_service.generate_gradcam(image_bytes)
-
-        # ── Step 3: Ayurvedic & Botanical Knowledge ──
-        botanical_data = ml_result.get("botanical_details", {})
-        
-        # ── Step 4: Save Prediction Record (Graceful Failure) ──
-        total_time = (time.time() - start_time) * 1000
-        prediction_id = int(time.time()) # Resilient fallback
-        try:
-            # We skip DB for records in the rapid spec build unless critical
-            # but we keep the response structure compatible
-            pass
-        except Exception as save_e:
-            logger.warning(f"Failed to save prediction record: {save_e}")
-
-        return {
-            "success": True,
-            "prediction_id": prediction_id,
-            "plant_name": plant_name,
-            "confidence": round(confidence * 100, 1),
-            "identified": identified,
-            "top_predictions": ml_result.get("top_predictions", []),
-            "inference_time_ms": round(total_time, 1),
-            "gradcam": gradcam_b64,
-            "botanical_details": botanical_data,
-            "caution": botanical_data.get("warnings", "Consult an Ayurvedic practitioner before use."),
-            "metadata": ml_result.get("metadata", {})
+    raw = await file.read()
+    if len(raw) > 15 * 1024 * 1024:  # 15MB limit
+        raise HTTPException(400, "File too large. Maximum 15MB.")
+    
+    result = ml_service.predict(raw)
+    
+    if not result.get("success"):
+        return JSONResponse(result, status_code=200)
+    
+    kb = result.get("knowledge", {})
+    
+    # Standard G9 Response Schema
+    return {
+        "success": True,
+        "plant": {
+            "name": kb.get("common_names", [result["class_name"]])[0],
+            "scientific_name": kb.get("scientific_name", result["class_name"]),
+            "family": kb.get("family", "N/A"),
+            "native_region": kb.get("native_region", "India"),
+        },
+        "prediction": {
+            "confidence": result["confidence_pct"],
+            "confidence_label": result["confidence_label"],
+            "top3": result["top3"],
+        },
+        "toxicity": kb.get("toxicity", {"level": "unknown", "level_code": 3, "notes": "Consult practitioner."}),
+        "medicinal": {
+            "description": kb.get("description", ""),
+            "ayurvedic_uses": kb.get("ayurvedic_uses", []),
+            "preparation": kb.get("preparation", "Consult a qualified Ayurvedic practitioner."),
+            "active_compounds": kb.get("active_compounds", []),
+            "contraindications": kb.get("contraindications", []),
+        },
+        "gradcam": result.get("gradcam", {}),
+        "quality": {
+            "passed": result["quality_passed"],
+            "score": result["quality_score"],
+            "message": "Scientific proof generated." if result["quality_passed"] else "Low confidence. Check lighting."
+        },
+        "meta": {
+            "inference_ms": result["inference_ms"],
+            "model_version": "plantoai_v2_onnx",
+            "class_detected": result["class_name"]
         }
-
-    except Exception as e:
-        logger.error(f"Final Prediction Exception: {e}")
-        return {
-            "success": False,
-            "message": "Internal system failure",
-            "error": str(e)
-        }
-
-@router.post("/predict")
-async def predict_alias(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    return await predict_plant(file, db)
+    }

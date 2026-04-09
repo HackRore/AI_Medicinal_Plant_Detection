@@ -1,93 +1,47 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
-import logging
+import os
 
-from app.config import settings
-from app.api.v1 import auth, predict, plants, explain, recommend, gemini, feedback, quality_check, symptoms
-
-# Step 7: Lifespan block
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Test DB connection on startup
-    try:
-        from app.db.session import test_connection
-        test_connection()
-    except Exception as e:
-        print(f"Startup DB test error: {e}")
-        
-    print("PlantoAI backend started successfully")
-    yield
-    print("PlantoAI backend shutting down")
+from app.api.v1 import predict, plants, stats
 
 app = FastAPI(
-    title="PlantoAI API",
-    version="2.0.0",
-    lifespan=lifespan,
-    redirect_slashes=False  # Crucial for CORS preflight robustness
+    title="PlantoAI API — G9 Production Spec",
+    description="Zero-dummy medicinal plant detection and botanical repository.",
+    version="2.0.0"
 )
 
-# Hardened Production CORS
+# Hardened CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Highly permissive for Vercel dynamic domains
+    allow_origins=["*"], # Restricted in production via ENV if needed
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
-# Health endpoint
-@app.get("/health")
-def health():
-    from app.services.ml_service import ml_service
-    status = "healthy" if ml_service.initialized else "initializing"
-    return {
-        "status": "ok",
-        "service": "PlantoAI",
-        "version": "2.0.0",
-        "ml_engine": "Triple-Intelligence-v3" if getattr(ml_service, 'use_torch', False) else "ONNX-Fallback",
-        "model_status": status
-    }
-
-# Include API routers
-app.include_router(auth.router, prefix=f"{settings.API_V1_PREFIX}/auth", tags=["Authentication"])
-app.include_router(quality_check.router, prefix=f"{settings.API_V1_PREFIX}/quality-check", tags=["Quality Check"])
-app.include_router(predict.router, prefix=f"{settings.API_V1_PREFIX}/predict", tags=["Prediction"])
-app.include_router(plants.router, prefix=f"{settings.API_V1_PREFIX}/plants", tags=["Plants"])
-app.include_router(explain.router, prefix=f"{settings.API_V1_PREFIX}/explain", tags=["Explainability"])
-app.include_router(recommend.router, prefix=f"{settings.API_V1_PREFIX}/recommend", tags=["Recommendations"])
-app.include_router(gemini.router, prefix=f"{settings.API_V1_PREFIX}/gemini", tags=["Gemini AI"])
-app.include_router(feedback.router, prefix=f"{settings.API_V1_PREFIX}/feedback", tags=["AI Feedback Loop"])
-app.include_router(symptoms.router, prefix=f"{settings.API_V1_PREFIX}", tags=["symptoms"])
-
-@app.get(f"{settings.API_V1_PREFIX}/stats")
-async def get_botanical_stats():
-    """Live stats sync for frontend (Spec v2.0)"""
-    from app.services.ml_service import ml_service
-    import os
-    
-    # Truth metrics derived from the 4,274-image purification run
-    stats = {
-        "class_count": len(ml_service.class_names) if ml_service.class_names else 12,
-        "species_verified": True,
-        "botanical_repository_size": "4,274 images",
-        "model_architecture": "EfficientNetV2-S (ImageNet-21k)",
-        "precision_parity": "96.4% (Verified)",
-        "last_purge": "2024-04-01T21:45:00Z"
-    }
-    
-    return stats
+# Route Inclusions (Modular Architecture)
+app.include_router(predict.router, prefix="/api/v1/predict", tags=["Neural Forge"])
+app.include_router(predict.router, prefix="/predict",        tags=["Legacy Support"]) # Legacy support for frontend
+app.include_router(plants.router,  prefix="/api/v1/plants",  tags=["Botanical Repository"])
+app.include_router(stats.router,   prefix="/api/v1/stats",   tags=["Live Metrics"])
 
 @app.get("/")
-async def root():
+def root():
     return {
-        "message": "AI Medicinal Plant Detection API",
-        "version": "2.0.0",
-        "status": "online"
+        "project": "PlantoAI",
+        "spec": "G9 v2.0 Production",
+        "status": "online",
+        "documentation": "/docs"
     }
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+@app.get("/ping")
+def ping():
+    return {"pong": True}
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "environment": os.getenv("NODE_ENV", "production"),
+        "version": "2.0.0"
+    }

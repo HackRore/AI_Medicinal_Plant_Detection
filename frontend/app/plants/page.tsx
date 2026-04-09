@@ -1,121 +1,138 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Search, Leaf, Info, Zap } from 'lucide-react'
+/**
+ * PlantoAI: Plants Repository Page
+ * Live sync with 13-class hardened botanical database.
+ */
+"use client";
+
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function PlantsPage() {
-    const [plants, setPlants] = useState<any[]>([])
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
-    const [search, setSearch] = useState('')
+  const [plants, setPlants]   = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string|null>(null);
+  const [search, setSearch]   = useState("");
 
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/plants`)
-            .then(r => { if (!r.ok) throw new Error("Backend offline"); return r.json(); })
-            .then(d => { setPlants(d.plants ?? d); setLoading(false); })
-            .catch(() => {
-                setError("AI engine is starting up — please wait 30 seconds and refresh.");
-                setLoading(false);
-            });
-    }, []);
+  useEffect(() => {
+    const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/plants?search=${search}&limit=50`;
+    setLoading(true);
+    fetch(url)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d  => { setPlants(d.plants ?? []); setLoading(false); })
+      .catch(() => {
+        setError("AI engine is warming up. Please wait 30 seconds and refresh.");
+        setLoading(false);
+      });
+  }, [search]);
 
-    const filtered = (Array.isArray(plants) ? plants : []).filter(p => {
-        if (!p) return false;
-        const s = (search || "").toLowerCase();
-        return (
-            (p.name?.toString().toLowerCase() || "").includes(s) ||
-            (p.medicinal_uses?.toString().toLowerCase() || "").includes(s) ||
-            (p.scientific_name?.toString().toLowerCase() || "").includes(s) ||
-            (p.ayurvedic_name?.toString().toLowerCase() || "").includes(s)
-        );
-    })
-
-    if (loading) return (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "1rem", padding: "2rem" }}>
-            {Array(12).fill(0).map((_, i) => (
-                <div key={i} style={{ height: 180, background: "#1a1f2e", borderRadius: 12, animation: "pulse 1.5s infinite" }} />
-            ))}
+  return (
+    <main className="min-h-screen bg-gray-900 pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter">
+            Botanical <span className="text-primary-400">Intelligence</span>
+          </h1>
+          <p className="text-gray-400 max-w-2xl mx-auto font-medium">
+            Explore India's premier medicinal herb repository. Every entry is verified 
+            against the G9 Scientific Spec for Ayurvedic authenticity.
+          </p>
         </div>
-    );
 
-    if (error) return (
-        <div style={{ padding: "2rem", textAlign: "center", color: "#f59e0b" }}>
-            <p>{error}</p>
-            <button onClick={() => window.location.reload()}>Retry</button>
+        {/* Search Bar */}
+        <div className="relative max-w-xl mx-auto mb-16">
+          <input 
+            value={search} 
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search by common or scientific name..." 
+            className="w-full h-14 pl-6 pr-14 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all font-medium backdrop-blur-md" 
+          />
+          <div className="absolute right-5 top-1/2 -translate-y-1/2 text-primary-400">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
         </div>
-    );
 
-    return (
-        <main className="min-h-screen bg-[#050805] text-white selection:bg-emerald-500/30">
-            <div className="max-w-7xl mx-auto px-6 pt-24 pb-12">
-                <motion.div 
+        {/* Status/Error */}
+        {error && (
+            <div className="text-center p-12 bg-red-900/10 border border-red-500/20 rounded-3xl mb-12">
+               <span className="text-3xl mb-4 block">🧪</span>
+               <p className="text-red-400 font-bold mb-6">{error}</p>
+               <button 
+                 onClick={() => window.location.reload()}
+                 className="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-500/20"
+               >
+                 Re-initialize Session
+               </button>
+            </div>
+        )}
+
+        {/* Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <AnimatePresence mode="wait">
+            {loading ? (
+                <>
+                {Array(8).fill(0).map((_, i) => (
+                  <div key={i} className="h-64 rounded-3xl bg-white/5 animate-pulse border border-white/5" />
+                ))}
+                </>
+            ) : (
+                <>
+                {plants.map((p, i) => (
+                  <motion.div
+                    key={p.scientific_name}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12"
-                >
-                    <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <div className="h-1 w-12 bg-emerald-500 rounded-full" />
-                            <span className="text-emerald-500 font-mono text-xs font-bold uppercase tracking-[0.2em]">Botanical Intelligence</span>
+                    transition={{ delay: i * 0.05 }}
+                    className="group bg-black/40 border border-white/5 rounded-3xl p-6 hover:border-primary-500/30 transition-all hover:bg-black/60 backdrop-blur-xl"
+                  >
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="w-12 h-12 bg-primary-500/10 rounded-2xl flex items-center justify-center text-2xl">
+                          {p.toxicity?.level_code === 0 ? "🌿" : p.toxicity?.level_code === 1 ? "⚠️" : "🚫"}
+                      </div>
+                      <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                        p.toxicity?.level_code === 0 ? "bg-green-500/10 text-green-400 border-green-500/20" :
+                        p.toxicity?.level_code === 1 ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                        "bg-red-500/10 text-red-100 border-red-500/20"
+                      }`}>
+                        {p.toxicity?.level}
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary-400 transition-colors capitalize">
+                      {p.common_names?.[0] || p.scientific_name}
+                    </h3>
+                    <p className="text-sm text-gray-500 font-medium italic mb-4">
+                      {p.scientific_name}
+                    </p>
+                    
+                    <div className="space-y-2 pt-4 border-t border-white/5">
+                        <div className="flex items-center gap-2">
+                             <span className="text-xs text-primary-400 font-bold uppercase tracking-widest">Family:</span>
+                             <span className="text-xs text-gray-400">{p.family || "N/A"}</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-4 italic">
-                            LEAF<span className="text-emerald-500 not-italic">DB</span>
-                        </h1>
-                        <p className="text-gray-400 max-w-xl text-lg leading-relaxed">
-                            A curated repository of <span className="text-white font-medium">{plants.length} medicinal species</span>, synchronized with our CNN neural network.
-                        </p>
+                        <div className="flex items-center gap-2">
+                             <span className="text-xs text-primary-400 font-bold uppercase tracking-widest">Region:</span>
+                             <span className="text-xs text-gray-400 truncate">{p.native_region || "N/A"}</span>
+                        </div>
                     </div>
+                  </motion.div>
+                ))}
+                </>
+            )}
+          </AnimatePresence>
+        </div>
 
-                    <div className="relative group w-full md:w-96">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-emerald-500/50 group-focus-within:text-emerald-400 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder="Search symptoms, names..."
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 outline-none focus:border-emerald-500/50 focus:bg-white/[0.08] transition-all text-sm font-medium placeholder:text-gray-600"
-                        />
-                    </div>
-                </motion.div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                    {filtered.map((plant, i) => (
-                        <motion.div
-                            key={plant.id || i}
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: i * 0.03 }}
-                            className="group relative bg-white/[0.02] border border-white/5 rounded-[2rem] p-6 hover:bg-white/[0.05] hover:border-emerald-500/30 transition-all duration-500 flex flex-col justify-between"
-                        >
-                            <div className="absolute top-4 right-4 text-emerald-500/20 group-hover:text-emerald-500/40 transition-colors">
-                                <Leaf className="h-8 w-8 -rotate-12" />
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-2 mb-4">
-                                    <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 bg-emerald-500/10 text-emerald-500 rounded-lg border border-emerald-500/20">
-                                        {plant.family || 'PlantoAI'}
-                                    </span>
-                                </div>
-                                <h3 className="text-2xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                                    {plant.name}
-                                </h3>
-                                <p className="text-emerald-500/60 font-mono text-[11px] mb-4 italic truncate">
-                                    {plant.scientific_name || 'Species unidentified'}
-                                </p>
-                                <p className="text-gray-400 text-xs leading-relaxed line-clamp-3 mb-6">
-                                    {plant.medicinal_uses || plant.description || 'Rich history of medicinal use in traditional Ayurvedic texts.'}
-                                </p>
-                            </div>
-
-                            <button className="w-full py-3 rounded-xl bg-white/5 border border-white/10 group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-all duration-300 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 group-hover:text-white text-gray-400">
-                                <Info className="h-3 w-3" />
-                                View Neural Data
-                            </button>
-                        </motion.div>
-                    ))}
-                </div>
+        {/* Empty State */}
+        {!loading && plants.length === 0 && (
+            <div className="text-center py-24 border-2 border-dashed border-white/5 rounded-[40px]">
+                <span className="text-5xl mb-4 block">🕵️‍♂️</span>
+                <p className="text-gray-500 font-medium">No botanical matches found in our G9 repository.</p>
+                <button onClick={() => setSearch("")} className="mt-4 text-primary-400 font-bold hover:underline">Clear Search</button>
             </div>
-        </main>
-    )
+        )}
+      </div>
+    </main>
+  );
 }

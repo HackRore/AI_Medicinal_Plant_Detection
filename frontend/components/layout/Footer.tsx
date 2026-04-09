@@ -87,7 +87,7 @@ export const Footer = () => {
 };
 
 const SocialIcon = ({ icon }: { icon: React.ReactNode }) => (
-    <a href="#" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary-600 hover:text-white transition-all">
+    <a href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:bg-primary-600 hover:text-white transition-all">
         {icon}
     </a>
 );

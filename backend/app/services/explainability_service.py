@@ -10,7 +10,7 @@ import io
 import base64
 from typing import Dict, Tuple
 import logging
-from app.services.ml_service import get_gradcam_base64
+
 
 logger = logging.getLogger(__name__)
 

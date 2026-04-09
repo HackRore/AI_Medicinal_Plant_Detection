@@ -1,4 +1,4 @@
-// frontend/components/layout/BackendWarmup.tsx
+// frontend/components/BackendWarmup.tsx
 "use client";
 import { useEffect } from "react";
 export default function BackendWarmup() {

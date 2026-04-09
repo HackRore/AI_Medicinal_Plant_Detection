@@ -14,15 +14,15 @@ export const StatsSection = () => {
     });
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/stats`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/stats`)
             .then(r => r.json())
             .then(data => {
                 setStats({
-                    species: data.class_count || data.num_classes || "13",
-                    accuracy: (data.precision_parity || data.top1_accuracy || 96.4) + "%",
+                    species: data.species_count ?? "—",
+                    accuracy: data.top1_accuracy ? `${data.top1_accuracy}%` : "—",
                     speed: "< 2s",
-                    models: "5",
-                    status: "Spec v2.0"
+                    models: "Ensemble-V2",
+                    status: "Live"
                 });
             })
             .catch(() => {});
