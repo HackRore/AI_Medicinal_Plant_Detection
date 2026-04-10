@@ -115,12 +115,12 @@ def train_model():
                 vc += (model(imgs).argmax(1) == lbls).sum().item(); vt += len(lbls)
         
         vacc = vc/vt
-        print(f"✓ Epoch {ep+1} | Val Acc: {vacc:.4f}")
+        print(f"Epoch {ep+1} | Val Acc: {vacc:.4f}")
         
         if vacc > best:
             best = vacc
             torch.save(model.state_dict(), f"{MODEL_OUT}/best.pt")
-            print(f"  ⭐ Saved Best")
+            print(f"  Saved Best")
 
     print("\nTraining complete. Exporting ONNX...")
     model.load_state_dict(torch.load(f"{MODEL_OUT}/best.pt"))

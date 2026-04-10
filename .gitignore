@@ -27,15 +27,6 @@ env/
 .ipynb_checkpoints
 *.ipynb_checkpoints
 
-# ML Models
-*.h5
-*.pkl
-*.pth
-*.onnx
-*.pb
-ml_models/
-checkpoints/
-
 # Data
 ml_pipeline/data/raw/
 ml_pipeline/data/processed/
@@ -44,6 +35,17 @@ ml_pipeline/data/processed/
 !configs/*.json
 !package.json
 !tsconfig.json
+!backend/app/data/*.json
+
+# ML Models
+*.h5
+*.pkl
+*.pth
+*.pb
+ml_models/
+!backend/ml_models/plantoai_model.onnx
+!backend/ml_models/plantoai_model.onnx.data
+checkpoints/
 
 # Node
 node_modules/
@@ -99,5 +101,7 @@ tmp/
 
 # Datasets
 dataset/
+IMLD/
+kagglehub/
 backend/uploads/
 .vercel

@@ -44,10 +44,16 @@ class MLService:
     def _softmax(self, x): e=np.exp(x-x.max()); return e/e.sum()
 
     def _kb(self, name):
-        for k in [name, name.replace(" ","_"), name.lower(), name.title()]:
-            if k in self.kb: return self.kb[k]
+        # Normalize: 'Apple leaf' -> 'apple', 'Tomato Early blight' -> 'tomato'
+        target = name.lower().replace("_", " ").split(" ")[0]
+        
+        # Priority 1: Exact Match (Case Insensitive)
         for k in self.kb:
-            if name.lower() in k.lower() or k.lower() in name.lower():
+            if target == k.lower(): return self.kb[k]
+            
+        # Priority 2: Partial Search
+        for k in self.kb:
+            if target in k.lower() or k.lower() in target:
                 return self.kb[k]
         return {}
 

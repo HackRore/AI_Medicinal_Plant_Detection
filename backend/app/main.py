@@ -5,9 +5,9 @@ import os
 from app.api.v1 import predict, plants, stats
 
 app = FastAPI(
-    title="PlantoAI API — G9 Production Spec",
-    description="Zero-dummy medicinal plant detection and botanical repository.",
-    version="2.0.0"
+    title="PlantoAI API — G9 Outstanding Spec",
+    description="Scientific-grade medicinal plant detection and PlantDoc integrated repository.",
+    version="3.1.0"
 )
 
 # Hardened CORS configuration
@@ -29,7 +29,7 @@ app.include_router(stats.router,   prefix="/api/v1/stats",   tags=["Live Metrics
 def root():
     return {
         "project": "PlantoAI",
-        "spec": "G9 v2.0 Production",
+        "spec": "G9 v3.1 Outstanding",
         "status": "online",
         "documentation": "/docs"
     }
@@ -42,6 +42,6 @@ def ping():
 def health():
     return {
         "status": "healthy",
-        "environment": os.getenv("NODE_ENV", "production"),
-        "version": "2.0.0"
+        "spec_version": "3.1.0 (PlantDoc Integration)",
+        "environment": os.getenv("ENVIRONMENT", "production")
     }
