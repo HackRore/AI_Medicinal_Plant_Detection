@@ -72,16 +72,32 @@ def train_model():
     vl = DataLoader(TDS(raw, va_idx, tfm_vl), BATCH, num_workers=0)
 
     print("Building EfficientNetV2-S (G9 Scientific Configuration)...")
+    # Load ImageNet weights first
     model = timm.create_model("tf_efficientnetv2_s.in21k", pretrained=True, num_classes=NUM)
+
+    checkpoint_path = os.path.join(MODEL_OUT, "best.pt")
+    if os.path.exists(checkpoint_path):
+        print(f"Loading Base Intelligence from: {checkpoint_path}")
+        try:
+            # Load old weights (33 classes) into a 33-class model to extract base features
+            base_model = timm.create_model("tf_efficientnetv2_s.in21k", num_classes=33)
+            base_model.load_state_dict(torch.load(checkpoint_path, map_location="cpu"))
+            
+            # Transfer all weights except the classifier head
+            msg = model.load_state_dict(base_model.state_dict(), strict=False)
+            print(f"  Finetuning Sync: {msg}")
+        except Exception as e:
+            print(f"  Warning: Could not perform full intelligence transfer: {e}")
 
     for p in model.parameters(): p.requires_grad = False
     for p in model.classifier.parameters(): p.requires_grad = True
     
+    # Use balanced learning rate for finetuning
     opt   = torch.optim.AdamW(filter(lambda p:p.requires_grad, model.parameters()), lr=LR)
     crit  = nn.CrossEntropyLoss(label_smoothing=0.1)
     best  = 0.0
 
-    print("Running Neural Forge Epochs...")
+    print("Running Neural Forge Epochs (Fine-Tuning Mode)...")
     for ep in range(EPOCHS):
         if ep == 3:
             print("  Phase 2: Unfreezing all layers for convergence...")
