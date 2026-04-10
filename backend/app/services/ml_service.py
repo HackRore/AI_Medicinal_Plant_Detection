@@ -9,7 +9,7 @@ from app.config import settings
 
 MODEL_PATH  = settings.PRODUCTION_MODEL_PATH
 CLASS_PATH  = settings.CLASS_NAMES_PATH
-KB_PATH     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "data", "medicinal_knowledge.json")
+KB_PATH     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "medicinal_knowledge.json")
 
 IMG_SIZE    = 224
 OOD_THRESH  = 0.25

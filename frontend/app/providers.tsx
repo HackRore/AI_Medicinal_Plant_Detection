@@ -15,12 +15,6 @@ const queryClient = new QueryClient({
 })
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  // Proactive Backend Warm-up (Render Cold Start Mitigation)
-  React.useEffect(() => {
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
-    fetch(`${API_BASE}/health`).catch(() => console.log("Backend warm-up initiated"))
-  }, [])
-
   return (
     <QueryClientProvider client={queryClient}>
       {children}

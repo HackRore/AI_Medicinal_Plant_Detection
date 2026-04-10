@@ -1,9 +1,10 @@
-// frontend/components/layout/BackendWarmup.tsx
 "use client";
 import { useEffect } from "react";
-export default function BackendWarmup() {
+
+export function BackendWarmup() {
   useEffect(() => {
-    fetch((process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000") + "/ping").catch(() => {});
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
+    fetch(`${API_BASE}/health`).catch(() => {});
   }, []);
   return null;
 }

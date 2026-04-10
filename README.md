@@ -2,39 +2,19 @@
 
 PlantoAI is a high-fidelity botanical intelligence system designed to bridge traditional Ayurvedic wisdom with modern Artificial Intelligence. It features a custom-forged EfficientNetV2 engine specifically tuned for medicinal leaf morphology and clinical safety.
 
+## 🧠 Intelligence Engine (v3.2 Production)
+The system has been upgraded to **64 medicinal & botanical classes**, integrating the comprehensive **PlantDoc (IMLD)** dataset. 
+
+### 📐 Species Intelligence Tiers:
+- **Ayurvedic Core**: Tulsi, Neem, Arjun, Bael, Aloe Vera, and 30+ traditional herbs.
+- **Agricultural Core**: Tomato, Potato, Corn, Wheat, Soybean, and fruit varieties.
+- **Disease Intelligence**: Detection for diseases like Late Blight, Scab, and Rust variants across major species.
+
 ## 🚀 Key Features
-- 🔍 **Neural Forge**: Real-time identification from leaf photos with **97.21% Top-1 Accuracy**.
-- 🧠 **Explainability (Grad-CAM)**: Visual neural attention heatmaps showing precisely what the AI analyzed on the leaf.
-- 📚 **Medicinal Intelligence**: Clinical data including Ayurvedic uses, preparation methods, and active compounds.
-- ⚠️ **Safety-First (Toxicity)**: Color-coded toxicity intelligence and medicinal contraindications for every species.
-- 📱 **Zero-Dummy Sync**: All platform statistics are live-synced with real-world model performance.
-- 🕶️ **Premium UX**: Modern, high-performance interface with real-time confidence tiers.
-
-## 🧠 Neural Forge Intelligence (Trained Species)
-The system is currently capable of high-precision identification for the following **33 botanical & medicinal species**:
-
-| Common Name | Scientific Name | Common Name | Scientific Name |
-| :--- | :--- | :--- | :--- |
-| **Alstonia** | *A. scholaris* | **Apple** | *Malus domestica* |
-| **Arjun** | *T. arjuna* | **Bael** | *A. marmelos* |
-| **Banana** | *Musa* | **Basil (Tulsi)** | *O. tenuiflorum* |
-| **Cassava** | *M. esculenta* | **Cherry** | *Prunus avium* |
-| **Chili** | *Capsicum* | **Chinar** | *P. orientalis* |
-| **Coffee** | *Coffea* | **Corn** | *Zea mays* |
-| **Cucumber** | *C. sativus* | **Grape** | *Vitis vinifera* |
-| **Guava** | *P. guajava* | **Jackfruit** | *A. heterophyllus* |
-| **Jamun** | *S. cumini* | **Jatropha** | *J. curcas* |
-| **Lemon** | *C. limon* | **Mango** | *M. indica* |
-| **Neem** | *A. indica* | **Peach** | *P. persica* |
-| **Pomegranate** | *P. granatum* | **Pongamia** | *P. pinnata* |
-| **Potato** | *S. tuberosum* | **Rice** | *Oryza sativa* |
-| **Soybean** | *Glycine max* | **Strawberry** | *Fragaria* |
-| **Sugarcane** | *Saccharum* | **Tea** | *Camellia sinensis* |
-| **Tomato** | *S. lycopersicum* | **Wheat** | *Triticum* |
-
-*Plus: Pepper Bell, Cassava, and more.*
-
-## ⚙️ Technical Stack
+- 🔍 **Neural Forge**: Real-time identification with **97.21% Precision** (Top-1).
+- 🧠 **Morphological Explainability**: Integrated Grad-CAM heatmaps showing precise neural attention.
+- 📚 **Medicinal Wisdom Layer**: Dynamic lookup for Scientific nomenclature, Ayurvedic preparations, and Toxicity levels.
+- ⚙️ **Lean Architecture**: Repository purged of legacy assets (v3.2 Purge) for optimized maintenance and lightning-fast cloud deployment.
 - **Architecture**: EfficientNetV2-S (ImageNet-21k fine-tuned)
 - **Engine**: ONNX Runtime (Opset 18)
 - **Backend**: FastAPI (Python 3.10+)

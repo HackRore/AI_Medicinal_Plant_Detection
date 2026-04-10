@@ -46,14 +46,17 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
     
+    # Database
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
+    
     # File Upload
-    UPLOAD_DIR: str = "./uploads"
+    UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "uploads")
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB
     
     # ML Models
-    MODEL_DIR: str = "ml_models"
-    PRODUCTION_MODEL_PATH: str = "ml_models/plantoai_model.onnx"
-    CLASS_NAMES_PATH: str = "app/data/class_names.json"
+    MODEL_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ml_models")
+    PRODUCTION_MODEL_PATH: str = os.path.join(MODEL_DIR, "plantoai_model.onnx")
+    CLASS_NAMES_PATH: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "class_names.json")
     
     # Optimized Gates
     ENABLE_LEAF_GATE: bool = False # Integrated in main model for v3.1
