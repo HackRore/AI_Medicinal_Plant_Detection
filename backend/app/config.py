@@ -13,10 +13,10 @@ class Settings(BaseSettings):
     """Application settings"""
     
     # Application
-    APP_NAME: str = "Medicinal Plant Detection API"
-    APP_VERSION: str = "1.0.0"
+    APP_NAME: str = "PlantoAI — G9 Outstanding Spec"
+    APP_VERSION: str = "3.1.0"
     DEBUG: bool = False
-    STRICT_ML_MODE: bool = False  # If True, fails if models aren't loaded instead of using mock
+    STRICT_ML_MODE: bool = True  # Production strictness
     API_V1_PREFIX: str = "/api/v1"
     
     # Server
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # Database
-    DATABASE_URL: str = "sqlite:///./medicinal_plants.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -51,18 +51,12 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB
     
     # ML Models
-    MODEL_DIR: str = "./ml_models"
-
-    VIT_MODEL_PATH: str = "./ml_models/vit_best.onnx"
-    MOBILENET_MODEL_PATH: str = "./ml_models/mobilenetv2_best.onnx"
-    ENHANCED_MODEL_PATH: str = "./ml_models/enhanced_model.onnx"
-    LEAF_GATE_MODEL_PATH: str = "./ml_models/leaf_gate/leaf_gate.onnx"
-    # Input Gate (Leaf vs Non-Leaf)
-    # If enabled and model exists, the API first checks whether the input is a leaf.
-    CLASS_NAMES_PATH: str = "./ml_models/class_names_full.json"
-    ENSEMBLE_WEIGHTS_PATH: str = "./ml_models/ensemble_weights.json"
-    ENABLE_LEAF_GATE: bool = True
-    # Probability threshold for classifying as leaf. Tune using gate evaluation.
+    MODEL_DIR: str = "ml_models"
+    PRODUCTION_MODEL_PATH: str = "ml_models/plantoai_model.onnx"
+    CLASS_NAMES_PATH: str = "app/data/class_names.json"
+    
+    # Optimized Gates
+    ENABLE_LEAF_GATE: bool = False # Integrated in main model for v3.1
     LEAF_GATE_THRESHOLD: float = 0.5
     # If True, the app uses more permissive thresholds for demos.
     SHOWCASE_MODE: bool = True

@@ -5,16 +5,11 @@ All data served from trained model and knowledge base — zero hardcoded values.
 import onnxruntime as ort, numpy as np, cv2, base64, json, time, os
 from PIL import Image
 from io import BytesIO
+from app.config import settings
 
-BASE        = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_PATH  = os.path.join(BASE, "ml_models", "plantoai_model.onnx")
-CLASS_PATH  = os.path.join(BASE, "app",       "data", "class_names.json")
-KB_PATH     = os.path.join(BASE, "app",       "data", "medicinal_knowledge.json")
-
-# Fallback model names in order of preference
-for candidate in ["plantoai_model.onnx","efficientnetv2_12class.onnx","efficientnetv2.onnx"]:
-    p = os.path.join(BASE,"ml_models",candidate)
-    if os.path.exists(p): MODEL_PATH = p; break
+MODEL_PATH  = settings.PRODUCTION_MODEL_PATH
+CLASS_PATH  = settings.CLASS_NAMES_PATH
+KB_PATH     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "app", "data", "medicinal_knowledge.json")
 
 IMG_SIZE    = 224
 OOD_THRESH  = 0.25
