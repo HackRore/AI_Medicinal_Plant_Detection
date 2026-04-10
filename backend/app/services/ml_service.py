@@ -7,9 +7,30 @@ from PIL import Image
 from io import BytesIO
 from app.config import settings
 
-MODEL_PATH  = settings.PRODUCTION_MODEL_PATH
-CLASS_PATH  = settings.CLASS_NAMES_PATH
-KB_PATH     = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "medicinal_knowledge.json")
+import os
+
+# Absolute path resolution — works in both local and Render container
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_BACKEND_ROOT = os.path.dirname(os.path.dirname(_HERE))
+
+def _find_model():
+    candidates = [
+        os.path.join(_BACKEND_ROOT, "ml_models", "plantoai_model.onnx"),
+        os.path.join(_BACKEND_ROOT, "ml_models", "efficientnetv2_12class.onnx"),
+        os.path.join(_BACKEND_ROOT, "ml_models", "efficientnetv2.onnx"),
+        os.path.join(_BACKEND_ROOT, "ml_models", "model_v3.pth"),
+        os.path.join(os.getcwd(), "ml_models", "plantoai_model.onnx"),
+        os.path.join(os.getcwd(), "backend", "ml_models", "plantoai_model.onnx"),
+    ]
+    for p in candidates:
+        if os.path.exists(p):
+            print(f"Model found: {p}")
+            return p
+    raise FileNotFoundError(f"No model file found. Searched:\n" + "\n".join(candidates))
+
+MODEL_PATH = _find_model()
+CLASS_PATH = os.path.normpath(os.path.join(os.path.dirname(MODEL_PATH), "..", "app", "data", "class_names.json"))
+KB_PATH    = os.path.normpath(os.path.join(os.path.dirname(MODEL_PATH), "..", "app", "data", "medicinal_knowledge.json"))
 
 IMG_SIZE    = 224
 OOD_THRESH  = 0.25
@@ -32,9 +53,6 @@ class MLService:
             with open(KB_PATH) as f: self.kb = json.load(f)
             
             # Load ONNX model
-            if not os.path.exists(MODEL_PATH):
-                raise FileNotFoundError(f"Missing production model at {MODEL_PATH}")
-            
             self.sess = ort.InferenceSession(MODEL_PATH,
                 providers=["CUDAExecutionProvider","CPUExecutionProvider"])
             print(f"MLService initialized: {len(self.class_names)} classes | {os.path.basename(MODEL_PATH)}")
