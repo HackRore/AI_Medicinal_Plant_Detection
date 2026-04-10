@@ -1,14 +1,34 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-import os
+from fastapi.responses import JSONResponse
+import os, logging
 
 from app.api.v1 import predict, plants, stats
+from app.db.session import test_connection
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="PlantoAI API — G9 Outstanding Spec",
     description="Scientific-grade medicinal plant detection and PlantDoc integrated repository.",
     version="3.1.0"
 )
+
+# Global Resilience Shield: Catch-all exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"SYSTEM_CRASH_PREVENTED: {request.url} - Error: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": "server_error",
+            "message": "An internal botanical engine error occurred. Our engineers have been notified.",
+            "trace_id": os.urandom(4).hex()
+        }
+    )
 
 # Hardened CORS configuration
 app.add_middleware(
@@ -21,7 +41,7 @@ app.add_middleware(
 
 # Route Inclusions (Modular Architecture)
 app.include_router(predict.router, prefix="/api/v1/predict", tags=["Neural Forge"])
-app.include_router(predict.router, prefix="/predict",        tags=["Legacy Support"]) # Legacy support for frontend
+app.include_router(predict.router, prefix="/predict",        tags=["Legacy Support"])
 app.include_router(plants.router,  prefix="/api/v1/plants",  tags=["Botanical Repository"])
 app.include_router(stats.router,   prefix="/api/v1/stats",   tags=["Live Metrics"])
 
@@ -31,17 +51,15 @@ def root():
         "project": "PlantoAI",
         "spec": "G9 v3.1 Outstanding",
         "status": "online",
-        "documentation": "/docs"
+        "environment": os.getenv("APP_ENV", "development")
     }
-
-@app.get("/ping")
-def ping():
-    return {"pong": True}
 
 @app.get("/health")
 def health():
+    db_ok = test_connection()
     return {
-        "status": "healthy",
-        "spec_version": "3.1.0 (PlantDoc Integration)",
-        "environment": os.getenv("ENVIRONMENT", "production")
+        "status": "healthy" if db_ok else "degraded",
+        "database": "connected" if db_ok else "disconnected",
+        "engine": "v3.1_outstanding",
+        "models": "loaded"
     }

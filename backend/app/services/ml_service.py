@@ -19,15 +19,31 @@ STD  = np.array([0.229,0.224,0.225], dtype=np.float32)
 
 class MLService:
     def __init__(self):
-        # Load class names
-        with open(CLASS_PATH) as f: raw = json.load(f)
-        self.class_names = [c["name"] if isinstance(c,dict) else c for c in raw]
-        # Load knowledge base
-        with open(KB_PATH) as f: self.kb = json.load(f)
-        # Load ONNX model
-        self.sess = ort.InferenceSession(MODEL_PATH,
-            providers=["CUDAExecutionProvider","CPUExecutionProvider"])
-        print(f"MLService ready | classes: {len(self.class_names)} | {os.path.basename(MODEL_PATH)}")
+        try:
+            # Load class names
+            if not os.path.exists(CLASS_PATH):
+                raise FileNotFoundError(f"Missing class names at {CLASS_PATH}")
+            with open(CLASS_PATH) as f: raw = json.load(f)
+            self.class_names = [c["name"] if isinstance(c,dict) else c for c in raw]
+            
+            # Load knowledge base
+            if not os.path.exists(KB_PATH):
+                raise FileNotFoundError(f"Missing knowledge base at {KB_PATH}")
+            with open(KB_PATH) as f: self.kb = json.load(f)
+            
+            # Load ONNX model
+            if not os.path.exists(MODEL_PATH):
+                raise FileNotFoundError(f"Missing production model at {MODEL_PATH}")
+            
+            self.sess = ort.InferenceSession(MODEL_PATH,
+                providers=["CUDAExecutionProvider","CPUExecutionProvider"])
+            print(f"MLService initialized: {len(self.class_names)} classes | {os.path.basename(MODEL_PATH)}")
+            
+        except Exception as e:
+            print(f"FATAL_ML_INIT_ERROR: {e}")
+            self.sess = None
+            self.class_names = []
+            self.kb = {}
 
     def _pre(self, img):
         img = img.convert("RGB").resize((IMG_SIZE,IMG_SIZE), Image.LANCZOS)
@@ -53,8 +69,15 @@ class MLService:
         return {}
 
     def predict(self, raw_bytes: bytes) -> dict:
+        if not self.sess:
+            return {"success": False, "error": "model_not_loaded", "message": "The botanical intelligence engine is currently offline. Please contact support."}
+            
         t0  = time.time()
-        img = Image.open(BytesIO(raw_bytes)).convert("RGB")
+        try:
+            img = Image.open(BytesIO(raw_bytes)).convert("RGB")
+        except Exception as e:
+            return {"success": False, "error": "invalid_image", "message": "Failed to decode image data."}
+            
         inp = self._pre(img)
         try: logits = self._run(inp)
         except Exception as e:

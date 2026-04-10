@@ -54,9 +54,11 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE: int = 10485760  # 10MB
     
     # ML Models
-    MODEL_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "ml_models")
+    # Use absolute paths to prevent CWD dependency issues on Render
+    BASE_DIR: str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    MODEL_DIR: str = os.path.join(BASE_DIR, "ml_models")
     PRODUCTION_MODEL_PATH: str = os.path.join(MODEL_DIR, "plantoai_model.onnx")
-    CLASS_NAMES_PATH: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "class_names.json")
+    CLASS_NAMES_PATH: str = os.path.join(BASE_DIR, "app", "data", "class_names.json")
     
     # Optimized Gates
     ENABLE_LEAF_GATE: bool = False # Integrated in main model for v3.1
@@ -65,22 +67,15 @@ class Settings(BaseSettings):
     SHOWCASE_MODE: bool = True
     
     # Google Gemini
-    GEMINI_API_KEY: str | None = None
+    GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
     GEMINI_MODEL: str = "gemini-1.5-flash"
     
     # AWS S3 (Optional)
     USE_S3: bool = False
-    AWS_ACCESS_KEY_ID: str | None = None
-    AWS_SECRET_ACCESS_KEY: str | None = None
-    AWS_REGION: str = "us-east-1"
-    S3_BUCKET_NAME: str | None = None
     
     # Logging
     LOG_LEVEL: str = "INFO"
-    LOG_FILE: str = "./logs/app.log"
-    
-    # Rate Limiting
-    RATE_LIMIT_PER_MINUTE: int = 60
+    LOG_FILE: str = os.path.join(BASE_DIR, "logs", "app.log")
     
     # Pydantic v2 configuration
     model_config = {
@@ -93,7 +88,10 @@ class Settings(BaseSettings):
 # Create settings instance
 settings = Settings()
 
-# Create necessary directories
-os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-os.makedirs(settings.MODEL_DIR, exist_ok=True)
-os.makedirs(os.path.dirname(settings.LOG_FILE), exist_ok=True)
+# Create necessary directories with safety
+try:
+    os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
+    os.makedirs(settings.MODEL_DIR, exist_ok=True)
+    os.makedirs(os.path.dirname(settings.LOG_FILE), exist_ok=True)
+except Exception as e:
+    print(f"Directory creation warning: {e}")
