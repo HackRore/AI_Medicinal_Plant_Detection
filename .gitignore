@@ -37,14 +37,9 @@ ml_pipeline/data/processed/
 !tsconfig.json
 !backend/app/data/*.json
 
-# ML Models
 *.h5
 *.pkl
-*.pth
 *.pb
-ml_models/
-!backend/ml_models/plantoai_model.onnx
-!backend/ml_models/plantoai_model.onnx.data
 checkpoints/
 
 # Node
