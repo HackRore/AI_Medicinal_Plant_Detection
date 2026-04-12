@@ -1,3 +1,14 @@
+import sys, os, logging
+print("=== PRODUCTION HANDSHAKE: STARTING DIAGNOSTICS ===", flush=True)
+print(f"PYTHON: {sys.version}", flush=True)
+print(f"CWD: {os.getcwd()}", flush=True)
+print(f"ROOT FILES: {os.listdir('.')}", flush=True)
+if os.path.exists('ml_models'):
+    print(f"ML_MODELS DIR FOUND: {os.listdir('ml_models')}", flush=True)
+else:
+    print("WARNING: 'ml_models' directory not found in current root.", flush=True)
+print("==================================================", flush=True)
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse

@@ -14,19 +14,37 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _BACKEND_ROOT = os.path.dirname(os.path.dirname(_HERE))
 
 def _find_model():
-    candidates = [
-        os.path.join(_BACKEND_ROOT, "ml_models", "plantoai_model.onnx"),
-        os.path.join(_BACKEND_ROOT, "ml_models", "efficientnetv2_12class.onnx"),
-        os.path.join(_BACKEND_ROOT, "ml_models", "efficientnetv2.onnx"),
-        os.path.join(_BACKEND_ROOT, "ml_models", "model_v3.pth"),
-        os.path.join(os.getcwd(), "ml_models", "plantoai_model.onnx"),
-        os.path.join(os.getcwd(), "backend", "ml_models", "plantoai_model.onnx"),
-    ]
+    """Robust model resolution for local and production (Render) environments."""
+    model_name = "plantoai_model.onnx"
+    
+    # Candidate 1: Direct path from current structure (works in Render after flattening)
+    # File is in backend/app/services/ml_service.py, model in backend/ml_models/
+    candidate1 = os.path.abspath(os.path.join(_HERE, "..", "..", "ml_models", model_name))
+    
+    # Candidate 2: Local development path (nested backend)
+    candidate2 = os.path.abspath(os.path.join(_HERE, "..", "..", "..", "backend", "ml_models", model_name))
+    
+    # Candidate 3: Current directory fallback
+    candidate3 = os.path.abspath(os.path.join(os.getcwd(), "ml_models", model_name))
+
+    candidates = [candidate1, candidate2, candidate3]
+    
     for p in candidates:
         if os.path.exists(p):
-            print(f"Model found: {p}")
-            return p
-    raise FileNotFoundError(f"No model file found. Searched:\n" + "\n".join(candidates))
+            size_mb = os.path.getsize(p) / (1024 * 1024)
+            if size_mb > 5:
+                print(f"VERIFIED MODEL FOUND: {p} ({size_mb:.1f}MB)")
+                return p
+            else:
+                print(f"INVALID MODEL at {p}: Size {size_mb:.1f}MB is too small (placeholder). Searching further...")
+
+    error_msg = (
+        f"CRITICAL: Production model not found or invalid (>5MB).\n"
+        f"Searched paths:\n" + "\n".join([f" - {p}" for p in candidates]) +
+        f"\n\nCWD: {os.getcwd()}\n"
+        f"Verify 'backend/ml_models/plantoai_model.onnx' exists and is committed."
+    )
+    raise FileNotFoundError(error_msg)
 
 MODEL_PATH = _find_model()
 CLASS_PATH = os.path.normpath(os.path.join(os.path.dirname(MODEL_PATH), "..", "app", "data", "class_names.json"))

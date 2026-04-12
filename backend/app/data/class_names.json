@@ -5,250 +5,74 @@
   },
   {
     "id": 1,
-    "name": "Apple"
-  },
-  {
-    "id": 2,
-    "name": "Apple Scab Leaf"
-  },
-  {
-    "id": 3,
-    "name": "Apple leaf"
-  },
-  {
-    "id": 4,
-    "name": "Apple rust leaf"
-  },
-  {
-    "id": 5,
     "name": "Arjun"
   },
   {
-    "id": 6,
+    "id": 2,
     "name": "Bael"
   },
   {
-    "id": 7,
-    "name": "Banana"
-  },
-  {
-    "id": 8,
+    "id": 3,
     "name": "Basil"
   },
   {
-    "id": 9,
-    "name": "Bell pepper leaf"
-  },
-  {
-    "id": 10,
-    "name": "Bell pepper leaf spot"
-  },
-  {
-    "id": 11,
-    "name": "Blueberry leaf"
-  },
-  {
-    "id": 12,
-    "name": "Cassava"
-  },
-  {
-    "id": 13,
-    "name": "Cherry"
-  },
-  {
-    "id": 14,
-    "name": "Cherry leaf"
-  },
-  {
-    "id": 15,
-    "name": "Chili"
-  },
-  {
-    "id": 16,
+    "id": 4,
     "name": "Chinar"
   },
   {
-    "id": 17,
-    "name": "Coffee"
-  },
-  {
-    "id": 18,
-    "name": "Corn"
-  },
-  {
-    "id": 19,
-    "name": "Corn Gray leaf spot"
-  },
-  {
-    "id": 20,
-    "name": "Corn leaf blight"
-  },
-  {
-    "id": 21,
-    "name": "Corn rust leaf"
-  },
-  {
-    "id": 22,
-    "name": "Cucumber"
-  },
-  {
-    "id": 23,
-    "name": "Grape"
-  },
-  {
-    "id": 24,
+    "id": 5,
     "name": "Guava"
   },
   {
-    "id": 25,
+    "id": 6,
     "name": "Jackfruit"
   },
   {
-    "id": 26,
+    "id": 7,
     "name": "Jamun"
   },
   {
-    "id": 27,
+    "id": 8,
     "name": "Jatropha"
   },
   {
-    "id": 28,
+    "id": 9,
     "name": "Lemon"
   },
   {
-    "id": 29,
+    "id": 10,
     "name": "Mango"
   },
   {
-    "id": 30,
+    "id": 11,
     "name": "Neem"
   },
   {
-    "id": 31,
-    "name": "Peach"
-  },
-  {
-    "id": 32,
-    "name": "Peach leaf"
-  },
-  {
-    "id": 33,
+    "id": 12,
     "name": "Pepper Bell"
   },
   {
-    "id": 34,
+    "id": 13,
     "name": "Pomegranate"
   },
   {
-    "id": 35,
+    "id": 14,
     "name": "Pongamia Pinnata"
   },
   {
-    "id": 36,
-    "name": "Potato"
-  },
-  {
-    "id": 37,
-    "name": "Potato leaf"
-  },
-  {
-    "id": 38,
-    "name": "Potato leaf early blight"
-  },
-  {
-    "id": 39,
-    "name": "Potato leaf late blight"
-  },
-  {
-    "id": 40,
+    "id": 15,
     "name": "Raspberry leaf"
   },
   {
-    "id": 41,
-    "name": "Rice"
-  },
-  {
-    "id": 42,
+    "id": 16,
     "name": "Soyabean leaf"
   },
   {
-    "id": 43,
-    "name": "Soybean"
-  },
-  {
-    "id": 44,
-    "name": "Soybean leaf"
-  },
-  {
-    "id": 45,
-    "name": "Squash Powdery mildew leaf"
-  },
-  {
-    "id": 46,
-    "name": "Strawberry"
-  },
-  {
-    "id": 47,
-    "name": "Strawberry leaf"
-  },
-  {
-    "id": 48,
+    "id": 17,
     "name": "Sugarcane"
   },
   {
-    "id": 49,
+    "id": 18,
     "name": "Tea"
-  },
-  {
-    "id": 50,
-    "name": "Tomato"
-  },
-  {
-    "id": 51,
-    "name": "Tomato Early blight leaf"
-  },
-  {
-    "id": 52,
-    "name": "Tomato Septoria leaf spot"
-  },
-  {
-    "id": 53,
-    "name": "Tomato leaf"
-  },
-  {
-    "id": 54,
-    "name": "Tomato leaf bacterial spot"
-  },
-  {
-    "id": 55,
-    "name": "Tomato leaf late blight"
-  },
-  {
-    "id": 56,
-    "name": "Tomato leaf mosaic virus"
-  },
-  {
-    "id": 57,
-    "name": "Tomato leaf yellow virus"
-  },
-  {
-    "id": 58,
-    "name": "Tomato mold leaf"
-  },
-  {
-    "id": 59,
-    "name": "Tomato two spotted spider mites leaf"
-  },
-  {
-    "id": 60,
-    "name": "Wheat"
-  },
-  {
-    "id": 61,
-    "name": "grape leaf"
-  },
-  {
-    "id": 62,
-    "name": "grape leaf black rot"
   }
 ]
