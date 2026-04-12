@@ -12,6 +12,7 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20):
     plants = []
     for key, val in ml_service.kb.items():
         entry = {
+            "id": key.lower().replace(" ", "-"),
             "scientific_name": key,
             "common_names": val.get("common_names", []),
             "ayurvedic_uses": val.get("ayurvedic_uses", []),
