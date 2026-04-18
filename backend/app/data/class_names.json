@@ -37,42 +37,66 @@
   },
   {
     "id": 9,
-    "name": "Lemon"
+    "name": "Leaf-Dataset"
   },
   {
     "id": 10,
-    "name": "Mango"
+    "name": "Lemon"
   },
   {
     "id": 11,
-    "name": "Neem"
+    "name": "Mango"
   },
   {
     "id": 12,
-    "name": "Pepper Bell"
+    "name": "Neem"
   },
   {
     "id": 13,
-    "name": "Pomegranate"
+    "name": "Pepper Bell"
   },
   {
     "id": 14,
-    "name": "Pongamia Pinnata"
+    "name": "Plant Leaf Freshness And Disease Detection Dataset From Bangladesh"
   },
   {
     "id": 15,
-    "name": "Raspberry leaf"
+    "name": "Pomegranate"
   },
   {
     "id": 16,
-    "name": "Soyabean leaf"
+    "name": "Pongamia Pinnata"
   },
   {
     "id": 17,
-    "name": "Sugarcane"
+    "name": "Raspberry Leaf"
   },
   {
     "id": 18,
+    "name": "Rizkikecek"
+  },
+  {
+    "id": 19,
+    "name": "Soyabean Leaf"
+  },
+  {
+    "id": 20,
+    "name": "Sugarcane"
+  },
+  {
+    "id": 21,
     "name": "Tea"
+  },
+  {
+    "id": 22,
+    "name": "Test"
+  },
+  {
+    "id": 23,
+    "name": "Train"
+  },
+  {
+    "id": 24,
+    "name": "Valid"
   }
 ]

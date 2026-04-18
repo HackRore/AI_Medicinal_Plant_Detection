@@ -2,146 +2,108 @@
 Complete ML service: ONNX inference + occlusion Grad-CAM + knowledge lookup.
 All data served from trained model and knowledge base — zero hardcoded values.
 """
-import onnxruntime as ort, numpy as np, cv2, base64, json, time, os
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
 from PIL import Image
+import os
+import json
+import numpy as np
+import logging
+import base64, time
 from io import BytesIO
 from app.config import settings
-
-import os
+from app.core.preprocessing import g9_pipe
 
 # Absolute path resolution — works in both local and Render container
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _BACKEND_ROOT = os.path.dirname(os.path.dirname(_HERE))
 
-def _find_model():
-    """Robust model resolution for local and production (Render) environments."""
-    model_name = "plantoai_model.onnx"
-    
-    # Candidate 1: Direct path from current structure (works in Render after flattening)
-    # File is in backend/app/services/ml_service.py, model in backend/ml_models/
-    candidate1 = os.path.abspath(os.path.join(_HERE, "..", "..", "ml_models", model_name))
-    
-    # Candidate 2: Local development path (nested backend)
-    candidate2 = os.path.abspath(os.path.join(_HERE, "..", "..", "..", "backend", "ml_models", model_name))
-    
-    # Candidate 3: Current directory fallback
-    candidate3 = os.path.abspath(os.path.join(os.getcwd(), "ml_models", model_name))
-
-    candidates = [candidate1, candidate2, candidate3]
-    
-    for p in candidates:
-        if os.path.exists(p):
-            size_mb = os.path.getsize(p) / (1024 * 1024)
-            if size_mb > 5:
-                print(f"VERIFIED MODEL FOUND: {p} ({size_mb:.1f}MB)")
-                return p
-            else:
-                print(f"INVALID MODEL at {p}: Size {size_mb:.1f}MB is too small (placeholder). Searching further...")
-
-    error_msg = (
-        f"CRITICAL: Production model not found or invalid (>5MB).\n"
-        f"Searched paths:\n" + "\n".join([f" - {p}" for p in candidates]) +
-        f"\n\nCWD: {os.getcwd()}\n"
-        f"Verify 'backend/ml_models/plantoai_model.onnx' exists and is committed."
-    )
-    raise FileNotFoundError(error_msg)
-
-MODEL_PATH = _find_model()
-CLASS_PATH = os.path.normpath(os.path.join(os.path.dirname(MODEL_PATH), "..", "app", "data", "class_names.json"))
-KB_PATH    = os.path.normpath(os.path.join(os.path.dirname(MODEL_PATH), "..", "app", "data", "medicinal_knowledge.json"))
+MODEL_PATH = os.path.join(_BACKEND_ROOT, "models", "best.pt")
+CLASS_PATH = os.path.normpath(os.path.join(_HERE, "..", "app", "data", "class_names.json"))
+KB_PATH    = os.path.normpath(os.path.join(_HERE, "..", "app", "data", "medicinal_knowledge.json"))
 
 IMG_SIZE    = 224
 OOD_THRESH  = 0.25
 CONF_THRESH = 0.50
-MEAN = np.array([0.485,0.456,0.406], dtype=np.float32)
-STD  = np.array([0.229,0.224,0.225], dtype=np.float32)
 
 class MLService:
     def __init__(self):
+        self.logger = logging.getLogger(__name__)
+        self.models_path = os.path.join(_BACKEND_ROOT, "models")
+        
         try:
-            # Load class names
-            if not os.path.exists(CLASS_PATH):
-                raise FileNotFoundError(f"Missing class names at {CLASS_PATH}")
             with open(CLASS_PATH) as f: raw = json.load(f)
             self.class_names = [c["name"] if isinstance(c,dict) else c for c in raw]
-            
-            # Load knowledge base
-            if not os.path.exists(KB_PATH):
-                raise FileNotFoundError(f"Missing knowledge base at {KB_PATH}")
             with open(KB_PATH) as f: self.kb = json.load(f)
-            
-            # Load ONNX model
-            self.sess = ort.InferenceSession(MODEL_PATH,
-                providers=["CUDAExecutionProvider","CPUExecutionProvider"])
-            print(f"MLService initialized: {len(self.class_names)} classes | {os.path.basename(MODEL_PATH)}")
-            
+            self._load_model()
         except Exception as e:
-            print(f"FATAL_ML_INIT_ERROR: {e}")
-            self.sess = None
-            self.class_names = []
-            self.kb = {}
+            self.logger.error(f"FATAL_ML_INIT_ERROR: {e}")
+            self.model = None
 
-    def _pre(self, img):
-        img = img.convert("RGB").resize((IMG_SIZE,IMG_SIZE), Image.LANCZOS)
-        a   = (np.array(img, dtype=np.float32)/255.0 - MEAN) / STD
-        return a.transpose(2,0,1)[np.newaxis].astype(np.float32)
+    def _load_model(self):
+        """Load the production model using native PyTorch weights."""
+        model_pt = os.path.join(self.models_path, "best.pt")
+        
+        try:
+            # Initialize architecture
+            self.model = models.mobilenet_v3_large(weights=None)
+            self.model.classifier[3] = nn.Linear(self.model.classifier[3].in_features, 25)
+            
+            if os.path.exists(model_pt):
+                self.model.load_state_dict(torch.load(model_pt, map_location='cpu'))
+                self.model.eval()
+                self.logger.info(f"Loaded G9 High-Confidence Model from {model_pt}")
+            else:
+                self.logger.warning(f"Production model not found at {model_pt}")
+                self.model = None
 
-    def _run(self, inp): return self.sess.run(["output"],{"input":inp})[0][0]
-
-    def _softmax(self, x): e=np.exp(x-x.max()); return e/e.sum()
+        except Exception as e:
+            self.logger.error(f"Critical error loading model: {e}")
+            self.model = None
 
     def _kb(self, name):
-        # Normalize: 'Apple leaf' -> 'apple', 'Tomato Early blight' -> 'tomato'
         target = name.lower().replace("_", " ").split(" ")[0]
-        
-        # Priority 1: Exact Match (Case Insensitive)
         for k in self.kb:
             if target == k.lower(): return self.kb[k]
-            
-        # Priority 2: Partial Search
         for k in self.kb:
             if target in k.lower() or k.lower() in target:
                 return self.kb[k]
         return {}
 
     def predict(self, raw_bytes: bytes) -> dict:
-        if not self.sess:
-            return {"success": False, "error": "model_not_loaded", "message": "The botanical intelligence engine is currently offline. Please contact support."}
-            
-        t0  = time.time()
+        """Perform high-confidence medicinal plant identification with knowledge synthesis."""
+        if self.model is None:
+            return {"success": False, "error": "Neural Engine Offline"}
+
+        t0 = time.time()
         try:
             img = Image.open(BytesIO(raw_bytes)).convert("RGB")
-        except Exception as e:
-            return {"success": False, "error": "invalid_image", "message": "Failed to decode image data."}
+            # Preprocessing
+            img_tensor = transforms.Compose([
+                transforms.Resize((224, 224)),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])(img).unsqueeze(0)
+
+            with torch.no_grad():
+                outputs = self.model(img_tensor)
+                probs = torch.nn.functional.softmax(outputs[0], dim=0)
+                conf, idx = torch.max(probs, dim=0)
+
+            predicted_class = self.class_names[idx.item()]
+            kb = self._kb(predicted_class)
             
-        inp = self._pre(img)
-        try: logits = self._run(inp)
+            return {
+                "success": True,
+                "class_name": predicted_class,
+                "confidence_pct": round(float(conf.item()) * 100, 2),
+                "knowledge": kb,
+                "inference_ms": int((time.time() - t0) * 1000)
+            }
         except Exception as e:
-            return {"success":False,"error":"model_error","message":str(e)}
-
-        probs = self._softmax(logits)
-        top   = np.argsort(probs)[::-1]
-        conf  = float(probs[top[0]])
-
-        if conf < OOD_THRESH:
-            return {"success":False,"error":"not_a_plant",
-                    "message":"Image does not appear to contain a recognizable medicinal plant leaf.",
-                    "suggestion":"Use a clear photo of a single leaf. Ensure good lighting and plain background."}
-
-        cname = self.class_names[top[0]]
-        top3  = [{"rank":i+1,"name":self.class_names[top[i]],
-                  "confidence":round(float(probs[top[i]])*100,2)}
-                 for i in range(min(3,len(top)))]
-        kb    = self._kb(cname)
-        img_np= np.array(img.resize((IMG_SIZE,IMG_SIZE)))
-        gcam  = self._gradcam(img_np, inp, int(top[0]))
-
-        return {"success":True,"class_name":cname,
-                "confidence_pct":round(conf*100,2),
-                "confidence_label":"High" if conf>=0.80 else "Medium" if conf>=CONF_THRESH else "Low",
-                "quality_passed":conf>=CONF_THRESH,"quality_score":round(conf,4),
-                "top3":top3,"knowledge":kb,"gradcam":gcam,
-                "inference_ms":int((time.time()-t0)*1000)}
+            self.logger.error(f"Inference error: {e}")
+            return {"success": False, "error": str(e)}
 
     def _gradcam(self, img_np, inp, cls_idx):
         try:

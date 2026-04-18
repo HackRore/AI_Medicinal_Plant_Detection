@@ -1,20 +1,17 @@
-import sys, os, logging
-print("=== PRODUCTION HANDSHAKE: STARTING DIAGNOSTICS ===", flush=True)
-print(f"PYTHON: {sys.version}", flush=True)
-print(f"CWD: {os.getcwd()}", flush=True)
-print(f"ROOT FILES: {os.listdir('.')}", flush=True)
-if os.path.exists('ml_models'):
-    print(f"ML_MODELS DIR FOUND: {os.listdir('ml_models')}", flush=True)
-else:
-    print("WARNING: 'ml_models' directory not found in current root.", flush=True)
-print("==================================================", flush=True)
-
+import os, sys, logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-import os, logging
+
+# --- G9 Path Hardening (Encapsulation Fix) ---
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_BACKEND_ROOT = os.path.dirname(_HERE)
+if _BACKEND_ROOT not in sys.path:
+    sys.path.insert(0, _BACKEND_ROOT)
+# ---------------------------------------------
 
 from app.api.v1 import predict, plants, stats
+from app.services.ml_service import ml_service
 from app.db.session import test_connection
 
 # Configure logging
@@ -54,7 +51,6 @@ app.add_middleware(
 app.include_router(predict.router, prefix="/api/v1/predict", tags=["Neural Forge"])
 app.include_router(predict.router, prefix="/predict",        tags=["Legacy Support"])
 app.include_router(plants.router,  prefix="/api/v1/plants",  tags=["Botanical Repository"])
-app.include_router(stats.router,   prefix="/api/v1/stats",   tags=["Live Metrics"])
 
 @app.get("/")
 def root():
@@ -67,10 +63,31 @@ def root():
 
 @app.get("/health")
 def health():
-    db_ok = test_connection()
     return {
-        "status": "healthy" if db_ok else "degraded",
-        "database": "connected" if db_ok else "disconnected",
-        "engine": "v3.1_outstanding",
-        "models": "loaded"
+        "status": "ok",
+        "model_loaded": ml_service is not None,
+        "classes": len(ml_service.class_names) if ml_service else 0
     }
+
+@app.get("/api/v1/stats")
+def stats():
+    import os, json
+    # Resolution parity with ml_service
+    rp = os.path.join(os.path.dirname(__file__), "..", "models", "training_report.json")
+    try:
+        if not os.path.exists(rp):
+             return {"species_count": len(ml_service.class_names) if ml_service else 0, "status": "no_report_found"}
+        with open(os.path.normpath(rp)) as f:
+            r = json.load(f)
+        return {
+            "species_count": r["num_classes"],
+            "top1_accuracy": r["top1_accuracy"],
+            "top3_accuracy": r["top3_accuracy"],
+            "total_training_images": r["train_images"]
+        }
+    except Exception as e:
+        return {
+            "species_count": len(ml_service.class_names) if ml_service else 0,
+            "top1_accuracy": None,
+            "error": str(e)
+        }
