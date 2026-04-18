@@ -5,7 +5,7 @@ All data served from trained model and knowledge base — zero hardcoded values.
 import torch
 import torch.nn as nn
 from torchvision import transforms, models
-from PIL import Image
+from PIL import Image, ImageOps # Added ImageOps for Exif handling
 import os
 import json
 import numpy as np
@@ -72,24 +72,41 @@ class MLService:
         return {}
 
     def predict(self, raw_bytes: bytes) -> dict:
-        """Perform high-confidence medicinal plant identification with knowledge synthesis."""
+        """Perform high-confidence medicinal plant identification with production hardening."""
         if self.model is None:
             return {"success": False, "error": "Neural Engine Offline"}
 
         t0 = time.time()
         try:
-            img = Image.open(BytesIO(raw_bytes)).convert("RGB")
-            # Preprocessing
+            # 1. Byte-stream intake
+            img = Image.open(BytesIO(raw_bytes))
+            
+            # 2. Exif Orientation Fix (Crucial for smartphone photos)
+            img = ImageOps.exif_transpose(img).convert("RGB")
+            
+            # 3. G9 Preprocessing Pipe
             img_tensor = transforms.Compose([
                 transforms.Resize((224, 224)),
                 transforms.ToTensor(),
                 transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ])(img).unsqueeze(0)
 
+            # 4. Neural Inference
             with torch.no_grad():
                 outputs = self.model(img_tensor)
                 probs = torch.nn.functional.softmax(outputs[0], dim=0)
                 conf, idx = torch.max(probs, dim=0)
+
+            conf_val = float(conf.item())
+            
+            # 5. Botanical Guardrail (Out-of-Distribution Detection)
+            if conf_val < 0.25: # OOD Threshold
+                return {
+                    "success": False,
+                    "error": "not_a_medicinal_plant",
+                    "message": "The G9 Engine could not verify this as a recognized medicinal species. Please ensure the leaf is clear and well-lit.",
+                    "confidence": conf_val
+                }
 
             predicted_class = self.class_names[idx.item()]
             kb = self._kb(predicted_class)
@@ -97,13 +114,14 @@ class MLService:
             return {
                 "success": True,
                 "class_name": predicted_class,
-                "confidence_pct": round(float(conf.item()) * 100, 2),
+                "confidence_pct": round(conf_val * 100, 2),
+                "confidence_label": "High" if conf_val > 0.85 else "Medium" if conf_val > 0.50 else "Low",
                 "knowledge": kb,
                 "inference_ms": int((time.time() - t0) * 1000)
             }
         except Exception as e:
-            self.logger.error(f"Inference error: {e}")
-            return {"success": False, "error": str(e)}
+            self.logger.error(f"Production inference error: {e}")
+            return {"success": False, "error": "Internal Processing Error", "details": str(e)}
 
     def _gradcam(self, img_np, inp, cls_idx):
         try:

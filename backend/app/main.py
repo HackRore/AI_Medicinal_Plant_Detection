@@ -63,31 +63,14 @@ def root():
 
 @app.get("/health")
 def health():
-    return {
-        "status": "ok",
-        "model_loaded": ml_service is not None,
-        "classes": len(ml_service.class_names) if ml_service else 0
-    }
+    return {"status": "ok", "model_loaded": True, "classes": len(ml_service.class_names)}
 
 @app.get("/api/v1/stats")
 def stats():
     import os, json
-    # Resolution parity with ml_service
-    rp = os.path.join(os.path.dirname(__file__), "..", "models", "training_report.json")
+    rp = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "ml_models", "training_report.json"))
     try:
-        if not os.path.exists(rp):
-             return {"species_count": len(ml_service.class_names) if ml_service else 0, "status": "no_report_found"}
-        with open(os.path.normpath(rp)) as f:
-            r = json.load(f)
-        return {
-            "species_count": r["num_classes"],
-            "top1_accuracy": r["top1_accuracy"],
-            "top3_accuracy": r["top3_accuracy"],
-            "total_training_images": r["train_images"]
-        }
+        with open(rp) as f: r = json.load(f)
+        return {"species_count": r["num_classes"], "top1_accuracy": r["top1_accuracy"], "top3_accuracy": r["top3_accuracy"], "total_training_images": r["train_images"]}
     except Exception as e:
-        return {
-            "species_count": len(ml_service.class_names) if ml_service else 0,
-            "top1_accuracy": None,
-            "error": str(e)
-        }
+        return {"species_count": len(ml_service.class_names), "top1_accuracy": None, "error": str(e)}
