@@ -90,8 +90,8 @@ export default function PlantDetailPage() {
                 {/* Header Image */}
                 <div className="relative h-[400px] w-full">
                     <img
-                        src={plant.image_url}
-                        alt={plant.species_name}
+                        src={plant?.image_url ?? ""}
+                        alt={plant?.species_name ?? "Plant Image"}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                             (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x600?text=No+Image+Available'
@@ -100,10 +100,10 @@ export default function PlantDetailPage() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
                         <div className="p-8 text-white w-full">
                             <h1 className="text-5xl font-bold mb-2">
-                                {plant.common_names.en}
+                                {plant?.common_names?.en ?? "Unknown Plant"}
                             </h1>
                             <p className="text-xl font-mono opacity-90 italic">
-                                {(plant.species_name || "Unknown Species").replace(/_/g, ' ')}
+                                {(plant?.species_name ?? "Unknown Species").replace(/_/g, ' ')}
                             </p>
                         </div>
                     </div>
@@ -119,7 +119,7 @@ export default function PlantDetailPage() {
                                     <span>📖</span> About
                                 </h2>
                                 <p className="text-gray-700 leading-relaxed text-lg">
-                                    {plant.description}
+                                    {plant?.description ?? "No description available for this species."}
                                 </p>
                             </section>
 
@@ -129,19 +129,19 @@ export default function PlantDetailPage() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div>
                                         <span className="text-xs uppercase font-bold text-orange-400">Hindi</span>
-                                        <p className="font-medium text-gray-800">{plant.common_names.hi || '-'}</p>
+                                        <p className="font-medium text-gray-800">{plant?.common_names?.hi ?? '-'}</p>
                                     </div>
                                     <div>
                                         <span className="text-xs uppercase font-bold text-orange-400">Tamil</span>
-                                        <p className="font-medium text-gray-800">{plant.common_names.ta || '-'}</p>
+                                        <p className="font-medium text-gray-800">{plant?.common_names?.ta ?? '-'}</p>
                                     </div>
                                     <div>
                                         <span className="text-xs uppercase font-bold text-orange-400">Telugu</span>
-                                        <p className="font-medium text-gray-800">{plant.common_names.te || '-'}</p>
+                                        <p className="font-medium text-gray-800">{plant?.common_names?.te ?? '-'}</p>
                                     </div>
                                     <div>
                                         <span className="text-xs uppercase font-bold text-orange-400">Bengali</span>
-                                        <p className="font-medium text-gray-800">{plant.common_names.bn || '-'}</p>
+                                        <p className="font-medium text-gray-800">{plant?.common_names?.bn ?? '-'}</p>
                                     </div>
                                 </div>
                             </section>
@@ -152,25 +152,25 @@ export default function PlantDetailPage() {
                                     <span>💊</span> Medicinal Uses
                                 </h2>
                                 <div className="space-y-6">
-                                    {plant.medicinal_properties.map((prop, idx) => (
+                                    {(plant?.medicinal_properties ?? []).map((prop, idx) => (
                                         <div key={idx} className="bg-primary-50 rounded-xl p-6 border border-primary-100 shadow-sm">
                                             <h3 className="text-xl font-bold text-primary-700 mb-3 border-b border-primary-200 pb-2">
-                                                {prop.ailment}
+                                                {prop?.ailment ?? "General Wellness"}
                                             </h3>
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 <div>
                                                     <h4 className="font-semibold text-gray-700 text-sm mb-1">Usage</h4>
-                                                    <p className="text-gray-600 mb-4">{prop.usage}</p>
+                                                    <p className="text-gray-600 mb-4">{prop?.usage ?? "Not specified"}</p>
 
                                                     <h4 className="font-semibold text-gray-700 text-sm mb-1">Preparation</h4>
-                                                    <p className="text-gray-600">{prop.preparation}</p>
+                                                    <p className="text-gray-600">{prop?.preparation ?? "Not specified"}</p>
                                                 </div>
                                                 <div className="bg-white/50 p-4 rounded-lg">
                                                     <h4 className="font-semibold text-gray-700 text-sm mb-1">Dosage</h4>
-                                                    <p className="text-gray-600 mb-3">{prop.dosage}</p>
+                                                    <p className="text-gray-600 mb-3">{prop?.dosage ?? "Not specified"}</p>
 
                                                     <h4 className="font-semibold text-red-600 text-xs uppercase mb-1">Precautions</h4>
-                                                    <p className="text-red-700 text-sm">{prop.precautions}</p>
+                                                    <p className="text-red-700 text-sm">{prop?.precautions ?? "None listed"}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -184,7 +184,7 @@ export default function PlantDetailPage() {
                             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-md sticky top-8">
                                 <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Scientific Classification</h3>
                                 <p className="text-sm text-gray-600 leading-relaxed font-mono">
-                                    {plant.scientific_classification}
+                                    {plant?.scientific_classification ?? "Data study in progress."}
                                 </p>
 
                                 <div className="mt-8 pt-6 border-t">

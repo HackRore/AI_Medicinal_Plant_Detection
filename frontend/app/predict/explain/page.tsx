@@ -104,15 +104,15 @@ export default function ExplainPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <p className="text-5xl font-black text-primary mb-2">
-                  {(result.prediction?.predicted_class || "Unknown").replace(/_/g, " ")}
+                  {(result?.prediction?.predicted_class ?? "Unknown").replace(/_/g, " ")}
                 </p>
                 <p className="text-3xl font-bold text-green-500">
-                  {(result.prediction.confidence * 100).toFixed(1)}% Confidence
+                  {((result?.prediction?.confidence ?? 0) * 100).toFixed(1)}% Confidence
                 </p>
               </div>
               <div className="space-y-4">
                 <p className="font-mono text-sm bg-muted px-4 py-2 rounded-lg">
-                  Model: {result.model_version || "Ensemble"}
+                  Model: {result?.model_version ?? "Ensemble"}
                 </p>
                 <Button variant="outline" onClick={() => navigator.clipboard.writeText(JSON.stringify(result, null, 2))}>
                   Copy JSON
@@ -122,7 +122,7 @@ export default function ExplainPage() {
           </div>
 
           {/* Grad-CAM */}
-          {result.gradcam && (
+          {result?.gradcam && (
             <div className="bg-gradient-to-r from-orange-500/10 to-pink-500/10 p-8 rounded-3xl border border-orange-200">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
                 🎯 Grad-CAM Heatmap
@@ -130,11 +130,11 @@ export default function ExplainPage() {
               </h2>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <img src={result.gradcam.heatmap} alt="Grad-CAM" className="w-full rounded-2xl shadow-2xl max-h-96 object-contain" />
+                  <img src={result?.gradcam?.heatmap ?? ""} alt="Grad-CAM" className="w-full rounded-2xl shadow-2xl max-h-96 object-contain" />
                 </div>
                 <div className="space-y-4">
                   <p className="text-muted-foreground">
-                    {result.gradcam.explanation}
+                    {result?.gradcam?.explanation ?? "Generating scientific local attention markers..."}
                   </p>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div className="bg-orange-50 p-4 rounded-xl">
@@ -152,17 +152,17 @@ export default function ExplainPage() {
           )}
 
           {/* LIME */}
-          {result.lime && (
+          {result?.lime && (
             <div className="bg-gradient-to-r from-green-500/10 to-blue-500/10 p-8 rounded-3xl border border-green-200">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
                 🔍 LIME Explanation
                 <span className="text-sm bg-green-200 px-3 py-1 rounded-full font-mono">Local Features</span>
               </h2>
               <div className="grid md:grid-cols-2 gap-8">
-                <img src={result.lime.feature_map} alt="LIME" className="w-full rounded-2xl shadow-2xl" />
+                <img src={result?.lime?.feature_map ?? ""} alt="LIME" className="w-full rounded-2xl shadow-2xl" />
                 <div className="space-y-4">
                   <p className="text-muted-foreground">
-                    {result.lime.explanation}
+                    {result?.lime?.explanation ?? "Synthesizing secondary verification map..."}
                   </p>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-green-50 p-4 rounded-xl">
@@ -180,11 +180,11 @@ export default function ExplainPage() {
           )}
 
           {/* Reasoning */}
-          {result.botanical_reasoning && (
+          {result?.botanical_reasoning && (
             <div className="bg-gradient-to-r from-indigo-500/10 p-8 rounded-3xl border border-indigo-200">
               <h2 className="text-3xl font-bold mb-6">🧠 Botanical Reasoning</h2>
               <p className="text-lg leading-relaxed prose prose-indigo max-w-none">
-                {result.botanical_reasoning}
+                {result?.botanical_reasoning ?? "Generating scientific rationale..."}
               </p>
             </div>
           )}

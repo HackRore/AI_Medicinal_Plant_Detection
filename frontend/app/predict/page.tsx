@@ -159,16 +159,16 @@ export default function PredictPage() {
       return res.json()
     },
     onSuccess: async (data: any) => {
-      if (data.success) {
-        if (data.prediction.confidence > 80) {
+      if (data?.success) {
+        if ((data?.prediction?.confidence ?? 0) > 80) {
           confetti({ particleCount: 150, spread: 80, origin: { y: 0.7 } })
-          toast.success(`Verified: ${data.plant.name}`)
+          toast.success(`Verified: ${data?.plant?.name ?? "Medicinal Plant"}`)
         }
         
         const newEntry = {
           id: Date.now().toString(),
-          plant_name: data.plant.name,
-          confidence: data.prediction.confidence,
+          plant_name: data?.plant?.name ?? "Unknown Species",
+          confidence: data?.prediction?.confidence ?? 0,
           thumb: uploadedImages[0]?.preview || preview || '',
           timestamp: Date.now()
         }
@@ -176,7 +176,7 @@ export default function PredictPage() {
         setLocalHistory(newHistory)
         localStorage.setItem('plantoai_history', JSON.stringify(newHistory))
       } else {
-        toast.error(data.message || "Identification failed")
+        toast.error(data?.message ?? "Identification failed")
       }
     },
     onError: (error: any) => {
