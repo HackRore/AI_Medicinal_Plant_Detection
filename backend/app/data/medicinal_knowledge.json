@@ -262,5 +262,41 @@
     "active_compounds": ["Papain","Chymopapain","Carpaine","Beta-carotene","Lycopene"],
     "description": "Papaya leaf juice is a proven folk remedy for dengue fever, now supported by clinical studies showing significant platelet count increase.",
     "contraindications": ["AVOID UNRIPE FRUIT AND LEAVES IN PREGNANCY","Blood thinners: papain has anticoagulant effect"]
+  },
+  "Jackfruit": {
+    "common_names": ["Jackfruit", "Kathal", "Nangka"],
+    "scientific_name": "Artocarpus heterophyllus",
+    "family": "Moraceae",
+    "toxicity": {"level":"safe","level_code":0,"notes":"All parts safe. Latex may cause contact allergy in sensitive individuals."},
+    "native_region": "Western Ghats, India — now pantropical",
+    "ayurvedic_uses": ["Digestive health and constipation relief","Energy and vitality boost","Anti-diabetic properties in leaves","Anti-inflammatory","Wound healing (latex topical)"],
+    "preparation": "Leaves: boil 10 fresh leaves in 500ml water, reduce to half, drink 1 cup daily for diabetes support. Raw fruit: eat as vegetable. Ripe fruit: eat freely as nutritious food.",
+    "active_compounds": ["Artocarpanone","Morusin","Quercetin","Potassium","Vitamin B6"],
+    "description": "Jackfruit is the world's largest tree fruit and a complete nutritional food. The leaves have documented anti-diabetic properties. Young jackfruit is used as a meat substitute across South and Southeast Asia.",
+    "contraindications": ["Latex allergy: avoid if allergic to latex","Diabetes medication: leaf tea may lower blood sugar — monitor"]
+  },
+  "Tea": {
+    "common_names": ["Tea","Chai","Green Tea","Camellia"],
+    "scientific_name": "Camellia sinensis",
+    "family": "Theaceae",
+    "toxicity": {"level":"safe","level_code":0,"notes":"Safe at normal consumption. High doses may cause caffeine-related effects."},
+    "native_region": "Yunnan Province China, Northeast India (Assam)",
+    "ayurvedic_uses": ["Antioxidant and anti-ageing","Mental alertness and focus","Digestive aid","Anti-inflammatory","Cardiovascular protection"],
+    "preparation": "Green tea: steep 1 tsp leaves in 80°C water (not boiling) for 2-3 min. Drink 2-3 cups daily. Avoid milk to preserve antioxidants.",
+    "active_compounds": ["EGCG (Epigallocatechin gallate)","L-Theanine","Caffeine","Quercetin","Theaflavins"],
+    "description": "Tea is the most consumed beverage after water globally. EGCG is one of the most potent natural antioxidants known. L-Theanine combined with caffeine produces calm alertness unique to tea.",
+    "contraindications": ["Iron deficiency: space 1hr from iron-rich meals","Anxiety disorders: limit caffeine intake","Pregnancy: limit to 2 cups daily"]
+  },
+  "Sugarcane": {
+    "common_names": ["Sugarcane","Ganna","Ikshu"],
+    "scientific_name": "Saccharum officinarum",
+    "family": "Poaceae",
+    "toxicity": {"level":"safe","level_code":0,"notes":"Completely safe. One of the most ancient medicinal plants in Ayurveda."},
+    "native_region": "New Guinea — cultivated in India for 4000+ years",
+    "ayurvedic_uses": ["Kidney and urinary tract health","Liver tonic and jaundice treatment","Energy and electrolyte replenishment","Anti-inflammatory","Digestive health"],
+    "preparation": "Fresh juice: drink 200-300ml daily. Add ginger and lemon for enhanced benefit. Jaggery (unrefined sugarcane): use instead of refined sugar for medicinal cooking.",
+    "active_compounds": ["Sucrose","Policosanol","Flavonoids","Phenolic compounds","Antioxidant enzymes"],
+    "description": "Sugarcane juice is one of Ayurveda's primary medicines for liver and kidney health. Jaggery (raw sugarcane) retains minerals lost in refined sugar processing.",
+    "contraindications": ["Diabetes: commercial refined sugar harmful, but fresh juice in moderation differs","Dental health: rinse after consumption"]
   }
 }

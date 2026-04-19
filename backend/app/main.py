@@ -12,7 +12,7 @@ if _BACKEND_ROOT not in sys.path:
 
 from app.api.v1 import predict, plants, stats
 from app.services.ml_service import ml_service
-from app.db.session import test_connection
+# from app.db.session import test_connection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

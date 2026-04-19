@@ -37,66 +37,42 @@
   },
   {
     "id": 9,
-    "name": "Leaf-Dataset"
-  },
-  {
-    "id": 10,
     "name": "Lemon"
   },
   {
-    "id": 11,
+    "id": 10,
     "name": "Mango"
   },
   {
-    "id": 12,
+    "id": 11,
     "name": "Neem"
   },
   {
-    "id": 13,
-    "name": "Pepper Bell"
-  },
-  {
-    "id": 14,
-    "name": "Plant Leaf Freshness And Disease Detection Dataset From Bangladesh"
-  },
-  {
-    "id": 15,
+    "id": 12,
     "name": "Pomegranate"
   },
   {
-    "id": 16,
+    "id": 13,
     "name": "Pongamia Pinnata"
   },
   {
+    "id": 14,
+    "name": "Hibiscus"
+  },
+  {
+    "id": 15,
+    "name": "Moringa"
+  },
+  {
+    "id": 16,
+    "name": "Tulsi"
+  },
+  {
     "id": 17,
-    "name": "Raspberry Leaf"
+    "name": "Curry Leaf"
   },
   {
     "id": 18,
-    "name": "Rizkikecek"
-  },
-  {
-    "id": 19,
-    "name": "Soyabean Leaf"
-  },
-  {
-    "id": 20,
-    "name": "Sugarcane"
-  },
-  {
-    "id": 21,
-    "name": "Tea"
-  },
-  {
-    "id": 22,
-    "name": "Test"
-  },
-  {
-    "id": 23,
-    "name": "Train"
-  },
-  {
-    "id": 24,
-    "name": "Valid"
+    "name": "Amla"
   }
 ]
