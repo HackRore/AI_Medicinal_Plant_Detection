@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.database import get_db
+# from app.database import get_db
 from app.services.recommendation_service import get_recommendation_service
 
 router = APIRouter()

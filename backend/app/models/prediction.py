@@ -6,7 +6,7 @@ Database model for storing user predictions and feedback
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
-from app.database import Base
+# from app.database import Base
 
 
 class Prediction(Base):

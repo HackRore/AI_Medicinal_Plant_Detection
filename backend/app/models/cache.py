@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, JSON, DateTime, Integer
 from sqlalchemy.sql import func
-from app.database import Base
+# from app.database import Base
 
 class GeminiCache(Base):
     """Cache for Gemini AI Vision results to save costs and latency"""

@@ -7,9 +7,9 @@ from fastapi import APIRouter, File, UploadFile, Depends, Body
 from sqlalchemy.orm import Session
 from typing import Optional
 
-from app.database import get_db
+# from app.database import get_db
 from app.services.gemini_service import get_gemini_service
-from app.models.plant import Plant
+# from app.models.plant import Plant
 
 router = APIRouter()
 

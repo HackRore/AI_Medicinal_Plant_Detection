@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.main import app
-from app.database import Base, get_db
+# from app.database import Base, get_db
 from app.config import settings
 
 # Use an in-memory SQLite database for testing
