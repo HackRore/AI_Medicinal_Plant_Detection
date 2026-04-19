@@ -1,4 +1,10 @@
-import os, sys, logging
+import os
+# Disable all database connections — project uses file-based knowledge base
+os.environ.pop("DATABASE_URL", None)
+os.environ.pop("SUPABASE_URL", None)
+os.environ.pop("SUPABASE_KEY", None)
+
+import sys, logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
