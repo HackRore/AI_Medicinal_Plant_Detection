@@ -367,7 +367,7 @@ export default function PredictPage() {
 
             {symptomResults && (
               <div className="grid md:grid-cols-3 gap-8">
-                {symptomResults.recommendations?.map((rec: any, i: number) => (
+                {(symptomResults?.recommendations ?? []).map((rec: any, i: number) => (
                   <motion.div 
                     key={i}
                     initial={{ opacity: 0, y: 20 }}
@@ -375,11 +375,11 @@ export default function PredictPage() {
                     transition={{ delay: i * 0.1 }}
                     className="p-8 bg-white/5 border border-white/5 text-white rounded-[32px] hover:border-primary-500/20 transition-all"
                   >
-                    <h4 className="text-2xl font-black text-primary-400 mb-3 tracking-tighter">{rec.plant}</h4>
-                    <p className="text-sm text-gray-400 font-medium mb-6 leading-relaxed">"{rec.why}"</p>
+                    <h4 className="text-2xl font-black text-primary-400 mb-3 tracking-tighter">{rec?.plant ?? "Unknown Plant"}</h4>
+                    <p className="text-sm text-gray-400 font-medium mb-6 leading-relaxed">"{rec?.why ?? "No explanation available."}"</p>
                     <div className="pt-6 border-t border-white/5">
                       <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">Ayurvedic Prep</p>
-                      <p className="text-xs text-gray-300 font-bold">{rec.preparation}</p>
+                      <p className="text-xs text-gray-300 font-bold">{rec?.preparation ?? "N/A"}</p>
                     </div>
                   </motion.div>
                 ))}

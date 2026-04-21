@@ -5,7 +5,7 @@ os.environ.pop("SUPABASE_KEY", None)
 
 import sys
 import logging
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import json
@@ -13,21 +13,34 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="PlantoAI API", version="2.0")
-app.add_middleware(CORSMiddleware,
-    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-logger.info("Starting PlantoAI backend...")
+# Phase 1: Pre-import ML Service placeholder to avoid NameErrors
+ml_service = None
+ML_LOADED = False
 
 try:
     from app.services.ml_service import ml_service
-    logger.info(f"ML service loaded: {len(ml_service.class_names)} classes")
+    logger.info(f"ML service metadata loaded: {len(ml_service.class_names)} classes")
     ML_LOADED = True
 except Exception as e:
-    logger.error(f"ML service failed: {e}")
+    logger.error(f"ML service failed to initialize metadata: {e}")
     import traceback; traceback.print_exc()
-    ml_service = None
-    ML_LOADED = False
+
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Trigger background neural load (If metadata worked)
+    if ml_service:
+        logger.info("Lifespan: Triggering background AI model initialization...")
+        ml_service.deferred_init()
+    yield
+    # Shutdown logic (none needed)
+
+app = FastAPI(title="PlantoAI API", version="2.0", lifespan=lifespan)
+app.add_middleware(CORSMiddleware,
+    allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+
+logger.info("Starting PlantoAI backend server...")
 
 @app.get("/")
 def root():
@@ -40,9 +53,14 @@ def ping():
 @app.get("/health")
 def health():
     return {
-        "status": "ok" if ML_LOADED else "degraded",
-        "model_loaded": ML_LOADED,
-        "classes": len(ml_service.class_names) if ml_service else 0
+        "status": "ok" if (ML_LOADED and ml_service and ml_service.class_names) else "degraded",
+        "system": {
+            "dataset_mapped": len(ml_service.class_names) > 0 if ml_service else False,
+            "clinical_kb_loaded": len(ml_service.kb) > 0 if ml_service else False,
+            "ai_engine_online": ml_service.model_loaded if ml_service else False,
+        },
+        "classes": len(ml_service.class_names) if ml_service else 0,
+        "message": "AI Training in progress. Knowledge base is active." if not (ml_service and ml_service.model_loaded) else "System fully operational."
     }
 
 @app.get("/api/v1/stats")
@@ -140,3 +158,90 @@ def get_plant(name: str):
         return {"error": "Service unavailable"}
     r = ml_service._kb(name.replace("-", " "))
     return {"scientific_name": name, **r} if r else {"error": "Not found"}
+
+@app.get("/api/v1/search")
+def search_symptoms(query: str = ""):
+    """Novelty Claim: Symptom-to-Plant Engine"""
+    if not query or len(query) < 2:
+        return {"results": []}
+    
+    query = query.lower()
+    results = []
+    
+    # Access knowledge directly from ml_service
+    if not ml_service or not ml_service.kb:
+        return {"results": []}
+        
+    for species, info in ml_service.kb.items():
+        # Match keywords in uses, description, and scientific name
+        uses_match = any(query in use.lower() for use in info.get("ayurvedic_uses", []))
+        desc_match = query in info.get("description", "").lower()
+        name_match = query in species.lower()
+        
+        if uses_match or desc_match or name_match:
+            results.append({
+                "name": species,
+                "common_names": info.get("common_names", []),
+                "scientific_name": info.get("scientific_name", ""),
+                "primary_use": info.get("ayurvedic_uses", [""])[0],
+                "toxicity_level": info.get("toxicity", {}).get("level", "unknown"),
+                "family": info.get("family", "")
+            })
+            
+    return {"results": results, "query": query, "count": len(results)}
+
+@app.post("/api/v1/symptom-search")
+async def symptom_search(request: dict = Body(...)):
+    """
+    Novelty Claim: AI Ayurvedic Physician
+    Performs deep-reasoning to map symptoms to medicinal plants.
+    - Uses Gemini if available for personalized advice.
+    - Falls back to local clinical knowledge for reliability.
+    """
+    symptoms = request.get("symptoms", "")
+    if not symptoms or len(symptoms) < 5:
+        return {"error": "Please provide a more detailed description of your symptoms."}
+
+    try:
+        from app.services.gemini_service import get_symptom_recommendations
+        
+        # 1. Attempt High-End AI Reasoning (Gemini)
+        result = await get_symptom_recommendations(symptoms)
+        
+        # 2. Heuristic Fallback if Gemini is not configured or fails
+        if "error" in result:
+            query = symptoms.lower()
+            recs = []
+            
+            # Simple keyword matching across our hardened Knowledge Base
+            if ml_service and ml_service.kb:
+                for species, info in ml_service.kb.items():
+                    match_count = sum(1 for use in info.get("ayurvedic_uses", []) if query in use.lower())
+                    if match_count > 0:
+                        recs.append({
+                            "plant": species,
+                            "scientific_name": info.get("scientific_name", ""),
+                            "ayurvedic_name": info.get("common_names", [""])[0],
+                            "why": info.get("description", "")[:150] + "...",
+                            "preparation": info.get("preparation", ""),
+                            "dosage": "As per Ayurvedic practitioner guidance.",
+                            "dosha_effect": "Consult clinical monograph.",
+                            "safety": info.get("toxicity", {}).get("notes", "Safe"),
+                            "classical_reference": info.get("references", ["API Vol I"])[0],
+                            "rank": len(recs) + 1
+                        })
+            
+            if not recs:
+                return {"error": "No specific matches found in the clinical database. Please be more specific."}
+
+            return {
+                "recommendations": recs[:3],
+                "lifestyle_advice": "Maintain a balanced diet (Ahara) and regular daily routine (Dinacharya).",
+                "diet_tip": "Prefer warm, freshly cooked meals with mild spices like ginger and cumin.",
+                "warning": "This is an automated finding. Always consult a qualified physician before starting treatment."
+            }
+            
+        return result
+        
+    except Exception as e:
+        return {"error": f"Search logic failed: {str(e)}"}

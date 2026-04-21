@@ -1,78 +1,186 @@
 [
   {
     "id": 0,
-    "name": "Alstonia Scholaris"
+    "name": "Aloe Vera"
   },
   {
     "id": 1,
-    "name": "Arjun"
+    "name": "Alstonia Scholaris"
   },
   {
     "id": 2,
-    "name": "Bael"
+    "name": "Amla"
   },
   {
     "id": 3,
-    "name": "Basil"
+    "name": "Amruta Balli"
   },
   {
     "id": 4,
-    "name": "Chinar"
+    "name": "Arali"
   },
   {
     "id": 5,
-    "name": "Guava"
+    "name": "Arjun"
   },
   {
     "id": 6,
-    "name": "Jackfruit"
+    "name": "Ashoka"
   },
   {
     "id": 7,
-    "name": "Jamun"
+    "name": "Ashwagandha"
   },
   {
     "id": 8,
-    "name": "Jatropha"
+    "name": "Avacado"
   },
   {
     "id": 9,
-    "name": "Lemon"
+    "name": "Bamboo"
   },
   {
     "id": 10,
-    "name": "Mango"
+    "name": "Basale"
   },
   {
     "id": 11,
-    "name": "Neem"
+    "name": "Betel"
   },
   {
     "id": 12,
-    "name": "Pomegranate"
+    "name": "Betel Nut"
   },
   {
     "id": 13,
-    "name": "Pongamia Pinnata"
+    "name": "Brahmi"
   },
   {
     "id": 14,
-    "name": "Hibiscus"
+    "name": "Castor"
   },
   {
     "id": 15,
-    "name": "Moringa"
+    "name": "Chinar"
   },
   {
     "id": 16,
-    "name": "Tulsi"
-  },
-  {
-    "id": 17,
     "name": "Curry Leaf"
   },
   {
+    "id": 17,
+    "name": "Doddapatre"
+  },
+  {
     "id": 18,
-    "name": "Amla"
+    "name": "Ekka"
+  },
+  {
+    "id": 19,
+    "name": "Ganike"
+  },
+  {
+    "id": 20,
+    "name": "Gauva"
+  },
+  {
+    "id": 21,
+    "name": "Geranium"
+  },
+  {
+    "id": 22,
+    "name": "Guava"
+  },
+  {
+    "id": 23,
+    "name": "Henna"
+  },
+  {
+    "id": 24,
+    "name": "Hibiscus"
+  },
+  {
+    "id": 25,
+    "name": "Honge"
+  },
+  {
+    "id": 26,
+    "name": "Insulin"
+  },
+  {
+    "id": 27,
+    "name": "Jamun"
+  },
+  {
+    "id": 28,
+    "name": "Jasmine"
+  },
+  {
+    "id": 29,
+    "name": "Jatropha"
+  },
+  {
+    "id": 30,
+    "name": "Lemon"
+  },
+  {
+    "id": 31,
+    "name": "Mango"
+  },
+  {
+    "id": 32,
+    "name": "Mint"
+  },
+  {
+    "id": 33,
+    "name": "Nagadali"
+  },
+  {
+    "id": 34,
+    "name": "Neem"
+  },
+  {
+    "id": 35,
+    "name": "Nithyapushpa"
+  },
+  {
+    "id": 36,
+    "name": "Nooni"
+  },
+  {
+    "id": 37,
+    "name": "Papaya"
+  },
+  {
+    "id": 38,
+    "name": "Pomegranate"
+  },
+  {
+    "id": 39,
+    "name": "Pongamia Pinnata"
+  },
+  {
+    "id": 40,
+    "name": "Raktachandini"
+  },
+  {
+    "id": 41,
+    "name": "Rose"
+  },
+  {
+    "id": 42,
+    "name": "Sapota"
+  },
+  {
+    "id": 43,
+    "name": "Tea"
+  },
+  {
+    "id": 44,
+    "name": "Tulsi"
+  },
+  {
+    "id": 45,
+    "name": "Wood Sorel"
   }
 ]

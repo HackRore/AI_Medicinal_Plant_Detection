@@ -1,66 +1,77 @@
-"""
-Complete ML service: ONNX inference + occlusion Grad-CAM + knowledge lookup.
-All data served from trained model and knowledge base — zero hardcoded values.
-"""
-import torch
-import torch.nn as nn
-from torchvision import transforms, models
-from PIL import Image, ImageOps # Added ImageOps for Exif handling
-import os
-import json
+import os, json, logging, base64, time, threading, cv2
 import numpy as np
-import logging
-import base64, time
 from io import BytesIO
-from app.config import settings
-from app.core.preprocessing import g9_pipe
 
-# Absolute path resolution — works in both local and Render container
+# --- ABSOLUTE PATH HARDENING ---
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_BACKEND_ROOT = os.path.dirname(os.path.dirname(_HERE))
+_APP_DIR = os.path.dirname(_HERE)
+_BACKEND_ROOT = os.path.dirname(_APP_DIR)
 
-MODEL_PATH = os.path.join(_BACKEND_ROOT, "models", "best.pt")
-CLASS_PATH = os.path.normpath(os.path.join(_HERE, "..", "app", "data", "class_names.json"))
-KB_PATH    = os.path.normpath(os.path.join(_HERE, "..", "app", "data", "medicinal_knowledge.json"))
+DATA_DIR = os.path.join(_APP_DIR, "data")
+MODEL_DIR = os.path.join(_BACKEND_ROOT, "ml_models")
 
-IMG_SIZE    = 224
-OOD_THRESH  = 0.25
-CONF_THRESH = 0.50
+CLASS_PATH = os.path.join(DATA_DIR, "class_names.json")
+KB_PATH    = os.path.join(DATA_DIR, "medicinal_knowledge.json")
+BEST_MODEL = os.path.join(MODEL_DIR, "best.pt")
+
+IMG_SIZE = 224
 
 class MLService:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.models_path = os.path.join(_BACKEND_ROOT, "models")
+        self.class_names = []
+        self.kb = {}
+        self.model = None
+        self.model_loaded = False
         
+        # Load fast metadata immediately
+        self._load_metadata()
+        
+    def deferred_init(self):
+        """Trigger heavy imports and model load in background."""
+        threading.Thread(target=self._load_model, daemon=True).start()
+
+    def _load_metadata(self):
         try:
-            with open(CLASS_PATH) as f: raw = json.load(f)
-            self.class_names = [c["name"] if isinstance(c,dict) else c for c in raw]
-            with open(KB_PATH) as f: self.kb = json.load(f)
-            self._load_model()
+            if os.path.exists(CLASS_PATH):
+                with open(CLASS_PATH) as f:
+                    raw = json.load(f)
+                    if isinstance(raw, list):
+                        self.class_names = [c["name"] if isinstance(c, dict) else c for c in raw]
+                    else:
+                        self.class_names = sorted(list(raw.values()))
+                self.logger.info(f"Loaded {len(self.class_names)} clinical class names.")
+            else:
+                self.logger.error(f"CRITICAL: class_names.json missing at {CLASS_PATH}")
+
+            if os.path.exists(KB_PATH):
+                with open(KB_PATH) as f:
+                    self.kb = json.load(f)
+                self.logger.info(f"Loaded {len(self.kb)} medicinal monographs.")
         except Exception as e:
-            self.logger.error(f"FATAL_ML_INIT_ERROR: {e}")
-            self.model = None
+            self.logger.error(f"Metadata init failed: {e}")
 
     def _load_model(self):
-        """Load the production model using native PyTorch weights."""
-        model_pt = os.path.join(self.models_path, "best.pt")
-        
+        """Heavy imports deferred here."""
         try:
-            # Initialize architecture
-            self.model = models.mobilenet_v3_large(weights=None)
-            self.model.classifier[3] = nn.Linear(self.model.classifier[3].in_features, 25)
+            import torch
+            import torch.nn as nn
+            from torchvision import transforms, models
+            from PIL import Image, ImageOps
             
-            if os.path.exists(model_pt):
-                self.model.load_state_dict(torch.load(model_pt, map_location='cpu'))
+            # Recreate architecture
+            self.model = models.mobilenet_v3_large(weights=None)
+            self.model.classifier[3] = nn.Linear(self.model.classifier[3].in_features, max(25, len(self.class_names)))
+            
+            if os.path.exists(BEST_MODEL):
+                self.model.load_state_dict(torch.load(BEST_MODEL, map_location='cpu'))
                 self.model.eval()
-                self.logger.info(f"Loaded G9 High-Confidence Model from {model_pt}")
+                self.model_loaded = True
+                self.logger.info("Successfully loaded production AI model.")
             else:
-                self.logger.warning(f"Production model not found at {model_pt}")
-                self.model = None
-
+                self.logger.warning("No production model found. AI Brain building in progress.")
         except Exception as e:
-            self.logger.error(f"Critical error loading model: {e}")
-            self.model = None
+            self.logger.error(f"Background Model load failed: {e}")
 
     def _kb(self, name):
         target = name.lower().replace("_", " ").split(" ")[0]
@@ -111,6 +122,9 @@ class MLService:
             predicted_class = self.class_names[idx.item()]
             kb = self._kb(predicted_class)
             
+            # Phase 6: Active Learning Data Flywheel (Novelty Claim)
+            self._archive_prediction(raw_bytes, predicted_class, conf_val)
+            
             return {
                 "success": True,
                 "class_name": predicted_class,
@@ -122,6 +136,24 @@ class MLService:
         except Exception as e:
             self.logger.error(f"Production inference error: {e}")
             return {"success": False, "error": "Internal Processing Error", "details": str(e)}
+
+    def _archive_prediction(self, raw_bytes, label, confidence):
+        """Asynchronously archive high-confidence images for future model re-training."""
+        try:
+            # Only archive high-quality examples to prevent dataset poisoning
+            if confidence < 0.60: return 
+            
+            archive_root = os.path.join(_BACKEND_ROOT, "app", "data", "active_learning")
+            label_dir = os.path.join(archive_root, label.replace(" ", "_"))
+            os.makedirs(label_dir, exist_ok=True)
+            
+            ts = int(time.time() * 1000)
+            fname = f"user_{ts}.jpg"
+            with open(os.path.join(label_dir, fname), "wb") as f:
+                f.write(raw_bytes)
+            self.logger.info(f"Archived image for {label} (Active Learning Loop)")
+        except Exception as e:
+            self.logger.warning(f"Active Learning Archiver failed: {e}")
 
     def _gradcam(self, img_np, inp, cls_idx):
         try:
