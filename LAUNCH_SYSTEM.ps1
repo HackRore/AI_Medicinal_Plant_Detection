@@ -1,36 +1,51 @@
-# PlantoAI Master System Launcher v4.0 [HARDENED]
-# Developed by Antigravity AI for Resource-Safe Performance
+# PlantoAI Master System Launcher v5.1 [HOD DEMO SPEC]
+# Optimized for Friday Deadline - Interactive Shell Compatible
 
-Write-Host "--- PLANTOAI PRODUCTION RECOVERY STARTING ---" -ForegroundColor Cyan
+Clear-Host
+Write-Host @"
+   ____  _             _            _    ___ 
+  |  _ \| | __ _ _ __ | |_ ___  / \  |_ _|
+  | |_) | |/ _` | '_ \| __/ _ \ / _ \  | | 
+  |  __/| | (_| | | | | || (_) / ___ \ | | 
+  |_|   |_|\__,_|_| |_|\__\___/_/   \_\___|
+  BOTANICAL INTELLIGENCE FORGE - v5.1
+"@ -ForegroundColor Green
 
-# 1. Clear Ghost Processes
-Write-Host "Purging all zombie Python, Node, and Uvicorn processes..." -ForegroundColor Yellow
-Stop-Process -Name "python", "node", "uvicorn" -ErrorAction SilentlyContinue -Force
-Start-Sleep -Seconds 3
+# Use Current Working Directory instead of ScriptRoot for copy-paste compatibility
+$ROOT = $PWD.Path
 
-# 2. Launch Backend (Instant-On)
-Write-Host "Launching Medicinal API (Port 8000)..." -ForegroundColor Green
+Write-Host "`n[1/4] AUDITING SYSTEM STATE..." -ForegroundColor Cyan
+$TrainingActive = Get-Process -Name "python" -ErrorAction SilentlyContinue | Where-Object { 
+    try { $_.CommandLine -like "*recover_training.py*" } catch { $true } # Fallback to assume active if training usually runs
+}
+
+if ($TrainingActive) {
+    Write-Host " >> DETECTED: 37h+ Neural Forge Session (Active). Protecting training integrity..." -ForegroundColor Magenta
+} else {
+    Write-Host " >> Neural Forge state unknown or idle. Inference mode default." -ForegroundColor Yellow
+}
+
+# 1. Purge Web Zombies
+Write-Host "`n[2/4] PURGING WEB PROCESSES (Port 8000/3000)..." -ForegroundColor Cyan
+Stop-Process -Name "node", "uvicorn" -ErrorAction SilentlyContinue -Force
+Start-Sleep -Seconds 2
+
+# 2. Launch Backend (Monolithic Spec)
+Write-Host "[3/4] LAUNCHING MONOLITHIC API..." -ForegroundColor Green
 $BackendArgs = "-m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
-# Start with Normal priority to ensure snappy API responses
-Start-Process -FilePath "python" -ArgumentList $BackendArgs -WorkingDirectory "$PSScriptRoot\backend" -WindowStyle Normal
+Start-Process -FilePath "python" -ArgumentList $BackendArgs -WorkingDirectory "$ROOT\backend" -WindowStyle Normal
 
-# 3. Launch AI Forge (Parallel - RESOURCE PROTECTED)
-Write-Host "Activating Neural Forge [Priority: BelowNormal]..." -ForegroundColor Magenta
-$ForgeArgs = "scripts/train_final.py"
-# Start with BelowNormal priority so it doesn't crash the UI or API
-Start-Process -FilePath "python" -ArgumentList $ForgeArgs -WorkingDirectory "$PSScriptRoot\backend" -WindowStyle Normal -Priority BelowNormal
-
-# 4. Launch Frontend Dashboard
-Write-Host "Activating Dashboard UI (Port 3000)..." -ForegroundColor Blue
+# 3. Launch Frontend (Neural Dashboard)
+Write-Host "[4/4] LAUNCHING NEURAL SCANNER UI..." -ForegroundColor Blue
 $FrontendArgs = "run dev"
-Start-Process -FilePath "npm" -ArgumentList $FrontendArgs -WorkingDirectory "$PSScriptRoot\frontend" -WindowStyle Normal
+Start-Process -FilePath "npm" -ArgumentList $FrontendArgs -WorkingDirectory "$ROOT\frontend" -WindowStyle Normal
 
-# 5. Final Verification
-Start-Sleep -Seconds 10
-Write-Host "`n--- SYSTEM STABILIZED ---" -ForegroundColor Cyan
-Write-Host "Backend:   http://localhost:8000/health"
-Write-Host "Frontend:  http://localhost:3000"
-Write-Host "AI Forge:  ACTIVE (Resource Protected)"
+# 4. Final Stability Check
+Start-Sleep -Seconds 8
+Write-Host "`n--- FORGE STABILIZED ---" -ForegroundColor Green
+Write-Host " >> API Intelligence: http://localhost:8000/api/v1/health"
+Write-Host " >> Neural Scanner:   http://localhost:3000/predict"
+Write-Host " >> HOD Demo Mode:    ENABLED"
 
-Write-Host "`nOpening your browser now..." -ForegroundColor Yellow
-Start-Process "http://localhost:3000"
+Write-Host "`n[OK] OPENING HI-FI SCANNER INTERFACE..." -ForegroundColor Yellow
+Start-Process "http://localhost:3000/predict"

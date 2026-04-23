@@ -1,6 +1,8 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from app.services.ml_service import ml_service
+from app.database import SessionLocal
+from app.models.plant import Plant
 
 router = APIRouter()
 
@@ -25,7 +27,7 @@ async def predict(file: UploadFile = File(...)):
     kb = result.get("knowledge", {})
     
     # Standard G9 Response Schema
-    return {
+    response = {
         "success": True,
         "plant": {
             "name": kb.get("common_names", [result["class_name"]])[0],
@@ -46,6 +48,7 @@ async def predict(file: UploadFile = File(...)):
             "active_compounds": kb.get("active_compounds", []),
             "contraindications": kb.get("contraindications", []),
         },
+        "botanical_intelligence": None,
         "gradcam": result.get("gradcam", {}),
         "quality": {
             "passed": result["quality_passed"],
@@ -54,7 +57,35 @@ async def predict(file: UploadFile = File(...)):
         },
         "meta": {
             "inference_ms": result["inference_ms"],
-            "model_version": "plantoai_v2_onnx",
+            "model_version": "plantoai_v1_onnx",
             "class_detected": result["class_name"]
         }
     }
+
+    # --- PREMIUM INTELLIGENCE ENRICHMENT ---
+    try:
+        db = SessionLocal()
+        # Search by Scientific Name or Model Key
+        plant_info = db.query(Plant).filter(
+            (Plant.species_name == kb.get("scientific_name", "")) | 
+            (Plant.common_name_en == result["class_name"])
+        ).first()
+        
+        if plant_info:
+            response["botanical_intelligence"] = {
+                "mechanism_of_action": plant_info.mechanism_of_action,
+                "synergy_partners": plant_info.synergy_partners,
+                "ayurvedic_balance": plant_info.ayurvedic_balance,
+                "iucn_status": plant_info.iucn_status,
+                "regional_names": {
+                    "hi": plant_info.common_name_hi,
+                    "ta": plant_info.common_name_ta,
+                    "te": plant_info.common_name_te,
+                    "bn": plant_info.common_name_bn
+                }
+            }
+        db.close()
+    except Exception as e:
+        print(f"Intelligence Enrichment Exception: {e}")
+
+    return response

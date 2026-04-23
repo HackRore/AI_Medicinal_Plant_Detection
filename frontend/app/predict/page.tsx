@@ -12,16 +12,18 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/Button"
 import { Camera, Upload, History, Leaf, ShieldAlert, Sparkles, Wand2 } from "lucide-react"
 import PredictResult from "@/components/predict/PredictResult"
+import DisclaimerModal from "@/components/predict/DisclaimerModal"
 import { Card } from "@/components/ui/Card"
+import React from "react"
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
 const THINKING_STEPS = [
-  { icon: "🔬", text: "Detecting leaf edges and boundaries..." },
-  { icon: "🌿", text: "Analyzing venation patterns and texture..." },
-  { icon: "🧬", text: "Matching against 12 G9-Verified Species..." },
-  { icon: "🧪", text: "Generating Grad-CAM morphological proof..." },
-  { icon: "📚", text: "Syncing Ayurvedic Knowledge Base..." },
+  { icon: "🔬", text: "Spectral Boundary Calibration..." },
+  { icon: "🌿", text: "Neural Venation Extraction..." },
+  { icon: "🧬", text: "Monolithic Cross-Reference (46 Species)..." },
+  { icon: "🧪", text: "Clinical Mechanism Synthesis..." },
+  { icon: "📚", text: "Ayurvedic Homeostasis Projection..." },
 ]
 
 function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
@@ -183,13 +185,27 @@ export default function PredictPage() {
       toast.error(error.message || 'AI engine is currently offline')
     }
   })
+  const previewRef = React.useRef<string | null>(null)
+
+  // Memory Safeguard: Revoke object URLs to prevent leaks
+  useEffect(() => {
+    return () => {
+      if (previewRef.current) URL.revokeObjectURL(previewRef.current)
+    }
+  }, [])
+
+  const updatePreview = (url: string) => {
+    if (previewRef.current) URL.revokeObjectURL(previewRef.current)
+    previewRef.current = url
+    setPreview(url)
+  }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []).slice(0, 1)
     if (files.length === 0) return
     const file = files[0]
     const previewUrl = URL.createObjectURL(file)
-    setPreview(previewUrl)
+    updatePreview(previewUrl)
     setUploadedImages([{file, preview: previewUrl}])
     predictMutation.mutate(file)
   }
@@ -205,7 +221,7 @@ export default function PredictPage() {
           if (blob) {
             const file = new File([blob], "capture.jpg", { type: "image/jpeg" })
             const url = URL.createObjectURL(blob)
-            setPreview(url)
+            updatePreview(url)
             setUploadedImages([{file, preview: url}])
             predictMutation.mutate(file)
             setIsCameraOpen(false)
@@ -233,6 +249,7 @@ export default function PredictPage() {
 
   return (
     <main className="container mx-auto p-6 pt-32 min-h-screen space-y-12 max-w-6xl">
+      <DisclaimerModal />
       <header className="text-center space-y-4">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4">
             <Wand2 className="w-4 h-4 text-primary-400" />
@@ -405,6 +422,7 @@ export default function PredictPage() {
                   </h3>
                 </div>
                 <div className="p-8 relative">
+                  <div className="scanner-line" />
                   <video ref={videoRef} autoPlay playsInline className="w-full rounded-[40px] aspect-[4/3] object-cover scale-x-[-1]" />
                   <canvas ref={canvasRef} className="hidden" />
                 </div>

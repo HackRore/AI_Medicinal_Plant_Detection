@@ -7,5 +7,10 @@ opencv-python-headless==4.9.0.80
 python-multipart==0.0.9
 psycopg2-binary==2.9.9
 SQLAlchemy==2.0.28
+supabase==2.4.1
+cloudinary==1.38.0
+python-dotenv==1.0.1
+google-genai==0.3.0
+timm==0.9.16
 torch --extra-index-url https://download.pytorch.org/whl/cpu
 torchvision --extra-index-url https://download.pytorch.org/whl/cpu

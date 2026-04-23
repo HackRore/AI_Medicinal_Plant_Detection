@@ -21,11 +21,11 @@ import { Button } from "@/components/ui/Button"
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
 const THINKING_STEPS = [
-  { icon: "🧠", text: "Analyzing symptom descriptions..." },
-  { icon: "📚", text: "Querying Ayurvedic classical texts..." },
-  { icon: "🌿", text: "Filtering appropriate medicinal species..." },
-  { icon: "⚖️", text: "Evaluating Dosha effects and safety..." },
-  { icon: "📝", text: "Formulating personalized recommendations..." },
+  { icon: "🧠", text: "Executing Multi-Path Symptom Synthesis..." },
+  { icon: "📚", text: "Cross-referencing Ayurvedic Classical Taxonomies..." },
+  { icon: "🌿", text: "Filtering Bio-Active Botanical Matches..." },
+  { icon: "⚖️", text: "Verifying Pharmacological Safety Profiles..." },
+  { icon: "📝", text: "Compiling Clinical Recommendation Matrix..." },
 ]
 
 function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
@@ -61,7 +61,7 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
           <div className="w-3 h-3 rounded-full bg-emerald-500 relative" />
         </div>
         <span className="text-emerald-400 text-sm font-mono font-bold tracking-widest uppercase">
-          Neural Ayurvedic Synthesis
+          PlantoAI Intelligence Monolith
         </span>
       </div>
       
@@ -159,7 +159,7 @@ export default function SymptomSearchPage() {
             className="text-4xl md:text-6xl font-black mb-6 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent"
           >
             Describe your symptoms. <br />
-            <span className="text-emerald-500">Get Ayurvedic wisdom.</span>
+            <span className="text-emerald-500">Expert Clinical Guidance.</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

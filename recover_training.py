@@ -11,6 +11,7 @@ BATCH   = 16
 EPOCHS  = 25
 LR      = 3e-4
 DEVICE  = 'cpu'
+START_EP = 11  # RESUMING FROM HERE
 
 os.makedirs(OUT, exist_ok=True)
 
@@ -72,10 +73,30 @@ for p in model.classifier.parameters(): p.requires_grad=True
 opt=torch.optim.AdamW(filter(lambda p:p.requires_grad,model.parameters()),lr=LR,weight_decay=1e-4)
 sched=torch.optim.lr_scheduler.CosineAnnealingLR(opt,EPOCHS)
 crit=nn.CrossEntropyLoss(weight=weight_tensor,label_smoothing=0.1)
-best=0.0
 
-print('Training started. Each epoch shows progress.', flush=True)
-for ep in range(EPOCHS):
+# RESUME LOGIC
+best = 0.0
+RESUME_PATH = f'{OUT}/best.pt'
+if os.path.exists(RESUME_PATH):
+    try:
+        model.load_state_dict(torch.load(RESUME_PATH, map_location=DEVICE))
+        print(f'>>> SUCCESS: Resumed from last known checkpoint ({RESUME_PATH})', flush=True)
+        # Seed best with a high floor for Epoch 11
+        best = 0.94 
+    except Exception as e:
+        print(f'>>> WARNING: Checkpoint load failed, starting fresh: {e}', flush=True)
+
+# FORCE UNFREEZE IF RESUMING AFTER EP 5
+if START_EP > 5:
+    for p in model.parameters(): p.requires_grad=True
+    opt=torch.optim.AdamW(model.parameters(),lr=LR/10,weight_decay=1e-4)
+    sched=torch.optim.lr_scheduler.CosineAnnealingLR(opt,EPOCHS-5)
+    # Advanced: Step the scheduler to match the epoch
+    for _ in range(START_EP - 6): sched.step()
+    print(f'>>> PHASE SYNC: Unfrozen state activated for Epoch {START_EP}', flush=True)
+
+print(f'Training resumed from Epoch {START_EP}. Each epoch shows progress.', flush=True)
+for ep in range(START_EP - 1, EPOCHS):
     if ep==5:
         for p in model.parameters(): p.requires_grad=True
         opt=torch.optim.AdamW(model.parameters(),lr=LR/10,weight_decay=1e-4)

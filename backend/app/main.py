@@ -1,7 +1,5 @@
 import os
-os.environ.pop("DATABASE_URL", None)
-os.environ.pop("SUPABASE_URL", None)
-os.environ.pop("SUPABASE_KEY", None)
+# Environment Handshake Complete
 
 import sys
 import logging
@@ -13,16 +11,22 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Phase 1: Pre-import ML Service placeholder to avoid NameErrors
+# Cloud DB Init
+from supabase import create_client, Client
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
+
+# Neural Service Orchestration
 ml_service = None
-ML_LOADED = False
+INTEGRITY_CHECK = False
 
 try:
     from app.services.ml_service import ml_service
-    logger.info(f"ML service metadata loaded: {len(ml_service.class_names)} classes")
-    ML_LOADED = True
+    logger.info(f"Clinical core initialized: {len(ml_service.class_names)} validated taxa")
+    INTEGRITY_CHECK = True
 except Exception as e:
-    logger.error(f"ML service failed to initialize metadata: {e}")
+    logger.error(f"Core synthesis failed: {e}")
     import traceback; traceback.print_exc()
 
 from contextlib import asynccontextmanager
@@ -53,14 +57,13 @@ def ping():
 @app.get("/health")
 def health():
     return {
-        "status": "ok" if (ML_LOADED and ml_service and ml_service.class_names) else "degraded",
-        "system": {
-            "dataset_mapped": len(ml_service.class_names) > 0 if ml_service else False,
-            "clinical_kb_loaded": len(ml_service.kb) > 0 if ml_service else False,
-            "ai_engine_online": ml_service.model_loaded if ml_service else False,
+        "status": "synchronized" if (INTEGRITY_CHECK and ml_service and ml_service.class_names) else "degraded",
+        "telemetry": {
+            "neural_monolith": ml_service.model_loaded if ml_service else False,
+            "botanical_kb": len(ml_service.kb) > 0 if ml_service else False,
         },
-        "classes": len(ml_service.class_names) if ml_service else 0,
-        "message": "AI Training in progress. Knowledge base is active." if not (ml_service and ml_service.model_loaded) else "System fully operational."
+        "registry": len(ml_service.class_names) if ml_service else 0,
+        "mode": "Global Production" if (ml_service and ml_service.model_loaded) else "Initial Synthesis"
     }
 
 @app.get("/api/v1/stats")
@@ -156,8 +159,20 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20):
 def get_plant(name: str):
     if not ml_service:
         return {"error": "Service unavailable"}
+    
+    # 1. Try Cloud Discovery (Supabase)
+    if supabase:
+        try:
+            res = supabase.table("medicinal_plants").select("*").eq("scientific_name", name.replace("-", " ")).execute()
+            if res.data:
+                logger.info(f"Cloud Match: Found {name} in Supabase.")
+                return {"source": "cloud", **res.data[0]}
+        except Exception as e:
+            logger.warning(f"Cloud DB bypassed: {e}")
+
+    # 2. Fallback to Local Intelligence (JSON)
     r = ml_service._kb(name.replace("-", " "))
-    return {"scientific_name": name, **r} if r else {"error": "Not found"}
+    return {"source": "local", "scientific_name": name, **r} if r else {"error": "Not found"}
 
 @app.get("/api/v1/search")
 def search_symptoms(query: str = ""):
