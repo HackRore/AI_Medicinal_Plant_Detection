@@ -11,11 +11,18 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Cloud DB Init
-from supabase import create_client, Client
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
+# Cloud DB Init (Defensive)
+try:
+    from supabase import create_client, Client
+    SUPABASE_URL = os.environ.get("SUPABASE_URL")
+    SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+    supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
+except ImportError:
+    logger.warning("Supabase SDK not found - Cloud integration disabled")
+    supabase = None
+except Exception as e:
+    logger.error(f"Supabase Init Error: {e}")
+    supabase = None
 
 # Neural Service Orchestration
 ml_service = None

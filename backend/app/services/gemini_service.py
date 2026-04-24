@@ -27,6 +27,8 @@ async def _call_gemini_text(prompt: str) -> str:
     """Call Gemini text API with timeout using google-generativeai."""
     try:
         import google.generativeai as genai
+        if not GEMINI_API_KEY: return ""
+        
         genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel("gemini-1.5-flash")
         
@@ -51,6 +53,8 @@ async def _call_gemini_vision(image_bytes: bytes, prompt: str) -> str:
     """Call Gemini vision API with image + prompt using google-generativeai."""
     try:
         import google.generativeai as genai
+        if not GEMINI_API_KEY: return ""
+        
         genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel("gemini-1.5-flash")
         
