@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from jose import jwt, JWTError
 
-# from app.database import get_db
-# from app.models.user import User
+from app.database import get_db
+from app.models.user import User
 from app.schemas.user import UserCreate, UserResponse, Token, TokenData
 from app.services.auth_service import create_access_token, verify_password, get_password_hash
 from app.config import settings
