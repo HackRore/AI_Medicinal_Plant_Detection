@@ -55,7 +55,11 @@ class MLService:
             x = np.expand_dims(x, axis=0)
             
             input_name = self.sess.get_inputs()[0].name
-            preds = self.sess.run(None, {input_name: x})[0][0]
+            raw_preds = self.sess.run(None, {input_name: x})[0][0]
+            
+            # Softmax normalization for professional 0-100% confidence scores
+            exp_preds = np.exp(raw_preds - np.max(raw_preds))
+            preds = exp_preds / exp_preds.sum()
             
             idx = int(np.argmax(preds))
             conf = float(preds[idx])
