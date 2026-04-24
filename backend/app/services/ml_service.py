@@ -6,8 +6,6 @@ import json
 import time
 import os
 import logging
-import PIL.Image
-import PIL.ImageOps
 from io import BytesIO
 
 logger = logging.getLogger(__name__)
@@ -45,10 +43,11 @@ class MLService:
 
     def predict(self, image_bytes):
         try:
+            # Inline import to bypass any weird module loading issues
+            from PIL import Image, ImageOps
             start_time = time.time()
             
-            # Use PIL.Image explicitly
-            img = PIL.Image.open(BytesIO(image_bytes)).convert('RGB')
+            img = Image.open(BytesIO(image_bytes)).convert('RGB')
             img = img.resize((224, 224))
             
             x = np.array(img).astype(np.float32) / 255.0
@@ -70,7 +69,7 @@ class MLService:
                 "knowledge": self.kb.get(name, {})
             }
         except Exception as e:
-            return {"success": false, "error": "Inference Error", "details": str(e)}
+            return {"success": False, "error": "Inference Error", "details": str(e)}
 
 ml_service = MLService()
 def get_ml_service(): return ml_service
