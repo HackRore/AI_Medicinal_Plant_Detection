@@ -45,7 +45,7 @@ export default function PlantDetailPage() {
             const res = await fetch(`${API_BASE}/api/v1/plants/${id}`)
             if (res.ok) {
                 const data = await res.json()
-                setPlant(data)
+                setPlant(data.plant || data) // Handle both wrapped and unwrapped responses
             }
         } catch (error) {
             console.error('Failed to fetch plant details:', error)
@@ -103,7 +103,7 @@ export default function PlantDetailPage() {
                                 {plant?.common_names?.en ?? "Unknown Plant"}
                             </h1>
                             <p className="text-xl font-mono opacity-90 italic">
-                                {(plant?.species_name ?? "Unknown Species").replace(/_/g, ' ')}
+                                {(plant?.species_name || "Unknown Species").toString().replace(/_/g, ' ')}
                             </p>
                         </div>
                     </div>

@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export default function PlantsPage() {
   const [plants, setPlants]   = useState<any[]>([]);
@@ -83,59 +84,63 @@ export default function PlantsPage() {
             ) : (
                 <>
                 {plants.map((p, i) => (
-                  <motion.div
-                    key={p.scientific_name}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="group glass-card p-0 overflow-hidden hover:border-primary-500/30 transition-all hover:bg-white/[0.07] cursor-pointer"
+                  <Link
+                    key={p.id || p.scientific_name}
+                    href={`/plants/${p.id || p.scientific_name}`}
                   >
-                    {/* Visual Asset */}
-                    <div className="relative h-48 w-full overflow-hidden">
-                        <img 
-                            src={p.image_url || `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2670&auto=format&fit=crop&q=plant,${p.common_names?.[0] || p.scientific_name}`}
-                            alt={p.scientific_name}
-                            className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-100"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
-                        
-                        <div className="absolute top-4 left-4">
-                            <div className="w-10 h-10 bg-primary-500/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-xl border border-white/10">
-                                {p.toxicity?.level_code === 0 ? "🌿" : p.toxicity?.level_code === 1 ? "⚠️" : "🚫"}
-                            </div>
-                        </div>
-
-                        <div className="absolute top-4 right-4">
-                            <span className={`text-[7px] font-black uppercase tracking-[0.3em] px-3 py-1.5 rounded-lg border backdrop-blur-xl ${
-                                p.toxicity?.level_code === 0 ? "bg-primary-500/20 text-primary-400 border-primary-500/30" :
-                                p.toxicity?.level_code === 1 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
-                                "bg-rose-500/20 text-rose-400 border-rose-500/30"
-                            }`}>
-                                {p.toxicity?.level || "safe"}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="p-8">
-                        <h3 className="text-xl font-black text-white mb-1 group-hover:text-primary-400 transition-colors capitalize tracking-tighter">
-                        {p.common_names?.[0] || p.scientific_name}
-                        </h3>
-                        <p className="text-xs text-gray-500 font-medium italic mb-6 font-serif">
-                        {p.scientific_name}
-                        </p>
-                        
-                        <div className="space-y-3 pt-4 border-t border-white/5">
-                            <div className="flex items-center justify-between">
-                                <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Taxa Family</span>
-                                <span className="text-[9px] text-white font-bold uppercase tracking-widest">{p.family || "N/A"}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Region</span>
-                                <span className="text-[9px] text-white/60 font-bold truncate max-w-[100px] text-right">{p.native_region || "Global"}</span>
-                            </div>
-                        </div>
-                    </div>
-                  </motion.div>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="group glass-card p-0 overflow-hidden hover:border-primary-500/30 transition-all hover:bg-white/[0.07] cursor-pointer"
+                    >
+                      {/* Visual Asset */}
+                      <div className="relative h-48 w-full overflow-hidden">
+                          <img 
+                              src={p.image_url || `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2670&auto=format&fit=crop&q=plant,${p.common_names?.[0] || p.scientific_name}`}
+                              alt={p.scientific_name}
+                              className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-100"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
+                          
+                          <div className="absolute top-4 left-4">
+                              <div className="w-10 h-10 bg-primary-500/10 backdrop-blur-xl rounded-xl flex items-center justify-center text-xl border border-white/10">
+                                  {p.toxicity?.level_code === 0 ? "🌿" : p.toxicity?.level_code === 1 ? "⚠️" : "🚫"}
+                              </div>
+                          </div>
+  
+                          <div className="absolute top-4 right-4">
+                              <span className={`text-[7px] font-black uppercase tracking-[0.3em] px-3 py-1.5 rounded-lg border backdrop-blur-xl ${
+                                  p.toxicity?.level_code === 0 ? "bg-primary-500/20 text-primary-400 border-primary-500/30" :
+                                  p.toxicity?.level_code === 1 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
+                                  "bg-rose-500/20 text-rose-400 border-rose-500/30"
+                              }`}>
+                                  {p.toxicity?.level || "safe"}
+                              </span>
+                          </div>
+                      </div>
+  
+                      <div className="p-8">
+                          <h3 className="text-xl font-black text-white mb-1 group-hover:text-primary-400 transition-colors capitalize tracking-tighter">
+                          {p.common_name || p.scientific_name}
+                          </h3>
+                          <p className="text-xs text-gray-500 font-medium italic mb-6 font-serif">
+                          {p.scientific_name}
+                          </p>
+                          
+                          <div className="space-y-3 pt-4 border-t border-white/5">
+                              <div className="flex items-center justify-between">
+                                  <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Taxa Family</span>
+                                  <span className="text-[9px] text-white font-bold uppercase tracking-widest">{p.family || "N/A"}</span>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                  <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Region</span>
+                                  <span className="text-[9px] text-white/60 font-bold truncate max-w-[100px] text-right">{p.native_region || "Global"}</span>
+                              </div>
+                          </div>
+                      </div>
+                    </motion.div>
+                  </Link>
                 ))}
                 </>
             )}

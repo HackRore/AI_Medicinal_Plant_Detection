@@ -65,7 +65,7 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20, db: Session = 
             img_url = f"https://images.unsplash.com/{photo_id}?q=80&w=1000&auto=format&fit=crop"
         
         plants.append({
-            "id": k.lower().replace(" ", "-"),
+            "id": v.get("scientific_name", k).lower().replace(" ", "-"),
             "common_name": v.get("common_names", [k])[0],
             "scientific_name": k,
             "family": v.get("family", "N/A"),
