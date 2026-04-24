@@ -49,7 +49,7 @@ logger.info("Starting PlantoAI backend server...")
 
 @app.get("/")
 def root():
-    return {"message": "PlantoAI API v2", "status": "online", "ml_loaded": ML_LOADED}
+    return {"message": "PlantoAI API v2.1.TEST", "status": "online", "ml_loaded": ML_LOADED}
 
 @app.get("/ping")
 def ping():
