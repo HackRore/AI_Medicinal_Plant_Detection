@@ -40,11 +40,15 @@ class MLService:
         with open(KB_PATH, encoding='utf-8') as f:
             self.kb = json.load(f)
 
-        self.sess = ort.InferenceSession(MODEL_PATH,
-            providers=['CPUExecutionProvider'])
-
-        logger.info(f'Loaded {len(self.class_names)} clinical class names.')
-        logger.info(f'Synchronized {len(self.kb)} botanical monographs.')
+        try:
+            self.sess = ort.InferenceSession(MODEL_PATH,
+                providers=['CPUExecutionProvider'])
+            self.model_loaded = True
+            logger.info(f'Loaded {len(self.class_names)} clinical class names.')
+            logger.info(f'Synchronized {len(self.kb)} botanical monographs.')
+        except Exception as e:
+            self.model_loaded = False
+            logger.error(f"Neural monolith failed to synthesize: {e}")
 
     def _kb(self, name):
         for k in [name, name.replace(' ','_'), name.lower(), name.title()]:
