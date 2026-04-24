@@ -8,10 +8,10 @@ DATASET = 'dataset/master_dataset'
 OUT     = 'backend/ml_models'
 SIZE    = 224
 BATCH   = 16
-EPOCHS  = 25
+EPOCHS  = 16
 LR      = 3e-4
 DEVICE  = 'cpu'
-START_EP = 11  # RESUMING FROM HERE
+START_EP = 14  # RESUMING FROM HERE
 
 os.makedirs(OUT, exist_ok=True)
 
@@ -82,7 +82,7 @@ if os.path.exists(RESUME_PATH):
         model.load_state_dict(torch.load(RESUME_PATH, map_location=DEVICE))
         print(f'>>> SUCCESS: Resumed from last known checkpoint ({RESUME_PATH})', flush=True)
         # Seed best with a high floor for Epoch 11
-        best = 0.94 
+        best = 0.9964 
     except Exception as e:
         print(f'>>> WARNING: Checkpoint load failed, starting fresh: {e}', flush=True)
 
