@@ -59,7 +59,13 @@ class MLService:
             
             idx = int(np.argmax(preds))
             conf = float(preds[idx])
-            name = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
+            
+            # Robust extraction: handles both ["Aloe Vera"] and [{"name": "Aloe Vera"}]
+            raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
+            if isinstance(raw_class, dict):
+                name = raw_class.get("name", "Unknown")
+            else:
+                name = str(raw_class)
             
             return {
                 "success": True,
