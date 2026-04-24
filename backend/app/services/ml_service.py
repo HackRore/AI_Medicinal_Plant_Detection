@@ -72,6 +72,7 @@ class MLService:
             raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
             name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
             
+            processing_time = time.time() - start_time
             return {
                 "success": True,
                 "class_name": name,
@@ -80,7 +81,8 @@ class MLService:
                 "confidence_pct": round(conf * 100, 2),
                 "confidence_label": "High" if conf > 0.8 else "Medium" if conf > 0.5 else "Low",
                 "top3": top3,
-                "processing_time": time.time() - start_time,
+                "processing_time": processing_time,
+                "inference_ms": round(processing_time * 1000, 1),
                 "knowledge": self.kb.get(name, {}),
                 "quality_passed": True,
                 "quality_score": 0.95,
