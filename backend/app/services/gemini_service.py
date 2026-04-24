@@ -23,23 +23,22 @@ def get_gemini_service():
 
 gemini_service = _gemini_service_instance
 
-# Removed redundant safe_parse_json (moved to app.utils.json_utils)
-
 async def _call_gemini_text(prompt: str) -> str:
-    """Call Gemini text API with timeout."""
+    """Call Gemini text API with timeout using google-generativeai."""
     try:
-        from google import genai
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
         response = await asyncio.wait_for(
             asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt,
-                    config={"response_mime_type": "application/json"}
+                lambda: model.generate_content(
+                    prompt,
+                    generation_config={"response_mime_type": "application/json"}
                 )
             ),
-            timeout=12.0
+            timeout=15.0
         )
         return response.text or ""
     except asyncio.TimeoutError:
@@ -49,28 +48,27 @@ async def _call_gemini_text(prompt: str) -> str:
         return ""
 
 async def _call_gemini_vision(image_bytes: bytes, prompt: str) -> str:
-    """Call Gemini vision API with image + prompt."""
+    """Call Gemini vision API with image + prompt using google-generativeai."""
     try:
-        from google import genai
-        from google.genai import types
-        client = genai.Client(api_key=GEMINI_API_KEY)
-        image_b64 = base64.b64encode(image_bytes).decode("utf-8")
+        import google.generativeai as genai
+        genai.configure(api_key=GEMINI_API_KEY)
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        
+        # Format for google-generativeai
+        content = [
+            {"mime_type": "image/jpeg", "data": image_bytes},
+            prompt
+        ]
+        
         response = await asyncio.wait_for(
             asyncio.get_event_loop().run_in_executor(
                 None,
-                lambda: client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=[
-                        types.Part.from_bytes(
-                            data=image_bytes,
-                            mime_type="image/jpeg"
-                        ),
-                        prompt
-                    ],
-                    config={"response_mime_type": "application/json"}
+                lambda: model.generate_content(
+                    content,
+                    generation_config={"response_mime_type": "application/json"}
                 )
             ),
-            timeout=12.0
+            timeout=15.0
         )
         return response.text or ""
     except asyncio.TimeoutError:
@@ -84,10 +82,7 @@ async def get_plant_analysis(
     confidence: float,
     image_bytes: Optional[bytes] = None
 ) -> dict:
-    """
-    Get Gemini Ayurvedic analysis for identified plant.
-    Falls back gracefully if Gemini unavailable.
-    """
+    """Get Gemini Ayurvedic analysis for identified plant."""
     if not GEMINI_AVAILABLE:
         return {"gemini_note": "AI enrichment not configured"}
 
@@ -95,9 +90,9 @@ async def get_plant_analysis(
 Your goal is to provide a "TRIPLE-SOURCE" verification for a leaf identified as "{plant_name}".
 
 SOURCES OF TRUTH:
-1. Native Dataset: "Indian Medicinal Leaves Image Datasets" (Region-specific accuracy)
-2. Benchmark Dataset: "PlantVillage" (Industry-standard agricultural features)
-3. Global Diversity: "Leafsnap / Pl@ntNet" (Global visual morphological features)
+1. Native Dataset: "Indian Medicinal Leaves Image Datasets"
+2. Benchmark Dataset: "PlantVillage"
+3. Global Diversity: "Leafsnap / Pl@ntNet"
 
 Provide a complete Ayurvedic medicinal profile. Cross-verify the CNN prediction against these datasets.
 Return ONLY raw JSON:
@@ -117,9 +112,7 @@ Return ONLY raw JSON:
   "interesting_fact": "fun fact",
   "vision_note": "A final verdict after weighing the 3 datasets above. Do you agree?"
 }}
-CRITICAL: Always return valid JSON even if uncertain.
 """
-
     if image_bytes:
         raw = await _call_gemini_vision(image_bytes, prompt)
     else:
@@ -135,33 +128,30 @@ async def get_symptom_recommendations(symptoms: str) -> dict:
     if not GEMINI_AVAILABLE:
         return {"error": "AI service not configured"}
 
-    prompt = f"""You are a senior Ayurvedic physician with 30 years of experience.
-
-Patient describes: "{symptoms}"
-
-Recommend exactly 3 medicinal plants. Return ONLY raw JSON, no markdown:
+    prompt = f"""You are a senior Ayurvedic physician. Patient describes: "{symptoms}"
+Recommend exactly 3 medicinal plants. Return ONLY raw JSON:
 {{
   "recommendations": [
     {{
       "plant": "Tulsi",
       "scientific_name": "Ocimum tenuiflorum",
       "ayurvedic_name": "Tulasi",
-      "why": "Primary herb for respiratory infections in Ayurveda",
-      "preparation": "Boil 10 fresh leaves in 200ml water for 5 minutes. Drink warm.",
-      "dosage": "Twice daily, 30 minutes after meals",
+      "why": "Primary herb for respiratory infections",
+      "preparation": "Boil 10 fresh leaves in 200ml water for 5 minutes.",
+      "dosage": "Twice daily",
       "dosha_effect": "Pacifies Kapha and Vata",
-      "active_compounds": "Eugenol, rosmarinic acid, ursolic acid",
-      "safety": "Generally safe. Avoid in high doses during pregnancy.",
-      "classical_reference": "Charaka Samhita, Sutrasthana 4.18"
+      "active_compounds": "Eugenol",
+      "safety": "Generally safe.",
+      "classical_reference": "Charaka Samhita"
     }}
   ],
-  "lifestyle_advice": "One key Ayurvedic lifestyle tip for these symptoms",
-  "diet_tip": "One Ayurvedic dietary recommendation",
-  "warning": "These are traditional remedies. Consult a qualified physician for serious conditions."
+  "lifestyle_advice": "tip",
+  "diet_tip": "tip",
+  "warning": "consult a physician"
 }}"""
 
     raw = await _call_gemini_text(prompt)
     result = safe_parse_gemini_json(raw)
     if not result or "recommendations" not in result:
-        return {"error": "Could not generate recommendations. Please try again."}
+        return {"error": "Could not generate recommendations."}
     return result
