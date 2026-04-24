@@ -6,7 +6,7 @@ import json
 import time
 import os
 import logging
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps # Essential for prediction
 from io import BytesIO
 
 logger = logging.getLogger(__name__)
