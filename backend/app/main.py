@@ -55,6 +55,13 @@ def root():
 def ping():
     return {"pong": True}
 
+@app.get("/debug-ml")
+def debug_ml():
+    try:
+        with open("app/services/ml_service.py", "r") as f:
+            return {"content": f.read()}
+    except Exception as e:
+        return {"error": str(e)}
 @app.get("/health")
 def health():
     return {
