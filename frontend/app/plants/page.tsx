@@ -14,7 +14,7 @@ export default function PlantsPage() {
   const [search, setSearch]   = useState("");
 
   useEffect(() => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/plants?search=${search}&limit=50`;
+    const url = `${process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"}/api/v1/plants?search=${search}&limit=50`;
     setLoading(true);
     fetch(url)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })

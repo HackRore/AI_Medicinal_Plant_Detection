@@ -16,7 +16,7 @@ import DisclaimerModal from "@/components/predict/DisclaimerModal"
 import { Card } from "@/components/ui/Card"
 import React from "react"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
 
 const THINKING_STEPS = [
   { icon: "🔬", text: "Spectral Boundary Calibration..." },

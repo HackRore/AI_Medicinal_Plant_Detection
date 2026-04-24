@@ -14,7 +14,7 @@ export const StatsSection = () => {
     });
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/v1/stats`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"}/api/v1/stats`)
             .then(r => r.json())
             .then(data => {
                 setStats({

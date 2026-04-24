@@ -178,8 +178,14 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20):
                 "photo-1502672260266-1c1ef2d93688", # Botanical
                 "photo-1459156212016-c812468e2115"  # Close-up
             ]
-            # Select ID based on the plant's name hash for consistency
-            photo_id = botanical_ids[hash(k) % len(botanical_ids)]
+            # Deterministic hash for consistent photo selection across restarts
+            def string_hash(s):
+                h = 0
+                for char in s:
+                    h = (h * 31 + ord(char)) & 0xFFFFFFFF
+                return h
+            
+            photo_id = botanical_ids[string_hash(k) % len(botanical_ids)]
             img_url = f"https://images.unsplash.com/{photo_id}?q=80&w=2670&auto=format&fit=crop"
         
         plants.append({
