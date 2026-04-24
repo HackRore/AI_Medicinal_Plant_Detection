@@ -55,7 +55,7 @@ def root():
 def ping():
     return {"pong": True}
 
-@app.get("/health")
+@app.get("/registry-check")
 def health():
     return {
         "status": "synchronized" if (INTEGRITY_CHECK and ml_service and ml_service.class_names) else "degraded",
