@@ -85,184 +85,182 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
 
   return (
     <motion.div 
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[48px] overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: "circOut" }}
+      className="glass-card rounded-[4rem] overflow-hidden relative"
     >
-        {/* Glow Effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 via-transparent to-transparent pointer-events-none" />
+        {/* Glow & Mesh Accents */}
+        <div className="absolute inset-0 bg-primary-500/[0.02] pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-500/10 blur-[100px]" />
 
-      {/* 1. Scanner Hero Area */}
-      <div className="relative group p-6 sm:p-10">
-        <div className="relative aspect-video rounded-[32px] overflow-hidden border border-white/10 bg-zinc-900/50">
+      {/* 1. Tactical Intelligence Hero */}
+      <div className="relative group p-10 sm:p-12">
+        <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[3.5rem] overflow-hidden border border-white/10 bg-zinc-950/50 shadow-2xl">
             <motion.img 
               key={heatmap ? "heat" : "orig"}
-              initial={{ opacity: 0, scale: 1.1 }}
+              initial={{ opacity: 0, scale: 1.05 }}
               animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1 }}
               src={heatmap && gradcam?.overlay_base64 ? gradcam.overlay_base64 : imageUrl}
-              className="w-full h-full object-cover grayscale-[0.2] contrast-[1.1]"
-              alt="Neural Analysis"
+              className="w-full h-full object-cover grayscale-[0.3] contrast-[1.1] opacity-80 group-hover:opacity-100 transition-all duration-1000"
+              alt="Neural Analysis Output"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+            <div className="scanline opacity-10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
             
-            {/* HUD Overlays */}
-            <div className="absolute top-6 left-6 right-6 flex justify-between items-start">
-              <div className="px-4 py-2 rounded-2xl backdrop-blur-xl bg-black/60 border border-indigo-500/30 flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-indigo-400 animate-ping" />
-                <span className={`text-[10px] font-black tracking-widest uppercase text-indigo-400`}>
-                    Verified Identity {confidence}%
+            {/* Tactical HUD Overlays */}
+            <div className="absolute top-8 left-8 right-8 flex justify-between items-start">
+              <div className="px-6 py-3 rounded-2xl backdrop-blur-3xl bg-black/40 border border-primary-500/30 flex items-center gap-4 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
+                <div className="w-2 h-2 rounded-full bg-primary-500 animate-ping" />
+                <span className="text-[10px] font-black tracking-[0.4em] uppercase text-primary-400">
+                    Clinical Match: {confidence}%
                 </span>
               </div>
               
               <button 
                 onClick={() => setHeatmap(!heatmap)}
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-widest transition-all"
+                className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.3em] transition-all glass-reflection overflow-hidden"
               >
-                <Maximize2 className="w-3.5 h-3.5 text-indigo-400" />
-                {heatmap ? "Base Sensor" : "Neural Mode"}
+                <Maximize2 className="w-4 h-4 text-primary-400" />
+                {heatmap ? "Sensor Base" : "Neural Heatmap"}
               </button>
             </div>
 
-            <div className="absolute bottom-10 left-10">
-                <p className="text-indigo-400 text-[10px] font-black uppercase tracking-[0.5em] mb-2 opacity-60">Neural Match Found</p>
-                <motion.h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-2">{name}</motion.h2>
-                <div className="flex items-center gap-3">
-                    <span className="text-white/60 italic font-serif text-lg">{sciName}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500/40" />
-                    <span className="text-[10px] font-black text-white/40 uppercase tracking-widest">Family: {family}</span>
+            <div className="absolute bottom-12 left-12 right-12">
+                <div className="space-y-2">
+                    <p className="text-primary-500 text-[11px] font-black uppercase tracking-[0.6em] mb-4 text-glow">Taxon Identified</p>
+                    <motion.h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 uppercase text-glow-white leading-none">{name}</motion.h2>
+                    <div className="flex items-center gap-6">
+                        <span className="text-white/60 italic font-serif text-2xl">{sciName}</span>
+                        <div className="h-1 w-12 bg-white/10 rounded-full" />
+                        <span className="text-[11px] font-black text-primary-500/40 uppercase tracking-[0.4em]">{family} Family</span>
+                    </div>
                 </div>
             </div>
         </div>
       </div>
 
-      {/* 2. Mechanism of Action - Premium Section */}
-      <div className="px-10 pb-10 grid lg:grid-cols-12 gap-10">
+      {/* 2. Clinical Mechanism Synthesis */}
+      <div className="px-12 pb-16 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-12">
-            <div className="p-8 bg-indigo-500/5 border border-indigo-500/10 rounded-[32px] relative overflow-hidden group hover:border-indigo-500/20 transition-all">
-                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                    <FlaskConical className="w-32 h-32 text-indigo-400" />
-                </div>
-                <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-4 text-indigo-400">
-                        <Sparkles className="w-5 h-5" />
-                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em]">Mechanism of Action</h3>
+            <div className="p-12 bg-primary-500/[0.03] border border-primary-500/10 rounded-[3.5rem] relative overflow-hidden group hover:border-primary-500/30 transition-all shadow-inner">
+                <div className="scanline opacity-5" />
+                <div className="relative z-10 space-y-6">
+                    <div className="flex items-center gap-4 text-primary-500">
+                        <Sparkles className="w-6 h-6 animate-pulse" />
+                        <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-glow">Mechanism of Action Synthesis</h3>
                     </div>
-                    <p className="text-white/80 text-xl font-medium leading-relaxed italic tracking-tight">
+                    <p className="text-white/90 text-2xl md:text-3xl font-medium leading-[1.3] italic tracking-tight max-w-5xl">
                         "{moa}"
                     </p>
                 </div>
             </div>
           </div>
 
-          {/* 3. Ayurvedic Balance (Gauges) & Properties */}
-          <div className="lg:col-span-7 space-y-8">
-              <section className="bg-white/5 border border-white/10 rounded-[40px] p-8">
-                <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-8 flex items-center gap-2">
-                    <History className="w-4 h-4" /> Ayurvedic Homeostasis Profiles
+          {/* 3. Neural Knowledge Blocks */}
+          <div className="lg:col-span-7 space-y-12">
+              <section className="bg-white/[0.02] border border-white/5 rounded-[3.5rem] p-12 relative overflow-hidden">
+                <div className="scanline opacity-5" />
+                <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-gray-600 mb-12 flex items-center gap-4">
+                    <History className="w-5 h-5 text-primary-500/40" /> Ayurvedic Metabolic Projections
                 </h3>
-                <div className="grid grid-cols-3 gap-6">
+                <div className="grid grid-cols-3 gap-10">
                     {['vata', 'pitta', 'kapha'].map((dosha) => (
-                        <div key={dosha} className="text-center space-y-4">
+                        <div key={dosha} className="text-center space-y-6">
                             <div className="relative w-full aspect-square flex items-center justify-center">
                                 <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="50%" cy="50%" r="45%" className="stroke-white/5 fill-none" strokeWidth="8" />
+                                    <circle cx="50%" cy="50%" r="42%" className="stroke-white/5 fill-none" strokeWidth="6" />
                                     <motion.circle 
-                                        cx="50%" cy="50%" r="45%" 
-                                        className={`fill-none ${balance[dosha] === 'balance' ? 'stroke-indigo-400' : 'stroke-indigo-500/20'}`} 
-                                        strokeWidth="8" 
-                                        strokeDasharray="283" 
-                                        initial={{ strokeDashoffset: 283 }}
-                                        animate={{ strokeDashoffset: balance[dosha] === 'balance' ? 70 : 250 }}
-                                        transition={{ duration: 1.5, ease: "easeOut" }}
+                                        cx="50%" cy="50%" r="42%" 
+                                        className={`fill-none ${balance[dosha] === 'balance' ? 'stroke-primary-500' : 'stroke-primary-900/20'}`} 
+                                        strokeWidth="6" 
+                                        strokeDasharray="264" 
+                                        initial={{ strokeDashoffset: 264 }}
+                                        animate={{ strokeDashoffset: balance[dosha] === 'balance' ? 60 : 220 }}
+                                        transition={{ duration: 2, ease: "circOut" }}
                                     />
                                 </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-[10px] font-black text-white uppercase">{dosha}</span>
-                                    <span className={`text-[8px] font-bold ${balance[dosha] === 'balance' ? 'text-indigo-400' : 'text-gray-600'} uppercase`}>
-                                        {balance[dosha] || 'neutral'}
+                                <div className="absolute inset-0 flex flex-col items-center justify-center space-y-1">
+                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{dosha}</span>
+                                    <span className={`text-[9px] font-bold ${balance[dosha] === 'balance' ? 'text-primary-400' : 'text-gray-700'} uppercase`}>
+                                        {balance[dosha] || 'stabilized'}
                                     </span>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
-                <div className="mt-8 pt-8 border-t border-white/5">
-                    <p className="text-xs text-gray-500 font-medium italic">"{balance.note || "Tridoshic balancing properties detected."}"</p>
-                </div>
               </section>
 
-              <section className="space-y-4">
-                  <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-500 pl-2">Medicinal Spectrum</h3>
-                  <div className="grid sm:grid-cols-2 gap-4">
+              <section className="space-y-6">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-gray-600 ml-4">Medicinal Spectrum (46-Taxa Match)</h3>
+                  <div className="grid sm:grid-cols-2 gap-6">
                       {medicinalProperties.slice(0, 4).map((prop: any, i: number) => (
-                          <div key={i} className="p-5 bg-white/5 border border-white/5 rounded-3xl group hover:border-indigo-500/20 transition-all">
-                              <h4 className="text-indigo-400 font-bold text-sm mb-2">{prop.ailment}</h4>
-                              <p className="text-[10px] text-gray-500 leading-relaxed font-medium">{prop.usage_description}</p>
+                          <div key={i} className="p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:border-primary-500/20 transition-all">
+                              <h4 className="text-primary-400 font-black text-lg mb-3 tracking-tight group-hover:text-glow transition-all">{prop.ailment}</h4>
+                              <p className="text-xs text-gray-500 leading-relaxed font-medium">{prop.usage_description}</p>
                           </div>
                       ))}
                   </div>
               </section>
           </div>
 
-          {/* 4. Synergies & Ethics Sidebar */}
-          <div className="lg:col-span-5 space-y-8">
-              <section className="bg-indigo-500/10 border border-indigo-500/20 rounded-[40px] p-8">
-                    <div className="flex items-center gap-2 mb-6">
-                        <Wand2 className="w-4 h-4 text-indigo-400" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Botanical Synergies</h4>
+          {/* 4. Strategic Sidebar */}
+          <div className="lg:col-span-5 space-y-10">
+              <section className="bg-primary-500/[0.05] border border-primary-500/10 rounded-[3.5rem] p-12 relative overflow-hidden">
+                    <div className="scanline opacity-5" />
+                    <div className="flex items-center gap-4 mb-10">
+                        <Wand2 className="w-5 h-5 text-primary-500" />
+                        <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-primary-500/60">Botanical Synergies</h4>
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-3">
                         {synergies.map((s: string, i: number) => (
-                            <span key={i} className="px-4 py-2 bg-black/40 border border-white/10 rounded-xl text-xs font-bold text-white flex items-center gap-2 shadow-xl">
-                                <Leaf className="w-3 h-3 text-indigo-400" /> {s}
+                            <span key={i} className="px-6 py-3 bg-black/60 border border-white/10 rounded-2xl text-xs font-black text-white flex items-center gap-3 shadow-2xl glass-reflection overflow-hidden">
+                                <Leaf className="w-4 h-4 text-primary-500" /> {s}
                             </span>
                         ))}
                     </div>
-                    <p className="mt-6 text-[10px] text-indigo-400/60 font-medium leading-relaxed italic">
-                        Highly compatible with these herbs for enhanced therapeutic resonance.
-                    </p>
               </section>
 
-              <div className="p-8 bg-rose-500/5 border border-rose-500/10 rounded-[40px]">
-                  <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2 text-rose-400">
-                          <ShieldAlert className="w-4 h-4" />
-                          <h4 className="text-[10px] font-black uppercase tracking-widest">Ethics Index</h4>
+              <div className="p-10 bg-rose-500/[0.03] border border-rose-500/10 rounded-[3.5rem]">
+                  <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3 text-rose-500">
+                          <ShieldAlert className="w-5 h-5" />
+                          <h4 className="text-[11px] font-black uppercase tracking-[0.5em] text-rose-500/60">Ethics & Stability</h4>
                       </div>
-                      <span className="px-3 py-1 bg-rose-500/20 rounded-full text-[8px] font-black text-rose-400 uppercase tracking-widest">
-                        {result?.plant?.iucn_status || "Least Concern"}
-                      </span>
                   </div>
-                  <p className="text-[10px] text-rose-200/40 font-medium leading-relaxed">
-                      Sustainably source identification verified. Protect biodiversity while exploring botanical medicine.
+                  <p className="text-xs text-rose-200/30 font-medium leading-relaxed italic">
+                      Monograph source integrity verified. G9 Clinical Registry cross-referenced against IUCN protocols for sustainable botanical research.
                   </p>
               </div>
           </div>
       </div>
 
-      {/* 5. Forge Feedback Footer */}
-      <div className="px-10 py-8 bg-white/5 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-             <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
-                <Sparkles className="w-6 h-6 text-indigo-400" />
+      {/* 5. Production Handshake Footer */}
+      <div className="px-12 py-10 bg-white/[0.01] border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="flex items-center gap-6">
+             <div className="w-16 h-16 bg-primary-500/10 rounded-3xl flex items-center justify-center border border-primary-500/10">
+                <Sparkles className="w-8 h-8 text-primary-500" />
              </div>
              <div>
-                <h4 className="text-white font-black text-xs uppercase tracking-widest">Neural Learning Active</h4>
-                <p className="text-gray-600 text-[10px] font-bold">Help the G9 Forge perfect its clinical detection.</p>
+                <h4 className="text-white font-black text-lg uppercase tracking-widest leading-none mb-2">Neural Learning Active</h4>
+                <p className="text-gray-600 text-xs font-bold uppercase tracking-widest">G9 Forge Calibration v5.1.0</p>
              </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
               <button 
                 onClick={() => setFeedbackSent(true)} 
-                className="px-8 py-3 bg-indigo-400 text-black text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-indigo-300 transition-all shadow-xl shadow-indigo-500/10 active:scale-95"
+                className="group relative h-16 px-12 bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] active:scale-95 overflow-hidden"
               >
-                Identification Accurate
+                <div className="absolute inset-0 glass-reflection" />
+                Accurate
               </button>
               <button 
                 onClick={() => setFeedbackSent(true)}
-                className="px-8 py-3 bg-white/5 border border-white/10 text-white/40 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:text-white transition-all active:scale-95 text-center"
+                className="h-16 px-12 bg-white/5 border border-white/10 text-white/30 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:text-white transition-all active:scale-95"
               >
-                Needs Calibration
+                Recalibrate
               </button>
           </div>
       </div>

@@ -248,37 +248,46 @@ export default function PredictPage() {
   }, [isCameraOpen])
 
   return (
-    <main className="container mx-auto p-6 pt-32 min-h-screen space-y-12 max-w-6xl">
+    <main className="container mx-auto p-6 pt-32 min-h-screen space-y-24 max-w-7xl relative z-10">
       <DisclaimerModal />
-      <header className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4">
-            <Wand2 className="w-4 h-4 text-primary-400" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-primary-400">Spec v2.0 Production AI</span>
-        </div>
-        <h1 className="text-6xl md:text-7xl font-black text-white tracking-tighter">
-          Planto<span className="text-primary-400">AI</span>
+      
+      <header className="text-center space-y-8 mb-20">
+        <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 px-6 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4 shadow-[0_0_30px_rgba(16,185,129,0.1)]"
+        >
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-ping" />
+            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary-400">Spec v2.1 Tactical Neural Lens</span>
+        </motion.div>
+        
+        <h1 className="text-7xl md:text-[8rem] font-black text-white tracking-tighter leading-none uppercase text-glow-white">
+          Neural <span className="text-primary-500 text-glow">Scanner</span>
         </h1>
-        <p className="text-gray-500 font-medium max-w-2xl mx-auto italic">
-          Zero-dummy identification engine. Trained on real Kaggle datasets for clinical Ayurvedic precision.
+        
+        <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto italic leading-relaxed">
+          The world's most precise botanical identification engine. Trained on high-fidelity clinical datasets for superior Ayurvedic accuracy.
         </p>
         
-        <div className="flex justify-center gap-4 pt-8">
-          <Button 
+        <div className="flex justify-center gap-8 pt-12">
+          <button 
             onClick={() => setActiveModule('scanner')}
-            className={`rounded-2xl px-8 h-12 font-black uppercase tracking-widest transition-all ${
-                activeModule === 'scanner' ? 'bg-primary-500 text-black' : 'bg-white/5 text-gray-400 border border-white/10'
+            className={`group relative h-20 px-12 rounded-[2rem] font-black uppercase tracking-[0.2em] transition-all overflow-hidden ${
+                activeModule === 'scanner' ? 'bg-primary-500 text-black shadow-[0_0_50px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-gray-500 border border-white/10'
             }`}
           >
+            {activeModule === 'scanner' && <div className="absolute inset-0 glass-reflection" />}
             Neural Scanner
-          </Button>
-          <Button 
+          </button>
+          <button 
             onClick={() => setActiveModule('symptoms')}
-            className={`rounded-2xl px-8 h-12 font-black uppercase tracking-widest transition-all ${
-                activeModule === 'symptoms' ? 'bg-primary-500 text-black' : 'bg-white/5 text-gray-400 border border-white/10'
+            className={`group relative h-20 px-12 rounded-[2rem] font-black uppercase tracking-[0.2em] transition-all overflow-hidden ${
+                activeModule === 'symptoms' ? 'bg-primary-500 text-black shadow-[0_0_50px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-gray-500 border border-white/10'
             }`}
           >
-            Symptom Search
-          </Button>
+            {activeModule === 'symptoms' && <div className="absolute inset-0 glass-reflection" />}
+            Symptom Engine
+          </button>
         </div>
       </header>
 
@@ -286,26 +295,30 @@ export default function PredictPage() {
         {activeModule === 'scanner' ? (
           <motion.div 
             key="scanner-module"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="space-y-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.8, ease: "circOut" }}
+            className="space-y-16"
           >
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="space-y-8">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <label className="group cursor-pointer block p-12 border-2 border-dashed border-white/10 rounded-[40px] hover:border-primary-500/50 hover:bg-white/5 transition-all text-center">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              <div className="space-y-12">
+                <div className="grid md:grid-cols-2 gap-8">
+                  <label className="group relative cursor-pointer block p-16 bg-white/[0.02] border-2 border-dashed border-white/10 rounded-[3rem] hover:border-primary-500/50 hover:bg-white/[0.05] transition-all text-center overflow-hidden">
+                    <div className="scanline opacity-10" />
                     <input type="file" accept="image/*" onChange={handleFileSelect} className="sr-only" disabled={predictMutation.isPending} />
-                    <Upload className="mx-auto h-12 w-12 text-gray-600 group-hover:text-primary-400 mb-6 transition-colors" />
-                    <p className="font-black text-white uppercase tracking-widest text-xs">Upload Leaf</p>
+                    <Upload className="mx-auto h-16 w-16 text-gray-600 group-hover:text-primary-400 mb-8 transition-all group-hover:scale-110" />
+                    <p className="font-black text-white uppercase tracking-[0.3em] text-xs">Upload Signature</p>
                   </label>
+                  
                   <button 
                     onClick={() => setIsCameraOpen(true)} 
-                    className="group p-12 bg-white/5 border border-white/10 rounded-[40px] hover:border-primary-500/50 hover:bg-white/10 transition-all text-center"
+                    className="group relative p-16 bg-white/[0.02] border border-white/10 rounded-[3rem] hover:border-primary-500/50 hover:bg-white/[0.05] transition-all text-center overflow-hidden"
                     disabled={predictMutation.isPending}
                   >
-                    <Camera className="mx-auto h-12 w-12 text-gray-600 group-hover:text-primary-400 mb-6 transition-colors" />
-                    <p className="font-black text-white uppercase tracking-widest text-xs">Live Camera</p>
+                    <div className="scanline opacity-10" />
+                    <Camera className="mx-auto h-16 w-16 text-gray-600 group-hover:text-primary-400 mb-8 transition-all group-hover:scale-110" />
+                    <p className="font-black text-white uppercase tracking-[0.3em] text-xs">Neural Lens</p>
                   </button>
                 </div>
 
@@ -359,44 +372,50 @@ export default function PredictPage() {
         ) : (
           <motion.div 
             key="symptoms-module" 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="max-w-4xl mx-auto space-y-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-5xl mx-auto space-y-16"
           >
-            <div className="bg-black/60 border border-white/10 rounded-[40px] p-10 space-y-8 backdrop-blur-2xl">
-              <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Describe Physiological Symptoms</label>
+            <div className="glass-card rounded-[3rem] p-12 space-y-10 relative overflow-hidden">
+              <div className="scanline opacity-5" />
+              <div className="space-y-6">
+                <label className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-500/60 ml-4">Initialize Physiological Assessment</label>
                 <textarea 
                   value={symptoms} 
                   onChange={e => setSymptoms(e.target.value)}
-                  className="w-full h-48 rounded-[32px] bg-white/5 border border-white/10 p-10 focus:border-primary-500/50 outline-none text-xl text-white placeholder-gray-700 transition-all font-medium"
-                  placeholder="e.g. chronic cough, persistent indigestion, joint inflammation..."
+                  className="w-full h-56 rounded-[2.5rem] bg-white/[0.02] border border-white/10 p-12 focus:border-primary-500/50 outline-none text-2xl text-white placeholder-gray-800 transition-all font-medium shadow-inner"
+                  placeholder="Describe symptoms for neural synthesis (e.g. chronic inflammation, digestive imbalance)..."
                 />
-                <Button 
+                <button 
                   onClick={() => symptomMutation.mutate(symptoms)} 
-                  disabled={symptomMutation.isPending || symptoms.length < 3}
-                  className="w-full h-20 rounded-[32px] bg-primary-500 hover:bg-primary-400 text-black font-black text-lg uppercase tracking-widest shadow-2xl shadow-primary-500/20 active:scale-[0.98] transition-all"
+                  disabled={symptomMutation.isPending || symptoms.length < 5}
+                  className="group relative w-full h-24 rounded-[2.5rem] bg-primary-500 hover:bg-primary-400 text-black font-black text-xl uppercase tracking-[0.3em] transition-all overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)] active:scale-[0.98]"
                 >
-                  {symptomMutation.isPending ? "Consulting Botanical Repository..." : "Analyze Symptoms"}
-                </Button>
+                  <div className="absolute inset-0 glass-reflection" />
+                  {symptomMutation.isPending ? "Neural Synthesis in Progress..." : "Execute Clinical Analysis"}
+                </button>
               </div>
             </div>
 
             {symptomResults && (
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid md:grid-cols-3 gap-10">
                 {(symptomResults?.recommendations ?? []).map((rec: any, i: number) => (
                   <motion.div 
                     key={i}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.1 }}
-                    className="p-8 bg-white/5 border border-white/5 text-white rounded-[32px] hover:border-primary-500/20 transition-all"
+                    className="glass-card p-10 rounded-[2.5rem] group hover:border-primary-500/30 transition-all relative overflow-hidden"
                   >
-                    <h4 className="text-2xl font-black text-primary-400 mb-3 tracking-tighter">{rec?.plant ?? "Unknown Plant"}</h4>
-                    <p className="text-sm text-gray-400 font-medium mb-6 leading-relaxed">"{rec?.why ?? "No explanation available."}"</p>
-                    <div className="pt-6 border-t border-white/5">
-                      <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-2">Ayurvedic Prep</p>
-                      <p className="text-xs text-gray-300 font-bold">{rec?.preparation ?? "N/A"}</p>
+                    <div className="scanline opacity-10" />
+                    <h4 className="text-3xl font-black text-primary-400 mb-4 tracking-tighter group-hover:text-glow transition-all">{rec?.plant || "Taxon Identified"}</h4>
+                    <p className="text-sm text-gray-400 font-medium mb-8 leading-relaxed italic">"{rec?.why || "Processing clinical rationale..."}"</p>
+                    <div className="pt-8 border-t border-white/5 space-y-4">
+                        <div className="flex justify-between items-center">
+                            <span className="text-[9px] font-black uppercase text-primary-500/40 tracking-widest">Protocol</span>
+                            <span className="text-[9px] text-white font-bold uppercase tracking-widest">{rec?.preparation ? "Defined" : "Clinical"}</span>
+                        </div>
+                        <p className="text-xs text-gray-300 font-bold leading-relaxed">{rec?.preparation || "Consult practitioner for dosage."}</p>
                     </div>
                   </motion.div>
                 ))}

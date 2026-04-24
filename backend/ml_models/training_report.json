@@ -1,7 +1,10 @@
 {
-  "top1_accuracy": 98.4,
-  "top3_accuracy": 99.8,
-  "num_classes": 19,
+  "top1_accuracy": 99.47,
+  "top3_accuracy": 99.84,
+  "num_classes": 46,
+  "train_images": 14074,
+  "val_images": 2814,
+  "test_images": 1876,
   "model_arch": "tf_efficientnetv2_s.in21k",
   "img_size": 224
 }

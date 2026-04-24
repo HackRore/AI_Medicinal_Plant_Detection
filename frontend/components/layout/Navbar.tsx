@@ -36,45 +36,50 @@ export const Navbar = () => {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.5 }}
                 className={cn(
-                    "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b border-transparent",
-                    isScrolled ? "bg-white/80 backdrop-blur-md shadow-sm border-gray-200/50" : "bg-transparent"
+                    "fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b",
+                    isScrolled ? "bg-black/80 backdrop-blur-xl border-white/10 shadow-2xl" : "bg-transparent border-transparent"
                 )}
             >
                 <div className="container mx-auto px-4">
                     <div className="flex items-center justify-between h-20">
                         {/* Logo */}
                         <Link href="/" className="flex items-center gap-2 group">
-                            <div className="relative w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:rotate-12 transition-transform">
+                            <div className="relative w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-black shadow-lg group-hover:rotate-12 transition-transform">
                                 <Leaf className="w-6 h-6" />
                             </div>
                             <div className="flex flex-col">
-                                <span className={cn("text-lg font-black leading-none tracking-tight", isScrolled ? "text-gray-900" : "text-gray-900")}>
-                                    MEDICINAL
+                                <span className={cn("text-lg font-black leading-none tracking-tighter text-white")}>
+                                    PLANTO<span className="text-primary-400">AI</span>
                                 </span>
-                                <span className="text-xs font-bold text-primary-600 tracking-widest uppercase">PLANT AI</span>
+                                <span className="text-[8px] font-black text-gray-500 tracking-[0.4em] uppercase">Tactical Botani</span>
                             </div>
                         </Link>
 
                         {/* Desktop Nav */}
-                        <div className="hidden md:flex items-center gap-8">
+                        <div className="hidden md:flex items-center gap-10">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     href={link.href}
                                     className={cn(
-                                        "text-sm font-bold transition-colors hover:text-primary-600",
-                                        pathname === link.href ? "text-primary-600" : "text-gray-600"
+                                        "text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-primary-400",
+                                        pathname === link.href ? "text-primary-400" : "text-gray-400"
                                     )}
                                 >
                                     {link.name}
                                 </Link>
                             ))}
+                            <Link href="/predict">
+                                <Button size="sm" className="bg-primary-500 text-black font-black uppercase tracking-widest text-[10px] px-6 rounded-xl hover:bg-primary-400 transition-all shadow-xl shadow-primary-500/20">
+                                    Launch HUD
+                                </Button>
+                            </Link>
                         </div>
 
                         {/* Mobile Toggle */}
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="md:hidden p-2 text-gray-600"
+                            className="md:hidden p-2 text-white"
                         >
                             {isMobileMenuOpen ? <X /> : <Menu />}
                         </button>
@@ -86,27 +91,27 @@ export const Navbar = () => {
             <AnimatePresence>
                 {isMobileMenuOpen && (
                     <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="md:hidden fixed top-20 left-0 w-full bg-white border-b border-gray-100 shadow-xl z-40 overflow-hidden"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="md:hidden fixed top-20 left-0 w-full bg-black/95 backdrop-blur-2xl border-b border-white/10 z-40 overflow-hidden"
                     >
-                        <div className="container mx-auto px-4 py-6 flex flex-col gap-4">
+                        <div className="container mx-auto px-4 py-8 flex flex-col gap-6">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     href={link.href}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className={cn(
-                                        "text-lg font-bold py-2 border-b border-gray-50",
-                                        pathname === link.href ? "text-primary-600" : "text-gray-600"
+                                        "text-xs font-black uppercase tracking-[0.3em] py-3 border-b border-white/5",
+                                        pathname === link.href ? "text-primary-400" : "text-gray-400"
                                     )}
                                 >
                                     {link.name}
                                 </Link>
                             ))}
                             <Link href="/predict" onClick={() => setIsMobileMenuOpen(false)}>
-                                <Button className="w-full mt-4">Get Started</Button>
+                                <Button className="w-full h-16 rounded-2xl bg-primary-500 text-black font-black uppercase tracking-widest">Launch Scanner</Button>
                             </Link>
                         </div>
                     </motion.div>

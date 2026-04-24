@@ -31,6 +31,7 @@ export const metadata: Metadata = {
 }
 
 import { BackendWarmup } from '@/components/layout/BackendWarmup'
+import { BackgroundEffects } from '@/components/layout/BackgroundEffects'
 
 export default function RootLayout({
     children,
@@ -39,15 +40,16 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" suppressHydrationWarning className={`${inter.variable} ${outfit.variable} scroll-smooth`}>
-            <body className="font-sans bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 antialiased selection:bg-primary-500/30 selection:text-primary-900">
+            <body className="font-sans bg-[#050505] text-white antialiased selection:bg-primary-500/30 selection:text-primary-900 overflow-x-hidden">
                 <Providers>
+                    <BackgroundEffects />
                     <BackendWarmup />
                     <Navbar />
-    <main>
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
-    </main>
+                    <main className="relative z-10">
+                        <ErrorBoundary>
+                          {children}
+                        </ErrorBoundary>
+                    </main>
                     <Footer />
                 </Providers>
             </body>

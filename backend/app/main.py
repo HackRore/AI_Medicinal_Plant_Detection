@@ -20,11 +20,13 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL els
 # Neural Service Orchestration
 ml_service = None
 INTEGRITY_CHECK = False
+ML_LOADED = False
 
 try:
     from app.services.ml_service import ml_service
     logger.info(f"Clinical core initialized: {len(ml_service.class_names)} validated taxa")
     INTEGRITY_CHECK = True
+    ML_LOADED = True
 except Exception as e:
     logger.error(f"Core synthesis failed: {e}")
     import traceback; traceback.print_exc()
@@ -35,8 +37,7 @@ from contextlib import asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Trigger background neural load (If metadata worked)
     if ml_service:
-        logger.info("Lifespan: Triggering background AI model initialization...")
-        ml_service.deferred_init()
+        logger.info("Lifespan: ML Service initialized.")
     yield
     # Shutdown logic (none needed)
 
@@ -88,13 +89,11 @@ def stats():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    if not ML_LOADED or ml_service is None:
-        raise HTTPException(503, "Model not loaded")
     if not file.content_type.startswith("image/"):
-        raise HTTPException(400, "File must be an image")
+        raise HTTPException(400, "File must be an image.")
     raw = await file.read()
-    if len(raw) > 15 * 1024 * 1024:
-        raise HTTPException(400, "File too large (max 15MB)")
+    if len(raw) > 15*1024*1024:
+        raise HTTPException(400, "Max 15MB.")
     result = ml_service.predict(raw)
     if not result.get("success"):
         return JSONResponse(result)
@@ -113,26 +112,27 @@ async def predict(file: UploadFile = File(...)):
             "top3": result["top3"],
         },
         "toxicity": kb.get("toxicity", {
-            "level": "unknown", "level_code": 3,
-            "notes": "Consult an Ayurvedic practitioner."
+            "level":"unknown","level_code":3,
+            "notes":"Consult an Ayurvedic practitioner."
         }),
         "medicinal": {
-            "description": kb.get("description", ""),
-            "ayurvedic_uses": kb.get("ayurvedic_uses", []),
-            "preparation": kb.get("preparation", "Consult a qualified Ayurvedic practitioner."),
-            "active_compounds": kb.get("active_compounds", []),
-            "contraindications": kb.get("contraindications", []),
+            "description":      kb.get("description",""),
+            "ayurvedic_uses":   kb.get("ayurvedic_uses",[]),
+            "preparation":      kb.get("preparation",
+                "Consult a qualified Ayurvedic practitioner."),
+            "active_compounds": kb.get("active_compounds",[]),
+            "contraindications":kb.get("contraindications",[]),
         },
-        "gradcam": result.get("gradcam", {}),
+        "gradcam": result.get("gradcam",{}),
         "quality": {
-            "passed": result["quality_passed"],
-            "score": result["quality_score"],
+            "passed":  result["quality_passed"],
+            "score":   result["quality_score"],
             "message": "Good image" if result["quality_passed"] else
                 "Low confidence. Try better lighting, single leaf, plain background."
         },
         "meta": {
             "inference_ms": result["inference_ms"],
-            "model_version": "plantoai_v2"
+            "model_version": "plantoai_v2_46class"
         }
     }
 
@@ -140,7 +140,33 @@ async def predict(file: UploadFile = File(...)):
 def list_plants(search: str = "", page: int = 1, limit: int = 20):
     if not ml_service:
         return {"plants": [], "total": 0, "page": 1, "pages": 0}
-    plants = [{"scientific_name": k, **v} for k, v in ml_service.kb.items()]
+    
+    plants = []
+    for k, v in ml_service.kb.items():
+        # Dynamic Botanical Visual Synthesis
+        img_url = v.get("image_url")
+        if not img_url:
+            # Curated Botanical Photo IDs (strictly medicinal/plant focused)
+            botanical_ids = [
+                "photo-1520302630591-fd1c66ed11a8", # Aloe
+                "photo-1466692476868-aef1dfb1e735", # Herbs
+                "photo-1533038590840-1cde6e668a91", # Leaves
+                "photo-1501004318641-72e54e3f81d4", # Greenhouse
+                "photo-1518531933037-91b2f5f229cc", # Fern
+                "photo-1515523110800-9415d13b84a8", # Mint
+                "photo-1502672260266-1c1ef2d93688", # Botanical
+                "photo-1459156212016-c812468e2115"  # Close-up
+            ]
+            # Select ID based on the plant's name hash for consistency
+            photo_id = botanical_ids[hash(k) % len(botanical_ids)]
+            img_url = f"https://images.unsplash.com/{photo_id}?q=80&w=2670&auto=format&fit=crop"
+        
+        plants.append({
+            "scientific_name": k,
+            "image_url": img_url,
+            **v
+        })
+        
     if search:
         plants = [p for p in plants
                   if search.lower() in p["scientific_name"].lower()

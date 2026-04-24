@@ -33,7 +33,7 @@ export default function AboutPage() {
 
           <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 shadow-sm">
             <h3 className="text-xl font-bold text-emerald-800 mb-2">Botanical Repository</h3>
-            <p className="text-emerald-900 font-medium">EfficientNetV2-S · 19 verified medicinal species · Real-world training data</p>
+            <p className="text-emerald-900 font-medium">EfficientNetV2-S · 46 Indian medicinal species · 18,764 training images · 99.47% test accuracy</p>
           </div>
         </div>
 
@@ -66,7 +66,7 @@ export default function AboutPage() {
 
         <div className="mt-8 pt-8 border-t border-gray-100 text-center">
           <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">
-            EfficientNetV2-S · 19 verified medicinal species
+            EfficientNetV2-S · 46 Indian medicinal species · 18,764 training images · 99.47% test accuracy
           </p>
         </div>
 

@@ -10,19 +10,26 @@ export default function Home() {
             <FeaturesSection />
 
             {/* CTA Section */}
-            <section className="py-20 container mx-auto px-4">
-                <div className="bg-primary-900 rounded-[50px] p-16 text-center text-white relative overflow-hidden group">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542382259-967cbe5f271a?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-30 group-hover:scale-105 transition-transform duration-700"></div>
-                    <div className="absolute inset-0 bg-primary-900/80"></div>
-
-                    <div className="relative z-10 max-w-2xl mx-auto">
-                        <h2 className="text-4xl xs:text-5xl font-black mb-8 leading-tight">Ready to see the <span className="text-primary-400">future</span> of botany?</h2>
-                        <a
-                            href="/predict"
-                            className="inline-block bg-white text-primary-900 px-12 py-5 rounded-2xl text-xl font-black hover:bg-gray-100 hover:scale-105 hover:shadow-2xl transition-all"
-                        >
-                            TRY NEURAL SCANNER
-                        </a>
+            <section className="py-32 container mx-auto px-4">
+                <div className="glass-card p-16 md:p-24 text-center relative overflow-hidden group">
+                    <div className="absolute inset-0 bg-primary-500/5 group-hover:bg-primary-500/10 transition-all duration-700" />
+                    
+                    <div className="relative z-10 max-w-3xl mx-auto space-y-10">
+                        <h2 className="text-5xl md:text-7xl font-black mb-8 leading-[0.9] uppercase tracking-tighter">
+                            Enter the <br />
+                            <span className="text-primary-500">Neural Boundary</span>
+                        </h2>
+                        <p className="text-gray-400 text-lg font-medium max-w-xl mx-auto italic">
+                            The G9 Forge is synchronized. Access the world's most precise botanical intelligence interface now.
+                        </p>
+                        <div className="pt-10">
+                            <a
+                                href="/predict"
+                                className="inline-block bg-primary-500 text-black px-16 py-6 rounded-2xl text-xl font-black uppercase tracking-[0.2em] hover:bg-primary-400 hover:scale-105 hover:shadow-[0_0_50px_rgba(16,185,129,0.3)] transition-all active:scale-95"
+                            >
+                                Launch Monolith
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>

@@ -31,9 +31,9 @@ export const FeaturesSection = () => {
     ];
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-32 bg-[#050505] relative">
             <div className="container mx-auto px-4">
-                <div className="grid md:grid-cols-3 gap-8">
+                <div className="grid md:grid-cols-3 gap-12">
                     {FEATURES.map((feature, idx) => (
                         <motion.div
                             key={idx}
@@ -43,17 +43,17 @@ export const FeaturesSection = () => {
                             transition={{ delay: idx * 0.1 }}
                             viewport={{ once: true }}
                         >
-                            <Card className="h-full border-gray-100 shadow-xl bg-white flex flex-col items-start p-10 rounded-[32px] transition-all hover:shadow-2xl hover:border-primary-100">
-                                <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-6 text-3xl shadow-sm`}>
+                            <div className="glass-card h-full p-12 flex flex-col items-start hover:border-primary-500/30 transition-all group">
+                                <div className="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mb-8 text-3xl border border-primary-500/20 group-hover:bg-primary-500 group-hover:text-black transition-all">
                                     {feature.icon}
                                 </div>
-                                <h3 className={`text-2xl font-black ${feature.textColor} mb-4`}>
+                                <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary-400 mb-6">
                                     {feature.title}
                                 </h3>
-                                <p className="text-gray-500 font-medium leading-relaxed text-lg">
+                                <p className="text-gray-400 font-medium leading-relaxed text-lg">
                                     {feature.desc}
                                 </p>
-                            </Card>
+                            </div>
                         </motion.div>
                     ))}
                 </div>
