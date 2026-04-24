@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
     
     # Redis
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "") # Removal of hardcoded sensitive data
@@ -46,8 +46,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
     
-    # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
+
     
     # File Upload
     UPLOAD_DIR: str = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "uploads")

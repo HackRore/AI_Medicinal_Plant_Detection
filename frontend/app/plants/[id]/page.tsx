@@ -94,7 +94,7 @@ export default function PlantDetailPage() {
                         alt={plant?.species_name ?? "Plant Image"}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x600?text=No+Image+Available'
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2670&auto=format&fit=crop'
                         }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">

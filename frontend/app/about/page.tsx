@@ -6,7 +6,8 @@ export default function AboutPage() {
   const [stats, setStats] = useState<any>(null)
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/stats`)
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
+    fetch(`${API_BASE}/api/v1/stats`)
       .then(res => res.json())
       .then(data => setStats(data))
       .catch(err => console.error("Stats sync failed:", err))

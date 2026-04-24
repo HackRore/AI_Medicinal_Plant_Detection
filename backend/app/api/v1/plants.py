@@ -20,31 +20,67 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20, db: Session = 
     Query the finalized high-fidelity botanical database.
     Supports clinical search by name or family.
     """
-    query = db.query(Plant)
-    
+    from app.services.ml_service import ml_service
+    import os
+
+    try:
+        query = db.query(Plant)
+        if search:
+            query = query.filter(
+                (Plant.species_name.ilike(f"%{search}%")) |
+                (Plant.common_name_en.ilike(f"%{search}%")) |
+                (Plant.family.ilike(f"%{search}%"))
+            )
+        total = query.count()
+        if total > 0:
+            plants = query.offset((page - 1) * limit).limit(limit).all()
+            return {
+                "success": True,
+                "plants": [
+                    {
+                        "id": p.model_key,
+                        "common_name": p.common_name_en,
+                        "scientific_name": p.species_name,
+                        "family": p.family,
+                        "description": p.description,
+                        "iucn_status": p.iucn_status,
+                        "ayurvedic_balance": p.ayurvedic_balance,
+                        "image_url": p.image_url
+                    } for p in plants
+                ],
+                "total": total,
+                "page": page,
+                "pages": (total + limit - 1) // limit
+            }
+    except Exception as e:
+        print(f"Database Fallback Triggered: {e}")
+
+    # --- FALLBACK: LOCAL INTELLIGENCE (Zero-DB) ---
+    plants = []
+    for k, v in ml_service.kb.items():
+        img_url = v.get("image_url")
+        if not img_url:
+            botanical_ids = ["photo-1520302630591-fd1c66ed11a8", "photo-1466692476868-aef1dfb1e735", "photo-1533038590840-1cde6e668a91"]
+            photo_id = botanical_ids[hash(k) % len(botanical_ids)]
+            img_url = f"https://images.unsplash.com/{photo_id}?q=80&w=1000&auto=format&fit=crop"
+        
+        plants.append({
+            "id": k.lower().replace(" ", "-"),
+            "common_name": v.get("common_names", [k])[0],
+            "scientific_name": k,
+            "family": v.get("family", "N/A"),
+            "description": v.get("description", ""),
+            "image_url": img_url
+        })
+        
     if search:
-        query = query.filter(
-            (Plant.species_name.ilike(f"%{search}%")) |
-            (Plant.common_name_en.ilike(f"%{search}%")) |
-            (Plant.family.ilike(f"%{search}%"))
-        )
+        plants = [p for p in plants if search.lower() in p["scientific_name"].lower() or search.lower() in p["common_name"].lower()]
     
-    total = query.count()
-    plants = query.offset((page - 1) * limit).limit(limit).all()
-    
+    total = len(plants)
+    start = (page - 1) * limit
     return {
         "success": True,
-        "plants": [
-            {
-                "id": p.model_key,
-                "common_name": p.common_name_en,
-                "scientific_name": p.species_name,
-                "family": p.family,
-                "description": p.description,
-                "iucn_status": p.iucn_status,
-                "ayurvedic_balance": p.ayurvedic_balance
-            } for p in plants
-        ],
+        "plants": plants[start:start + limit],
         "total": total,
         "page": page,
         "pages": (total + limit - 1) // limit
