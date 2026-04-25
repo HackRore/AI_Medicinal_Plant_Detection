@@ -16,9 +16,9 @@ export default function AboutPage() {
   }, [])
 
   const TEAM = [
-    { name: "Group G9 Lead", role: "Neural Architecture", icon: <BrainCircuit className="w-6 h-6" /> },
-    { name: "Clinical Analyst", role: "Botanical Ontology", icon: <Database className="w-6 h-6" /> },
-    { name: "Uplink Engineer", role: "Full-Stack & DevOps", icon: <Microscope className="w-6 h-6" /> }
+    { name: "Principal Architect", role: "Neural Architecture", icon: <BrainCircuit className="w-6 h-6" /> },
+    { name: "Senior Analyst", role: "Botanical Ontology", icon: <Database className="w-6 h-6" /> },
+    { name: "Systems Lead", role: "Full-Stack & DevOps", icon: <Microscope className="w-6 h-6" /> }
   ];
 
   return (

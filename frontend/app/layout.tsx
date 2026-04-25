@@ -17,12 +17,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
     title: {
-        default: 'AI Medicinal Plant Detection | Group G9',
-        template: '%s | Medicinal Plant AI'
+        default: 'PlantoAI | Neural Botanical Forge',
+        template: '%s | PlantoAI'
     },
-    description: 'Advanced deep learning system for high-accuracy botanical identification and medicinal insight extraction.',
-    keywords: ['AI', 'Medicinal Plants', 'Leaf Recognition', 'MobileNetV2', 'Vision Transformer', 'Ayurveda', 'Botanical AI'],
-    authors: [{ name: 'Group G9' }],
+    description: 'Professional clinical interface for medicinal plant identification and Ayurvedic intelligence.',
+    keywords: ['AI', 'Medicinal Plants', 'Botanical AI', 'Ayurveda', 'Neural Forge'],
+    authors: [{ name: 'Neural Architects' }],
     manifest: '/manifest.json',
     icons: {
         icon: '/favicon.ico',
@@ -45,7 +45,6 @@ export default function RootLayout({
                 <Providers>
                     <BackgroundEffects />
                     <BackendWarmup />
-                    <DemoBanner />
                     <Navbar />
                     <main className="relative z-10">
                         <ErrorBoundary>
