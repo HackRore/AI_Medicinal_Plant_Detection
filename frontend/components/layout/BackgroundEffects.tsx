@@ -1,8 +1,17 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
 export const BackgroundEffects = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="fixed inset-0 -z-50 bg-[#050505]" />;
+
   return (
     <div className="fixed inset-0 -z-50 overflow-hidden bg-[#050505]">
       {/* Noise Texture */}

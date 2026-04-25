@@ -107,41 +107,12 @@ export default function PredictPage() {
   const [isCameraOpen, setIsCameraOpen] = useState(false)
   const [uploadedImages, setUploadedImages] = useState<{file: File, preview: string}[]>([])
   const [localHistory, setLocalHistory] = useState<any[]>([])
+  const resultRef = useRef<HTMLDivElement>(null)
   const [activeModule, setActiveModule] = useState<'scanner' | 'symptoms'>('scanner')
   const [symptoms, setSymptoms] = useState("")
   const [symptomResults, setSymptomResults] = useState<any>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  // Symptom Search mutation
-  const symptomMutation = useMutation({
-    mutationFn: async (symptoms: string) => {
-      const res = await fetch(`${API_BASE}/api/v1/symptom-search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ symptoms })
-      })
-      if (!res.ok) throw new Error("Search failed")
-      return res.json()
-    },
-    onSuccess: (data) => {
-      setSymptomResults(data)
-      if (data.error) toast.error(data.error)
-      else toast.success("Ayurvedic remedies found!")
-    }
-  })
-
-  // Load local history on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("plantoai_history")
-    if (saved) {
-      try {
-        setLocalHistory(JSON.parse(saved).slice(0, 10))
-      } catch (e) {
-        console.error("Failed to load history", e)
-      }
-    }
-  }, [])
 
   // Predict mutation
   const predictMutation = useMutation({
@@ -185,6 +156,46 @@ export default function PredictPage() {
       toast.error(error.message || 'AI engine is currently offline')
     }
   })
+
+  // Symptom Search mutation
+  const symptomMutation = useMutation({
+    mutationFn: async (symptoms: string) => {
+      const res = await fetch(`${API_BASE}/api/v1/symptom-search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ symptoms })
+      })
+      if (!res.ok) throw new Error("Search failed")
+      return res.json()
+    },
+    onSuccess: (data) => {
+      setSymptomResults(data)
+      if (data.error) toast.error(data.error)
+      else toast.success("Ayurvedic remedies found!")
+    }
+  })
+
+  // Auto-scroll to results
+  useEffect(() => {
+    if (predictMutation.isSuccess && resultRef.current) {
+      setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 300)
+    }
+  }, [predictMutation.isSuccess])
+
+  // Load local history on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("plantoai_history")
+    if (saved) {
+      try {
+        setLocalHistory(JSON.parse(saved).slice(0, 10))
+      } catch (e) {
+        console.error("Failed to load history", e)
+      }
+    }
+  }, [])
+
   const previewRef = React.useRef<string | null>(null)
 
   // Memory Safeguard: Revoke object URLs to prevent leaks
@@ -341,7 +352,7 @@ export default function PredictPage() {
                 )}
               </div>
 
-              <div>
+              <div ref={resultRef}>
                  <AIThinkingOverlay isVisible={predictMutation.isPending} />
                  
                  {predictMutation.isSuccess && (

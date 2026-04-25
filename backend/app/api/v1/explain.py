@@ -6,7 +6,7 @@ Grad-CAM, LIME, and SHAP visualizations
 from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-# from app.database import get_db
+from app.database import get_db
 from app.services.explainability_service import get_explainability_service
 from app.services.ml_service import get_ml_service
 

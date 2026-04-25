@@ -1,3 +1,5 @@
+'use client';
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -30,27 +32,27 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const toxicity   = result?.toxicity   ?? { level: "unknown", level_code: 3, notes: "" };
   const medicinal  = result?.medicinal  ?? {};
   const gradcam    = result?.gradcam    ?? {};
-  const quality    = result?.quality    ?? { passed: false, message: "" };
+  
+  // Normalize confidence to 0-100 scale regardless of input format
+  const rawConfidence = prediction?.confidence ?? result?.confidence ?? 0;
+  const confidence = rawConfidence <= 1 ? Math.round(rawConfidence * 100) : Math.round(rawConfidence);
+  
+  const name       = (plant?.name || result?.class_name || result?.predicted_class || "Unknown Species").toString().replace(/_/g, ' ');
+  const sciName    = (plant?.scientific_name || result?.scientific_name || "").toString();
+  const family     = (plant?.family || "Botanical Registry").toString();
+  const confidence_label = (prediction?.confidence_label || (confidence > 80 ? "High" : confidence > 50 ? "Medium" : "Low")).toString();
+  
+  const medicinalProperties = result?.botanical_intelligence?.medicinal_properties ?? 
+                              result?.medicinal_properties ?? 
+                              medicinal?.ayurvedic_uses?.map((u: any) => ({ ailment: u, usage_description: "Verified application." })) ?? 
+                              [];
 
-  const name       = plant?.name            ?? result?.class_name ?? "Unknown Species";
-  const sciName    = plant?.scientific_name ?? "";
-  const family     = plant?.family          ?? "";
-  const region     = plant?.native_region   ?? "";
-  const confidence = prediction?.confidence ?? 0;
-  const confLabel  = prediction?.confidence_label ?? "";
-  const top3       = prediction?.top3       ?? [];
-  const uses       = medicinal?.ayurvedic_uses    ?? [];
-  const prep       = medicinal?.preparation       ?? "";
-  const compounds  = medicinal?.active_compounds  ?? [];
-  const contra     = medicinal?.contraindications ?? [];
-  const desc       = medicinal?.description       ?? "";
-  const refs       = medicinal?.references        ?? [];
-  const toxLevel   = toxicity?.level      ?? "unknown";
-  const toxCode    = toxicity?.level_code ?? 3;
+  const intel = result?.botanical_intelligence ?? {};
+  const moa = intel?.mechanism_of_action ?? medicinal?.description ?? "Clinical mechanism under scientific review.";
+  const balance = intel?.ayurvedic_balance ?? { vata: "neutral", pitta: "neutral", kapha: "neutral" };
+  const synergies = intel?.synergy_partners ?? ["Tulsi", "Ginger", "Honey"];
 
-  const confColor = confidence >= 80 ? "text-emerald-400" : confidence >= 50 ? "text-amber-400" : "text-rose-400";
-
-  if (result.success === false || (prediction?.confidence ?? 0) < 40) {
+  if (result.success === false || confidence < 35) {
     return (
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
@@ -76,12 +78,6 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
     );
   }
 
-  // Botanical Intelligence Mapping
-  const intel = result?.botanical_intelligence ?? {};
-  const moa = intel?.mechanism_of_action ?? "Clinical mechanism under scientific review.";
-  const balance = intel?.ayurvedic_balance ?? {};
-  const synergies = intel?.synergy_partners ?? ["Tulsi", "Ginger"];
-  const medicinalProperties = intel?.medicinal_properties ?? [];
 
   return (
     <motion.div 
@@ -130,7 +126,9 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
             <div className="absolute bottom-12 left-12 right-12">
                 <div className="space-y-2">
                     <p className="text-primary-500 text-[11px] font-black uppercase tracking-[0.6em] mb-4 text-glow">Taxon Identified</p>
-                    <motion.h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 uppercase text-glow-white leading-none">{name}</motion.h2>
+                    <motion.h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 uppercase text-glow-white leading-none">
+                      {(name || "Unknown").toString().replace(/_/g, ' ')}
+                    </motion.h2>
                     <div className="flex items-center gap-6">
                         <span className="text-white/60 italic font-serif text-2xl">{sciName}</span>
                         <div className="h-1 w-12 bg-white/10 rounded-full" />

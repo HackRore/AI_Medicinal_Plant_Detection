@@ -3,37 +3,36 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Card } from "../ui/Card";
+import { Microscope, Leaf, Zap, BrainCircuit } from "lucide-react";
 
 export const FeaturesSection = () => {
     const FEATURES = [
         { 
-            title: 'Explainable AI', 
+            title: 'Neural Explainability', 
             desc: 'Grad-CAM heatmaps show exactly which leaf features the AI used for identification.', 
-            icon: '🔬',
-            color: 'bg-blue-50',
-            textColor: 'text-blue-700'
+            icon: <Microscope className="w-8 h-8" />,
         },
         { 
-            title: 'Ayurvedic Intelligence', 
-            desc: 'Classical dosage, dosha, preparation and compound data from Ayurvedic texts for 81 species.', 
-            icon: '🌿',
-            color: 'bg-green-50',
-            textColor: 'text-green-700'
+            title: 'Clinical Monographs', 
+            desc: 'Classical dosage, preparation and compound data from Ayurvedic texts for 81 species.', 
+            icon: <Leaf className="w-8 h-8" />,
         },
         { 
-            title: 'Dual Verification', 
+            title: 'Dual-Path Analysis', 
             desc: 'CNN + Gemini Vision cross-check every identification for maximum accuracy.', 
-            icon: '⚡',
-            color: 'bg-amber-50',
-            textColor: 'text-amber-700'
+            icon: <Zap className="w-8 h-8" />,
+        },
+        { 
+            title: 'Symptom Synthesis', 
+            desc: 'Multi-path AI reasoning identifies botanical remedies based on described symptoms.', 
+            icon: <BrainCircuit className="w-8 h-8" />,
         },
     ];
 
     return (
         <section className="py-32 bg-[#050505] relative">
             <div className="container mx-auto px-4">
-                <div className="grid md:grid-cols-3 gap-12">
+                <div className="grid md:grid-cols-4 gap-8">
                     {FEATURES.map((feature, idx) => (
                         <motion.div
                             key={idx}
@@ -43,8 +42,8 @@ export const FeaturesSection = () => {
                             transition={{ delay: idx * 0.1 }}
                             viewport={{ once: true }}
                         >
-                            <div className="glass-card h-full p-12 flex flex-col items-start hover:border-primary-500/30 transition-all group">
-                                <div className="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mb-8 text-3xl border border-primary-500/20 group-hover:bg-primary-500 group-hover:text-black transition-all">
+                            <div className="glass-card h-full p-8 flex flex-col items-start hover:border-primary-500/30 transition-all group">
+                                <div className="w-16 h-16 bg-primary-500/10 rounded-2xl flex items-center justify-center mb-8 text-primary-500 border border-primary-500/20 group-hover:bg-primary-500 group-hover:text-black transition-all">
                                     {feature.icon}
                                 </div>
                                 <h3 className="text-xs font-black uppercase tracking-[0.3em] text-primary-400 mb-6">

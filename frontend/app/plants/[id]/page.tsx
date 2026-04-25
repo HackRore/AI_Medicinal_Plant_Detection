@@ -41,7 +41,7 @@ export default function PlantDetailPage() {
 
     const fetchPlantDetails = async (id: string) => {
         try {
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000'
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || ""; // Production URL must be set via NEXT_PUBLIC_API_URL
             const res = await fetch(`${API_BASE}/api/v1/plants/${id}`)
             if (res.ok) {
                 const data = await res.json()
