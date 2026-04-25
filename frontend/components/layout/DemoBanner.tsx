@@ -7,7 +7,11 @@ export default function DemoBanner() {
   const [status, setStatus] = useState<"connecting" | "live" | "fallback">("connecting");
 
   useEffect(() => {
-    const api = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com";
+    // Production-First Resolver: Ignore local overrides if on live domain
+    const isLive = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app');
+    const api = isLive 
+        ? "https://plantoai-backend.onrender.com" 
+        : (process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
 

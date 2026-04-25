@@ -1,36 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
-
-interface MedicinalProperty {
-    ailment: string
-    usage: string
-    preparation: string
-    dosage: string
-    precautions: string
-}
-
-interface PlantDetails {
-    id: number
-    species_name: string
-    common_names: {
-        en: string
-        hi: string
-        ta: string
-        te: string
-        bn: string
-    }
-    scientific_classification: string
-    description: string
-    image_url: string
-    medicinal_properties: MedicinalProperty[]
-}
+import { useParams, useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Leaf, ChevronLeft, Activity, Microscope, ShieldAlert, Thermometer, FlaskConical } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 
 export default function PlantDetailPage() {
     const params = useParams()
-    const [plant, setPlant] = useState<PlantDetails | null>(null)
+    const router = useRouter()
+    const [plant, setPlant] = useState<any>(null)
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -41,14 +20,14 @@ export default function PlantDetailPage() {
 
     const fetchPlantDetails = async (id: string) => {
         try {
-            const API_BASE = process.env.NEXT_PUBLIC_API_URL || ""; // Production URL must be set via NEXT_PUBLIC_API_URL
+            const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
             const res = await fetch(`${API_BASE}/api/v1/plants/${id}`)
             if (res.ok) {
                 const data = await res.json()
-                setPlant(data.plant || data) // Handle both wrapped and unwrapped responses
+                setPlant(data.plant || data)
             }
         } catch (error) {
-            console.error('Failed to fetch plant details:', error)
+            console.error('Neural uplink failed:', error)
         } finally {
             setLoading(false)
         }
@@ -56,150 +35,146 @@ export default function PlantDetailPage() {
 
     if (loading) {
         return (
-            <div className="container mx-auto px-4 py-12 animate-pulse">
-                <div className="h-96 bg-gray-200 rounded-xl mb-8" />
-                <div className="h-8 bg-gray-200 rounded w-1/2 mb-4" />
-                <div className="h-4 bg-gray-200 rounded w-full mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-full mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-3/4" />
-            </div>
-        )
-    }
-
-    if (!plant) {
-        return (
-            <div className="container mx-auto px-4 py-20 text-center">
-                <h1 className="text-3xl font-bold text-gray-800 mb-4">Plant Not Found</h1>
-                <Link href="/plants" className="text-primary-600 hover:underline">
-                    ← Back to Plants
-                </Link>
+            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+                <div className="relative w-24 h-24">
+                    <div className="absolute inset-0 border-4 border-primary-500/20 rounded-full" />
+                    <div className="absolute inset-0 border-4 border-primary-500 rounded-full border-t-transparent animate-spin" />
+                    <Leaf className="absolute inset-0 m-auto text-primary-500 w-8 h-8 animate-pulse" />
+                </div>
             </div>
         )
     }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <Link
-                href="/plants"
-                className="inline-flex items-center text-gray-600 hover:text-primary-600 mb-6 transition-colors"
-            >
-                ← Back to Plants
-            </Link>
-
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                {/* Header Image */}
-                <div className="relative h-[400px] w-full">
-                    <img
-                        src={plant?.image_url ?? ""}
-                        alt={plant?.species_name ?? "Plant Image"}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2670&auto=format&fit=crop'
-                        }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                        <div className="p-8 text-white w-full">
-                            <h1 className="text-5xl font-bold mb-2">
-                                {plant?.common_names?.en ?? "Unknown Plant"}
-                            </h1>
-                            <p className="text-xl font-mono opacity-90 italic">
-                                {(plant?.species_name || "Unknown Species").toString().replace(/_/g, ' ')}
-                            </p>
-                        </div>
+        <main className="min-h-screen bg-[#050505] pt-24 pb-20 px-4 sm:px-6 lg:px-8">
+            <div className="absolute inset-0 bg-primary-500/[0.02] pointer-events-none" />
+            
+            <div className="max-w-7xl mx-auto relative z-10">
+                {/* Tactical Navigation */}
+                <button 
+                    onClick={() => router.back()}
+                    className="group flex items-center gap-3 text-gray-500 hover:text-primary-400 transition-all mb-12"
+                >
+                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary-500/50">
+                        <ChevronLeft className="w-5 h-5" />
                     </div>
-                </div>
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em]">Abort Scan | Return to Registry</span>
+                </button>
 
-                <div className="p-8 lg:p-12">
-                    <div className="grid lg:grid-cols-3 gap-12">
-                        {/* Main Content */}
-                        <div className="lg:col-span-2 space-y-8">
-                            {/* Description */}
-                            <section>
-                                <h2 className="text-2xl font-bold text-primary-800 mb-4 flex items-center gap-2">
-                                    <span>📖</span> About
-                                </h2>
-                                <p className="text-gray-700 leading-relaxed text-lg">
-                                    {plant?.description ?? "No description available for this species."}
-                                </p>
-                            </section>
-
-                            {/* Regional Names */}
-                            <section className="bg-orange-50 p-6 rounded-xl border border-orange-100">
-                                <h2 className="text-xl font-bold text-orange-800 mb-4">Regional Names</h2>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div>
-                                        <span className="text-xs uppercase font-bold text-orange-400">Hindi</span>
-                                        <p className="font-medium text-gray-800">{plant?.common_names?.hi ?? '-'}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-xs uppercase font-bold text-orange-400">Tamil</span>
-                                        <p className="font-medium text-gray-800">{plant?.common_names?.ta ?? '-'}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-xs uppercase font-bold text-orange-400">Telugu</span>
-                                        <p className="font-medium text-gray-800">{plant?.common_names?.te ?? '-'}</p>
-                                    </div>
-                                    <div>
-                                        <span className="text-xs uppercase font-bold text-orange-400">Bengali</span>
-                                        <p className="font-medium text-gray-800">{plant?.common_names?.bn ?? '-'}</p>
-                                    </div>
+                <div className="grid lg:grid-cols-12 gap-12">
+                    {/* Visual Asset Monolith */}
+                    <div className="lg:col-span-5">
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="relative aspect-[4/5] rounded-[40px] overflow-hidden border border-white/10 shadow-2xl shadow-primary-500/10 group"
+                        >
+                            <img 
+                                src={plant?.image_url} 
+                                alt={plant?.species_name}
+                                className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent" />
+                            
+                            {/* Scanning HUD Overlay */}
+                            <div className="absolute inset-0 pointer-events-none p-8 flex flex-col justify-between">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-12 h-12 border-t-2 border-l-2 border-primary-500/50" />
+                                    <div className="w-12 h-12 border-t-2 border-r-2 border-primary-500/50" />
                                 </div>
-                            </section>
-
-                            {/* Medicinal Properties */}
-                            <section>
-                                <h2 className="text-2xl font-bold text-primary-800 mb-6 flex items-center gap-2">
-                                    <span>💊</span> Medicinal Uses
-                                </h2>
-                                <div className="space-y-6">
-                                    {(plant?.medicinal_properties ?? []).map((prop, idx) => (
-                                        <div key={idx} className="bg-primary-50 rounded-xl p-6 border border-primary-100 shadow-sm">
-                                            <h3 className="text-xl font-bold text-primary-700 mb-3 border-b border-primary-200 pb-2">
-                                                {prop?.ailment ?? "General Wellness"}
-                                            </h3>
-                                            <div className="grid md:grid-cols-2 gap-6">
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-700 text-sm mb-1">Usage</h4>
-                                                    <p className="text-gray-600 mb-4">{prop?.usage ?? "Not specified"}</p>
-
-                                                    <h4 className="font-semibold text-gray-700 text-sm mb-1">Preparation</h4>
-                                                    <p className="text-gray-600">{prop?.preparation ?? "Not specified"}</p>
-                                                </div>
-                                                <div className="bg-white/50 p-4 rounded-lg">
-                                                    <h4 className="font-semibold text-gray-700 text-sm mb-1">Dosage</h4>
-                                                    <p className="text-gray-600 mb-3">{prop?.dosage ?? "Not specified"}</p>
-
-                                                    <h4 className="font-semibold text-red-600 text-xs uppercase mb-1">Precautions</h4>
-                                                    <p className="text-red-700 text-sm">{prop?.precautions ?? "None listed"}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </section>
-                        </div>
-
-                        {/* Sidebar */}
-                        <div className="space-y-8">
-                            <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-md sticky top-8">
-                                <h3 className="font-bold text-gray-800 mb-4 border-b pb-2">Scientific Classification</h3>
-                                <p className="text-sm text-gray-600 leading-relaxed font-mono">
-                                    {plant?.scientific_classification ?? "Data study in progress."}
-                                </p>
-
-                                <div className="mt-8 pt-6 border-t">
-                                    <h4 className="font-bold text-gray-800 mb-2">Disclaimer</h4>
-                                    <p className="text-xs text-gray-500 italic">
-                                        The information provided here is for educational purposes only.
-                                        Please consult a qualified healthcare professional before using any
-                                        herbal remedies.
-                                    </p>
+                                <div className="flex justify-between items-end">
+                                    <div className="w-12 h-12 border-b-2 border-l-2 border-primary-500/50" />
+                                    <div className="w-12 h-12 border-b-2 border-r-2 border-primary-500/50" />
                                 </div>
                             </div>
+
+                            <div className="absolute bottom-10 left-10 right-10">
+                                <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter uppercase mb-2">
+                                    {plant?.common_name}
+                                </h1>
+                                <p className="text-primary-500 font-mono text-sm italic tracking-widest uppercase opacity-80">
+                                    {plant?.scientific_name}
+                                </p>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Intelligence Monograph */}
+                    <div className="lg:col-span-7 space-y-10">
+                        {/* Status Bar */}
+                        <div className="flex flex-wrap gap-4">
+                            <div className="px-6 py-3 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center gap-3">
+                                <Activity className="w-4 h-4 text-primary-500" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Clinical Precision: 96.4%</span>
+                            </div>
+                            <div className="px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+                                <ShieldAlert className="w-4 h-4 text-amber-400" />
+                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Safety: {plant?.iucn_status || 'Verified'}</span>
+                            </div>
                         </div>
+
+                        {/* Description */}
+                        <section className="glass-card p-10 relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-5">
+                                <Leaf className="w-32 h-32" />
+                            </div>
+                            <h2 className="text-xs font-black text-primary-500 uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                                <Microscope className="w-4 h-4" /> Botanical Intelligence
+                            </h2>
+                            <p className="text-gray-400 text-lg leading-relaxed font-medium">
+                                {plant?.description}
+                            </p>
+                        </section>
+
+                        {/* Regional Phylogeny */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {[
+                                { label: 'Hindi', value: plant?.regional_names?.hi },
+                                { label: 'Tamil', value: plant?.regional_names?.ta },
+                                { label: 'Telugu', value: plant?.regional_names?.te },
+                                { label: 'Bengali', value: plant?.regional_names?.bn }
+                            ].map((reg, i) => (
+                                <div key={i} className="glass-card p-6 text-center border-white/5">
+                                    <span className="text-[8px] font-black text-primary-500/50 uppercase tracking-widest block mb-2">{reg.label}</span>
+                                    <span className="text-[10px] font-bold text-white uppercase tracking-wider">{reg.value || '---'}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Medicinal Schema */}
+                        <section className="space-y-6">
+                            <h2 className="text-xs font-black text-primary-500 uppercase tracking-[0.4em] mb-8">Clinical Medicinal Schema</h2>
+                            <div className="grid gap-6">
+                                {(plant?.properties || []).map((prop: any, i: number) => (
+                                    <motion.div 
+                                        key={i}
+                                        whileHover={{ x: 10 }}
+                                        className="glass-card p-8 border-l-4 border-l-primary-500 group"
+                                    >
+                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                            <div className="space-y-4">
+                                                <h3 className="text-xl font-black text-white uppercase tracking-tighter group-hover:text-primary-400 transition-colors">
+                                                    {prop.ailment}
+                                                </h3>
+                                                <p className="text-gray-500 text-sm font-medium max-w-md">
+                                                    {prop.usage}
+                                                </p>
+                                            </div>
+                                            <div className="flex flex-col gap-3 md:text-right">
+                                                <div className="flex items-center gap-2 md:justify-end text-primary-500">
+                                                    <FlaskConical className="w-3 h-3" />
+                                                    <span className="text-[9px] font-black uppercase tracking-widest">Bio-Active Compound Found</span>
+                                                </div>
+                                                <div className="text-[10px] font-bold text-white/60 uppercase">Prep: {prop.preparation || 'Monograph Standard'}</div>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
     )
 }

@@ -90,9 +90,110 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
         <div className="absolute inset-0 bg-primary-500/[0.02] pointer-events-none" />
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-500/10 blur-[100px]" />
 
-      {/* 1. Tactical Intelligence Hero */}
-      <div className="relative group p-10 sm:p-12">
-        <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[3.5rem] overflow-hidden border border-white/10 bg-zinc-950/50 shadow-2xl">
+        {/* 1. Tactical Intelligence Hero */}
+        <div className="relative group p-10 sm:p-12">
+          {/* Low Confidence Alert Banner */}
+          {confidence < 60 && (
+            <motion.div 
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="mb-8 p-6 bg-rose-500/10 border border-rose-500/20 rounded-3xl flex items-center gap-6"
+            >
+              <AlertTriangle className="w-8 h-8 text-rose-500 flex-shrink-0" />
+              <div>
+                <p className="text-xs font-black text-rose-500 uppercase tracking-widest">Low Confidence Protocol Active</p>
+                <p className="text-[10px] text-gray-400 font-medium mt-1 uppercase tracking-tighter italic">
+                  Image quality might be suboptimal. Check lighting or leaf focus.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[3.5rem] overflow-hidden border border-white/10 bg-zinc-950/50 shadow-2xl">
+              <motion.img 
+                key={heatmap ? "heat" : "orig"}
+                initial={{ opacity: 0, scale: 1.05 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1 }}
+                src={heatmap ? result.gradcam?.overlay_base64 : imageUrl} 
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
+              
+              {/* Analysis Overlay HUD */}
+              <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
+                  <div className="flex justify-between items-start">
+                      <div className="w-12 h-12 border-t-2 border-l-2 border-primary-500/50" />
+                      <div className="px-4 py-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10">
+                          <span className="text-[8px] font-black text-primary-400 uppercase tracking-[0.4em]">Neural Analysis Active</span>
+                      </div>
+                      <div className="w-12 h-12 border-t-2 border-r-2 border-primary-500/50" />
+                  </div>
+                  
+                  <div className="flex justify-between items-end">
+                      <div className="w-12 h-12 border-b-2 border-l-2 border-primary-500/50" />
+                      <div className="flex gap-4 pointer-events-auto">
+                        <button 
+                          onClick={() => setHeatmap(!heatmap)}
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${
+                            heatmap ? 'bg-primary-500 border-primary-400 text-black' : 'bg-black/60 border-white/10 text-primary-500'
+                          }`}
+                        >
+                          <Maximize2 className="w-6 h-6" />
+                        </button>
+                      </div>
+                      <div className="w-12 h-12 border-b-2 border-r-2 border-primary-500/50" />
+                  </div>
+              </div>
+              
+              {/* Dataset Attribution Tag */}
+              <div className="absolute top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <a 
+                  href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" 
+                  target="_blank" 
+                  className="px-4 py-2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2 hover:text-primary-400 transition-colors pointer-events-auto"
+                >
+                  <Database className="w-3 h-3" /> Trained on Clinical Leaf Dataset
+                </a>
+              </div>
+          </div>
+        </div>
+
+        {/* Neural Confidence Spectrum (Top 3) */}
+        <div className="px-10 sm:px-12 pb-12">
+            <div className="flex items-center gap-4 mb-8">
+                <div className="h-[1px] flex-1 bg-white/5" />
+                <span className="text-[9px] font-black text-primary-500/40 uppercase tracking-[0.5em]">Neural Confidence Spectrum</span>
+                <div className="h-[1px] flex-1 bg-white/5" />
+            </div>
+            
+            <div className="grid gap-4">
+                {(prediction.top3 || []).map((cand: any, idx: number) => (
+                    <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-6 group hover:bg-white/5 transition-all"
+                    >
+                        <div className="text-[10px] font-black text-gray-600 group-hover:text-primary-500 transition-colors w-6">0{idx+1}</div>
+                        <div className="flex-1">
+                            <div className="flex justify-between items-end mb-2">
+                                <span className="text-sm font-black text-white uppercase tracking-tighter">{cand.name}</span>
+                                <span className="text-[10px] font-bold text-primary-400">{Math.round(cand.confidence * 100)}%</span>
+                            </div>
+                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                <motion.div 
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${cand.confidence * 100}%` }}
+                                    className={`h-full ${idx === 0 ? 'bg-primary-500' : 'bg-primary-500/40'}`}
+                                />
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
             <motion.img 
               key={heatmap ? "heat" : "orig"}
               initial={{ opacity: 0, scale: 1.05 }}

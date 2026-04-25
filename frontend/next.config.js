@@ -21,19 +21,17 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**.supabase.co',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.onrender.com',
-      },
+      { protocol: 'https', hostname: '**.supabase.co' },
+      { protocol: 'https', hostname: '**.onrender.com' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'source.unsplash.com' },
     ],
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
+  reactStrictMode: true,
+  swcMinify: true,
 }
 
 module.exports = withPWA(nextConfig)

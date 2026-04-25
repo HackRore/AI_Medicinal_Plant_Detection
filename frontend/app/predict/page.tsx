@@ -16,7 +16,7 @@ import DisclaimerModal from "@/components/predict/DisclaimerModal"
 import { Card } from "@/components/ui/Card"
 import React from "react"
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"
+import { getApiBase } from "@/utils/api";
 
 const THINKING_STEPS = [
   { icon: "🔬", text: "Spectral Boundary Calibration..." },
@@ -102,6 +102,37 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
   )
 }
 
+function ColdStartWarning({ isVisible }: { isVisible: boolean }) {
+  const [show, setShow] = useState(false);
+  
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isVisible) {
+      timer = setTimeout(() => setShow(true), 5000); // Show after 5s of waiting
+    } else {
+      setShow(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isVisible]);
+
+  if (!show) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-center"
+    >
+      <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest animate-pulse">
+        Neural Engine Cold Start Detected
+      </p>
+      <p className="text-[9px] text-amber-200/50 uppercase tracking-tighter mt-1">
+        Waking up the Render instance... This may take up to 30 seconds.
+      </p>
+    </motion.div>
+  );
+}
+
 export default function PredictPage() {
   const [preview, setPreview] = useState<string | null>(null)
   const [isCameraOpen, setIsCameraOpen] = useState(false)
@@ -113,6 +144,7 @@ export default function PredictPage() {
   const [symptomResults, setSymptomResults] = useState<any>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const API_BASE = getApiBase()
 
   // Predict mutation
   const predictMutation = useMutation({
@@ -260,6 +292,18 @@ export default function PredictPage() {
 
   return (
     <main className="container mx-auto p-6 pt-32 min-h-screen space-y-24 max-w-7xl relative z-10">
+      {/* Sticky Medical Disclaimer Banner */}
+      <div className="fixed top-20 left-0 w-full z-[80] px-4 pointer-events-none">
+        <div className="max-w-4xl mx-auto bg-amber-500/10 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 pointer-events-auto shadow-2xl">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+            <ShieldAlert className="w-5 h-5 text-amber-500" />
+          </div>
+          <p className="text-[10px] sm:text-xs font-bold text-amber-200/80 leading-relaxed uppercase tracking-wider">
+            <span className="text-amber-500 font-black">Educational Use Only:</span> Identification and Ayurvedic monographs must be verified by a qualified practitioner before any use.
+          </p>
+        </div>
+      </div>
+
       <DisclaimerModal />
       
       <header className="text-center space-y-8 mb-20">
@@ -354,6 +398,7 @@ export default function PredictPage() {
 
               <div ref={resultRef}>
                  <AIThinkingOverlay isVisible={predictMutation.isPending} />
+                 <ColdStartWarning isVisible={predictMutation.isPending} />
                  
                  {predictMutation.isSuccess && (
                     <PredictResult 

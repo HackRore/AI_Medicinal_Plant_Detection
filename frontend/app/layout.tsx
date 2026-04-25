@@ -32,6 +32,7 @@ export const metadata: Metadata = {
 
 import { BackendWarmup } from '@/components/layout/BackendWarmup'
 import { BackgroundEffects } from '@/components/layout/BackgroundEffects'
+import DemoBanner from '@/components/layout/DemoBanner'
 
 export default function RootLayout({
     children,
@@ -44,6 +45,7 @@ export default function RootLayout({
                 <Providers>
                     <BackgroundEffects />
                     <BackendWarmup />
+                    <DemoBanner />
                     <Navbar />
                     <main className="relative z-10">
                         <ErrorBoundary>

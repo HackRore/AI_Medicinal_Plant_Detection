@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { getApiBase } from "@/utils/api";
 
 export default function PlantsPage() {
   const [plants, setPlants]   = useState<any[]>([]);
@@ -14,17 +15,44 @@ export default function PlantsPage() {
   const [error, setError]     = useState<string|null>(null);
   const [search, setSearch]   = useState("");
 
+  const [retryCount, setRetryCount] = useState(0);
+  const [isWaking, setIsWaking] = useState(false);
+
   useEffect(() => {
-    const url = `${process.env.NEXT_PUBLIC_API_URL || "https://plantoai-backend.onrender.com"}/api/v1/plants?search=${search}&limit=50`;
+    const API_BASE = getApiBase();
+    const url = `${API_BASE}/api/v1/plants?search=${search}&limit=50`;
     setLoading(true);
+    setError(null);
+
+    const timer = setTimeout(() => {
+      if (loading) setIsWaking(true);
+    }, 5000);
+
     fetch(url)
-      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-      .then(d  => { setPlants(d.plants ?? []); setLoading(false); })
-      .catch(() => {
-        setError("AI engine is warming up. Please wait 30 seconds and refresh.");
+      .then(r => { 
+        if (!r.ok) throw new Error("Connection timed out"); 
+        return r.json(); 
+      })
+      .then(d  => { 
+        setPlants(d.plants ?? []); 
         setLoading(false);
+        setIsWaking(false);
+      })
+      .catch(() => {
+        if (retryCount < 3) {
+            setTimeout(() => setRetryCount(prev => prev + 1), 3000);
+        } else {
+            setError("Neural engine is taking longer than usual to initialize.");
+            setLoading(false);
+            setIsWaking(false);
+        }
       });
-  }, [search]);
+
+    return () => {
+        clearTimeout(timer);
+        setIsWaking(false);
+    };
+  }, [search, retryCount]);
 
   return (
     <main className="min-h-screen bg-[#050505] pt-32 pb-24 px-4 sm:px-6 lg:px-8">
@@ -76,11 +104,20 @@ export default function PlantsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           <AnimatePresence mode="wait">
             {loading ? (
-                <>
-                {Array(8).fill(0).map((_, i) => (
-                  <div key={i} className="h-80 rounded-[40px] bg-white/5 animate-pulse border border-white/5" />
-                ))}
-                </>
+                <div className="col-span-full space-y-12">
+                   <div className="flex flex-col items-center justify-center p-20 glass-card border-dashed">
+                      <div className="w-16 h-16 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin mb-8" />
+                      <p className="text-[10px] font-black text-primary-500 uppercase tracking-[0.5em] animate-pulse">Synchronizing Monolith...</p>
+                      {isWaking && (
+                        <p className="text-[9px] text-amber-500 uppercase tracking-widest mt-4">Waking up neural engine on Render (30s cold start)...</p>
+                      )}
+                   </div>
+                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {Array(8).fill(0).map((_, i) => (
+                      <div key={i} className="h-80 rounded-[40px] bg-white/5 animate-pulse border border-white/5" />
+                    ))}
+                   </div>
+                </div>
             ) : (
                 <>
                 {plants.map((p, i) => (
@@ -97,7 +134,7 @@ export default function PlantsPage() {
                       {/* Visual Asset */}
                       <div className="relative h-48 w-full overflow-hidden">
                           <img 
-                              src={p.image_url || `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2670&auto=format&fit=crop&q=plant,${p.common_names?.[0] || p.scientific_name}`}
+                              src={p.image_url || `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2670&auto=format&fit=crop&q=plant,${p.common_name || p.scientific_name}`}
                               alt={p.scientific_name}
                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-100"
                           />
@@ -115,7 +152,7 @@ export default function PlantsPage() {
                                   p.toxicity?.level_code === 1 ? "bg-amber-500/20 text-amber-400 border-amber-500/30" :
                                   "bg-rose-500/20 text-rose-400 border-rose-500/30"
                               }`}>
-                                  {p.toxicity?.level || "safe"}
+                                  {p.toxicity?.level || "Safe"}
                               </span>
                           </div>
                       </div>
@@ -134,8 +171,8 @@ export default function PlantsPage() {
                                   <span className="text-[9px] text-white font-bold uppercase tracking-widest">{p.family || "N/A"}</span>
                               </div>
                               <div className="flex items-center justify-between">
-                                  <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Region</span>
-                                  <span className="text-[9px] text-white/60 font-bold truncate max-w-[100px] text-right">{p.native_region || "Global"}</span>
+                                  <span className="text-[9px] text-primary-500/40 font-black uppercase tracking-widest">Registry ID</span>
+                                  <span className="text-[9px] text-white/60 font-bold truncate max-w-[100px] text-right">{p.id || "Monolith-v3"}</span>
                               </div>
                           </div>
                       </div>

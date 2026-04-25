@@ -45,10 +45,9 @@ export const Footer = () => {
                     <div>
                         <h4 className="font-bold text-white mb-6">Resources</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
-                            <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Documentation</a></li>
-                            <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Technical Report</a></li>
+                            <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Neural Forge Specs</a></li>
                             <li><a href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Training Dataset</a></li>
-                            <li><a href="/about" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Research Paper (Coming Soon)</a></li>
+                            <li><Link href="/about" className="hover:text-primary-400 transition-colors">Team & Research</Link></li>
                         </ul>
                     </div>
 
@@ -77,7 +76,7 @@ export const Footer = () => {
                     </p>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                         <span>Made with</span>
-                        <Heart className="w-3 h-3 text-red-500 fill-red-500" />
+                        <span className="text-red-500 animate-pulse">♥</span>
                         <span>for nature & health</span>
                     </div>
                 </div>

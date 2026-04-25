@@ -14,7 +14,7 @@ export const FeaturesSection = () => {
         },
         { 
             title: 'Clinical Monographs', 
-            desc: 'Classical dosage, preparation and compound data from Ayurvedic texts for 81 species.', 
+            desc: 'Classical dosage, preparation and compound data from Ayurvedic texts for 80 species.', 
             icon: <Leaf className="w-8 h-8" />,
         },
         { 
