@@ -293,15 +293,19 @@ export default function PredictPage() {
   return (
     <main className="container mx-auto p-6 pt-32 min-h-screen space-y-24 max-w-7xl relative z-10">
       {/* Sticky Medical Disclaimer Banner */}
-      <div className="fixed top-20 left-0 w-full z-[80] px-4 pointer-events-none">
-        <div className="max-w-4xl mx-auto bg-amber-500/10 backdrop-blur-xl border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 pointer-events-auto shadow-2xl">
+      <div className="fixed top-[88px] left-0 w-full z-[100] px-4 pointer-events-none flex justify-center">
+        <motion.div 
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          className="max-w-4xl w-full bg-amber-500/10 backdrop-blur-2xl border border-amber-500/20 rounded-2xl p-4 flex items-center gap-4 pointer-events-auto shadow-[0_0_50px_rgba(245,158,11,0.15)]"
+        >
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
             <ShieldAlert className="w-5 h-5 text-amber-500" />
           </div>
           <p className="text-[10px] sm:text-xs font-bold text-amber-200/80 leading-relaxed uppercase tracking-wider">
             <span className="text-amber-500 font-black">Educational Use Only:</span> Identification and Ayurvedic monographs must be verified by a qualified practitioner before any use.
           </p>
-        </div>
+        </motion.div>
       </div>
 
       <DisclaimerModal />
