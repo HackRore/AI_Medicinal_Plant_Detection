@@ -18,6 +18,7 @@ import {
   Sparkles,
   Wand2,
   Leaf,
+  Database,
   History
 } from "lucide-react";
 
@@ -31,16 +32,13 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const prediction = result?.prediction ?? {};
   const toxicity   = result?.toxicity   ?? { level: "unknown", level_code: 3, notes: "" };
   const medicinal  = result?.medicinal  ?? {};
-  const gradcam    = result?.gradcam    ?? {};
   
-  // Normalize confidence to 0-100 scale regardless of input format
   const rawConfidence = prediction?.confidence ?? result?.confidence ?? 0;
   const confidence = rawConfidence <= 1 ? Math.round(rawConfidence * 100) : Math.round(rawConfidence);
   
   const name       = (plant?.name || result?.class_name || result?.predicted_class || "Unknown Species").toString().replace(/_/g, ' ');
   const sciName    = (plant?.scientific_name || result?.scientific_name || "").toString();
   const family     = (plant?.family || "Botanical Registry").toString();
-  const confidence_label = (prediction?.confidence_label || (confidence > 80 ? "High" : confidence > 50 ? "Medium" : "Low")).toString();
   
   const medicinalProperties = result?.botanical_intelligence?.medicinal_properties ?? 
                               result?.medicinal_properties ?? 
@@ -78,7 +76,6 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
     );
   }
 
-
   return (
     <motion.div 
       initial={{ opacity: 0, y: 40 }}
@@ -86,13 +83,10 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
       transition={{ duration: 0.8, ease: "circOut" }}
       className="glass-card rounded-[4rem] overflow-hidden relative"
     >
-        {/* Glow & Mesh Accents */}
         <div className="absolute inset-0 bg-primary-500/[0.02] pointer-events-none" />
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-primary-500/10 blur-[100px]" />
 
-        {/* 1. Tactical Intelligence Hero */}
         <div className="relative group p-10 sm:p-12">
-          {/* Low Confidence Alert Banner */}
           {confidence < 60 && (
             <motion.div 
               initial={{ y: -20, opacity: 0 }}
@@ -114,13 +108,11 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                 key={heatmap ? "heat" : "orig"}
                 initial={{ opacity: 0, scale: 1.05 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 1 }}
                 src={heatmap ? result.gradcam?.overlay_base64 : imageUrl} 
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60" />
               
-              {/* Analysis Overlay HUD */}
               <div className="absolute inset-0 p-8 flex flex-col justify-between pointer-events-none">
                   <div className="flex justify-between items-start">
                       <div className="w-12 h-12 border-t-2 border-l-2 border-primary-500/50" />
@@ -145,8 +137,7 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                       <div className="w-12 h-12 border-b-2 border-r-2 border-primary-500/50" />
                   </div>
               </div>
-              
-              {/* Dataset Attribution Tag */}
+
               <div className="absolute top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <a 
                   href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" 
@@ -159,7 +150,6 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
           </div>
         </div>
 
-        {/* Neural Confidence Spectrum (Top 3) */}
         <div className="px-10 sm:px-12 pb-12">
             <div className="flex items-center gap-4 mb-8">
                 <div className="h-[1px] flex-1 bg-white/5" />
@@ -173,7 +163,6 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                         key={idx}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
                         className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-6 group hover:bg-white/5 transition-all"
                     >
                         <div className="text-[10px] font-black text-gray-600 group-hover:text-primary-500 transition-colors w-6">0{idx+1}</div>
@@ -194,109 +183,33 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                 ))}
             </div>
         </div>
-            <motion.img 
-              key={heatmap ? "heat" : "orig"}
-              initial={{ opacity: 0, scale: 1.05 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1 }}
-              src={heatmap && gradcam?.overlay_base64 ? gradcam.overlay_base64 : imageUrl}
-              className="w-full h-full object-cover grayscale-[0.3] contrast-[1.1] opacity-80 group-hover:opacity-100 transition-all duration-1000"
-              alt="Neural Analysis Output"
-            />
-            <div className="scanline opacity-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-90" />
-            
-            {/* Tactical HUD Overlays */}
-            <div className="absolute top-8 left-8 right-8 flex justify-between items-start">
-              <div className="px-6 py-3 rounded-2xl backdrop-blur-3xl bg-black/40 border border-primary-500/30 flex items-center gap-4 shadow-[0_0_30px_rgba(16,185,129,0.1)]">
-                <div className="w-2 h-2 rounded-full bg-primary-500 animate-ping" />
-                <span className="text-[10px] font-black tracking-[0.4em] uppercase text-primary-400">
-                    Clinical Match: {confidence}%
-                </span>
-              </div>
-              
-              <button 
-                onClick={() => setHeatmap(!heatmap)}
-                className="flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-[10px] font-black uppercase tracking-[0.3em] transition-all glass-reflection overflow-hidden"
-              >
-                <Maximize2 className="w-4 h-4 text-primary-400" />
-                {heatmap ? "Sensor Base" : "Neural Heatmap"}
-              </button>
-            </div>
 
-            <div className="absolute bottom-12 left-12 right-12">
-                <div className="space-y-2">
-                    <p className="text-primary-500 text-[11px] font-black uppercase tracking-[0.6em] mb-4 text-glow">Taxon Identified</p>
-                    <motion.h2 className="text-6xl md:text-8xl font-black text-white tracking-tighter mb-4 uppercase text-glow-white leading-none">
-                      {(name || "Unknown").toString().replace(/_/g, ' ')}
-                    </motion.h2>
-                    <div className="flex items-center gap-6">
-                        <span className="text-white/60 italic font-serif text-2xl">{sciName}</span>
-                        <div className="h-1 w-12 bg-white/10 rounded-full" />
-                        <span className="text-[11px] font-black text-primary-500/40 uppercase tracking-[0.4em]">{family} Family</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </div>
-
-      {/* 2. Clinical Mechanism Synthesis */}
-      <div className="px-12 pb-16 grid lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-12">
-            <div className="p-12 bg-primary-500/[0.03] border border-primary-500/10 rounded-[3.5rem] relative overflow-hidden group hover:border-primary-500/30 transition-all shadow-inner">
-                <div className="scanline opacity-5" />
-                <div className="relative z-10 space-y-6">
-                    <div className="flex items-center gap-4 text-primary-500">
-                        <Sparkles className="w-6 h-6 animate-pulse" />
-                        <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-glow">Mechanism of Action Synthesis</h3>
-                    </div>
-                    <p className="text-white/90 text-2xl md:text-3xl font-medium leading-[1.3] italic tracking-tight max-w-5xl">
-                        "{moa}"
-                    </p>
-                </div>
-            </div>
-          </div>
-
-          {/* 3. Neural Knowledge Blocks */}
+        <div className="grid lg:grid-cols-12 gap-10 p-10 sm:p-12 border-t border-white/5">
           <div className="lg:col-span-7 space-y-12">
-              <section className="bg-white/[0.02] border border-white/5 rounded-[3.5rem] p-12 relative overflow-hidden">
-                <div className="scanline opacity-5" />
-                <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-gray-600 mb-12 flex items-center gap-4">
-                    <History className="w-5 h-5 text-primary-500/40" /> Ayurvedic Metabolic Projections
-                </h3>
-                <div className="grid grid-cols-3 gap-10">
-                    {['vata', 'pitta', 'kapha'].map((dosha) => (
-                        <div key={dosha} className="text-center space-y-6">
-                            <div className="relative w-full aspect-square flex items-center justify-center">
-                                <svg className="w-full h-full transform -rotate-90">
-                                    <circle cx="50%" cy="50%" r="42%" className="stroke-white/5 fill-none" strokeWidth="6" />
-                                    <motion.circle 
-                                        cx="50%" cy="50%" r="42%" 
-                                        className={`fill-none ${balance[dosha] === 'balance' ? 'stroke-primary-500' : 'stroke-primary-900/20'}`} 
-                                        strokeWidth="6" 
-                                        strokeDasharray="264" 
-                                        initial={{ strokeDashoffset: 264 }}
-                                        animate={{ strokeDashoffset: balance[dosha] === 'balance' ? 60 : 220 }}
-                                        transition={{ duration: 2, ease: "circOut" }}
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center space-y-1">
-                                    <span className="text-[10px] font-black text-white uppercase tracking-widest">{dosha}</span>
-                                    <span className={`text-[9px] font-bold ${balance[dosha] === 'balance' ? 'text-primary-400' : 'text-gray-700'} uppercase`}>
-                                        {balance[dosha] || 'stabilized'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+              <section className="space-y-6">
+                  <div className="flex items-center gap-4">
+                      <div className="w-1 h-8 bg-primary-500 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.5)]" />
+                      <h2 className="text-4xl sm:text-6xl font-black text-white uppercase tracking-tighter leading-none">
+                          {name}
+                      </h2>
+                  </div>
+                  <div className="flex flex-wrap gap-4">
+                      <span className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-primary-400 uppercase tracking-widest">{family}</span>
+                      <span className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest italic">{sciName}</span>
+                  </div>
+                  <p className="text-gray-400 leading-relaxed font-medium text-sm border-l-2 border-white/5 pl-8 italic">
+                      {moa}
+                  </p>
               </section>
 
-              <section className="space-y-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-gray-600 ml-4">Medicinal Spectrum (46-Taxa Match)</h3>
+              <section className="space-y-8">
+                  <div className="flex items-center gap-4">
+                      <BookOpen className="w-5 h-5 text-primary-500" />
+                      <h3 className="text-xs font-black text-gray-500 uppercase tracking-[0.4em]">Clinical Monographs</h3>
+                  </div>
                   <div className="grid sm:grid-cols-2 gap-6">
-                      {medicinalProperties.slice(0, 4).map((prop: any, i: number) => (
-                          <div key={i} className="p-8 bg-white/[0.02] border border-white/5 rounded-[2.5rem] group hover:border-primary-500/20 transition-all">
+                      {medicinalProperties.map((prop: any, i: number) => (
+                          <div key={i} className="group p-8 bg-white/[0.02] border border-white/5 rounded-3xl hover:border-primary-500/30 transition-all hover:bg-white/[0.04]">
                               <h4 className="text-primary-400 font-black text-lg mb-3 tracking-tight group-hover:text-glow transition-all">{prop.ailment}</h4>
                               <p className="text-xs text-gray-500 leading-relaxed font-medium">{prop.usage_description}</p>
                           </div>
@@ -305,7 +218,6 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
               </section>
           </div>
 
-          {/* 4. Strategic Sidebar */}
           <div className="lg:col-span-5 space-y-10">
               <section className="bg-primary-500/[0.05] border border-primary-500/10 rounded-[3.5rem] p-12 relative overflow-hidden">
                     <div className="scanline opacity-5" />
@@ -334,35 +246,34 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                   </p>
               </div>
           </div>
-      </div>
+        </div>
 
-      {/* 5. Production Handshake Footer */}
-      <div className="px-12 py-10 bg-white/[0.01] border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
-          <div className="flex items-center gap-6">
-             <div className="w-16 h-16 bg-primary-500/10 rounded-3xl flex items-center justify-center border border-primary-500/10">
-                <Sparkles className="w-8 h-8 text-primary-500" />
-             </div>
-             <div>
-                <h4 className="text-white font-black text-lg uppercase tracking-widest leading-none mb-2">Neural Learning Active</h4>
-                <p className="text-gray-600 text-xs font-bold uppercase tracking-widest">G9 Forge Calibration v5.1.0</p>
-             </div>
-          </div>
-          <div className="flex items-center gap-6">
-              <button 
-                onClick={() => setFeedbackSent(true)} 
-                className="group relative h-16 px-12 bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] active:scale-95 overflow-hidden"
-              >
-                <div className="absolute inset-0 glass-reflection" />
-                Accurate
-              </button>
-              <button 
-                onClick={() => setFeedbackSent(true)}
-                className="h-16 px-12 bg-white/5 border border-white/10 text-white/30 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:text-white transition-all active:scale-95"
-              >
-                Recalibrate
-              </button>
-          </div>
-      </div>
+        <div className="px-12 py-10 bg-white/[0.01] border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-10">
+            <div className="flex items-center gap-6">
+               <div className="w-16 h-16 bg-primary-500/10 rounded-3xl flex items-center justify-center border border-primary-500/10">
+                  <Sparkles className="w-8 h-8 text-primary-500" />
+               </div>
+               <div>
+                  <h4 className="text-white font-black text-lg uppercase tracking-widest leading-none mb-2">Neural Learning Active</h4>
+                  <p className="text-gray-600 text-xs font-bold uppercase tracking-widest">G9 Forge Calibration v5.1.0</p>
+               </div>
+            </div>
+            <div className="flex items-center gap-6">
+                <button 
+                  onClick={() => setFeedbackSent(true)} 
+                  className="group relative h-16 px-12 bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] active:scale-95 overflow-hidden"
+                >
+                  <div className="absolute inset-0 glass-reflection" />
+                  Accurate
+                </button>
+                <button 
+                  onClick={() => setFeedbackSent(true)}
+                  className="h-16 px-12 bg-white/5 border border-white/10 text-white/30 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:text-white transition-all active:scale-95"
+                >
+                  Recalibrate
+                </button>
+            </div>
+        </div>
     </motion.div>
   );
 }
