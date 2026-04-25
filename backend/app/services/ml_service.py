@@ -50,14 +50,26 @@ class MLService:
             img = Image.open(BytesIO(image_bytes)).convert('RGB')
             img = img.resize((224, 224))
             
-            x = np.array(img).astype(np.float32) / 255.0
-            x = np.transpose(x, (2, 0, 1))
-            x = np.expand_dims(x, axis=0)
+            # --- Neural Forge TTA (Test-Time Augmentation) ---
+            # 1. Original Image
+            x1 = np.array(img).astype(np.float32) / 255.0
+            x1 = np.transpose(x1, (2, 0, 1))
+            x1 = np.expand_dims(x1, axis=0)
             
+            # 2. Horizontal Flip
+            img_flip = ImageOps.mirror(img)
+            x2 = np.array(img_flip).astype(np.float32) / 255.0
+            x2 = np.transpose(x2, (2, 0, 1))
+            x2 = np.expand_dims(x2, axis=0)
+
             input_name = self.sess.get_inputs()[0].name
-            raw_preds = self.sess.run(None, {input_name: x})[0][0]
+            raw_preds1 = self.sess.run(None, {input_name: x1})[0][0]
+            raw_preds2 = self.sess.run(None, {input_name: x2})[0][0]
             
-            # Softmax normalization for professional 0-100% confidence scores
+            # Average the logits
+            raw_preds = (raw_preds1 + raw_preds2) / 2.0
+            
+            # Softmax normalization
             exp_preds = np.exp(raw_preds - np.max(raw_preds))
             preds = exp_preds / exp_preds.sum()
             

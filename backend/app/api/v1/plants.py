@@ -43,8 +43,10 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20, db: Session = 
                         "scientific_name": p.species_name,
                         "family": p.family,
                         "description": p.description,
-                        "iucn_status": p.iucn_status,
-                        "ayurvedic_balance": p.ayurvedic_balance,
+                        "toxicity": {
+                            "level": p.iucn_status or "Safe",
+                            "level_code": 0 if (p.iucn_status and p.iucn_status.lower() == "safe") else 1
+                        },
                         "image_url": p.image_url
                     } for p in plants
                 ],
@@ -70,6 +72,7 @@ def list_plants(search: str = "", page: int = 1, limit: int = 20, db: Session = 
             "scientific_name": k,
             "family": v.get("family", "N/A"),
             "description": v.get("description", ""),
+            "toxicity": v.get("toxicity", {"level": "Safe", "level_code": 0}),
             "image_url": img_url
         })
         
