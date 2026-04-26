@@ -31,6 +31,13 @@ export default function AboutClient() {
       links: { github: "#", linkedin: "mailto:madhurawankhade04@gmail.com" }
     },
     {
+      name: "Samruddhi Mahadev Gholap",
+      role: "Data Engineer",
+      focus: "Neural Calibration & Datasets",
+      bio: "Data optimization expert at DYPCOEI, Pune. Specialized in high-fidelity specimen validation and preprocessing pipelines.",
+      links: { github: "#", linkedin: "mailto:gholapsamruddhi7@gmail.com" }
+    },
+    {
       name: "Ravindra Pandit Ahire",
       role: "Systems Lead",
       focus: "Neural Engineering & Infrastructure",
@@ -96,7 +103,7 @@ export default function AboutClient() {
               <div className="h-[1px] flex-1 bg-white/5" />
            </div>
 
-           <div className="grid md:grid-cols-3 gap-10">
+           <div className="grid md:grid-cols-2 gap-10">
               {TEAM.map((member, i) => (
                 <motion.div 
                   key={i}

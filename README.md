@@ -177,6 +177,7 @@ To ensure absolute production readiness, the system was stress-tested against **
 
 - **Pranali Vishwanath Ghugarkar** (Research Lead)
 - **Madhura Raju Wankhade** (Design Lead)
+- **Samruddhi Mahadev Gholap** (Data Engineer)
 - **Ravindra Pandit Ahire** (Systems Lead)
 
 ---
