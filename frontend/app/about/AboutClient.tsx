@@ -17,25 +17,25 @@ export default function AboutClient() {
 
   const TEAM = [
     {
-      name: "Prathamesh Patil",
-      role: "Principal Architect",
-      focus: "Neural Engine & Cloud Infrastructure",
-      bio: "Visionary lead behind the Neural Forge integration and real-time inference pipeline.",
-      links: { github: "#", linkedin: "#" }
+      name: "Pranali Vishwanath Ghugarkar",
+      role: "Research Lead",
+      focus: "Neural Architecture & Data Science",
+      bio: "Lead researcher specializing in deep learning optimization at DYPCOEI, Pune. Instrumental in refining the botanical classification framework.",
+      links: { github: "#", linkedin: "mailto:pranalighugarkar673@gmail.com" }
     },
     {
-      name: "Sanket Mane",
-      role: "Botanical Ontology",
-      focus: "Dataset Hardening & Taxonomy",
-      bio: "Expert in medicinal leaf morphology and curated dataset synchronization for 46 species.",
-      links: { github: "#", linkedin: "#" }
+      name: "Madhura Raju Wankhade",
+      role: "Design Lead",
+      focus: "Botanical UX & Taxonomy Sync",
+      bio: "Expert in human-botanical interfaces at DYPCOEI, Pune. Spearheaded the tactical HUD design and metadata orchestration.",
+      links: { github: "#", linkedin: "mailto:madhurawankhade04@gmail.com" }
     },
     {
-      name: "Omkar Kulkarni",
+      name: "Ravindra Pandit Ahire",
       role: "Systems Lead",
-      focus: "Explainable AI & Frontend UX",
-      bio: "Crafted the tactical HUD and integrated Grad-CAM visual reasoning into the user experience.",
-      links: { github: "#", linkedin: "#" }
+      focus: "Neural Engineering & Infrastructure",
+      bio: "Full-stack architect at DYPCOEI, Pune. Engineered the PlantoAI production monolith and high-speed ONNX inference pipeline.",
+      links: { github: "https://github.com/HackRore", linkedin: "mailto:hackrore@gmail.com" }
     }
   ]
 

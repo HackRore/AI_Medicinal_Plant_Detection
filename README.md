@@ -172,4 +172,12 @@ To ensure absolute production readiness, the system was stress-tested against **
 | ![Bamboo Result](screenshots/whatsapp_bamboo.png) | ![Tulsi Result](screenshots/whatsapp_tulsi.png) |
 
 ---
-**Developed by Antigravity AI for the G9 Global Botanical Team.** 🏆
+## 👥 The Neural Architects Collective
+**Dept of Artificial Intelligence and Data Science, DYPCOEI, Pune, India**
+
+- **Pranali Vishwanath Ghugarkar** (Research Lead)
+- **Madhura Raju Wankhade** (Design Lead)
+- **Ravindra Pandit Ahire** (Systems Lead)
+
+---
+**Developed by the PlantoAI Engineering Team @ DYPCOEI Pune.** 🏆
