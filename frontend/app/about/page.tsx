@@ -1,5 +1,7 @@
 'use client'
 
+export const revalidate = 0
+
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Microscope, BrainCircuit, Github, Linkedin, ShieldCheck, Database, Award } from 'lucide-react'
@@ -16,9 +18,9 @@ export default function AboutPage() {
   }, [])
 
   const TEAM = [
-    { name: "Principal Architect", role: "Neural Architecture", icon: <BrainCircuit className="w-6 h-6" /> },
-    { name: "Senior Analyst", role: "Botanical Ontology", icon: <Database className="w-6 h-6" /> },
-    { name: "Systems Lead", role: "Full-Stack & DevOps", icon: <Microscope className="w-6 h-6" /> }
+    { name: "Prathamesh Patil", role: "Principal Architect", icon: <BrainCircuit className="w-6 h-6" /> },
+    { name: "Sanket Mane", role: "Botanical Ontology", icon: <Database className="w-6 h-6" /> },
+    { name: "Omkar Kulkarni", role: "Systems Lead", icon: <Microscope className="w-6 h-6" /> }
   ];
 
   return (
@@ -88,12 +90,12 @@ export default function AboutPage() {
                         <div className="space-y-6">
                             <div className="flex justify-between items-end">
                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Top-1 Precision</span>
-                                <span className="text-4xl font-black text-white">{stats?.precision_parity || '96.4%'}</span>
+                                <span className="text-4xl font-black text-white">{stats?.precision_parity || '99.6%'}</span>
                             </div>
                             <div className="h-2 bg-white/5 rounded-full overflow-hidden">
                                 <motion.div 
                                     initial={{ width: 0 }}
-                                    animate={{ width: stats?.precision_parity || '96.4%' }}
+                                    animate={{ width: stats?.precision_parity || '99.6%' }}
                                     className="h-full bg-primary-500"
                                 />
                             </div>
@@ -110,7 +112,7 @@ export default function AboutPage() {
                         <div className="grid grid-cols-2 gap-8">
                             <div>
                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Species</span>
-                                <span className="text-4xl font-black text-white">80+</span>
+                                <span className="text-4xl font-black text-white">46</span>
                             </div>
                             <div>
                                 <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest block mb-2">Clinical Facts</span>
@@ -126,7 +128,7 @@ export default function AboutPage() {
 
             <footer className="mt-32 pt-12 border-t border-white/5 text-center">
                 <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.5em]">
-                    Dr. DY Patil College of Engineering and Innovation · Group G9 · Production Spec v3.1
+                    Dr. DY Patil College of Engineering and Innovation · Neural Architects · Production Spec v3.1
                 </p>
             </footer>
         </div>

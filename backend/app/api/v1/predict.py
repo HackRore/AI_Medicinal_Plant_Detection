@@ -1,16 +1,18 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from fastapi.responses import JSONResponse
 from app.services.ml_service import ml_service
+from app.services.gemini_service import gemini_service
 from app.database import SessionLocal
 from app.models.plant import Plant
+import asyncio
 
 router = APIRouter()
 
 @router.post("")
 async def predict(file: UploadFile = File(...)):
     """
-    Hardened G9 Predict Endpoint
-    Ensures zero-dummy data and standardized Ayurvedic schema.
+    Hardened G9 Predict Endpoint with Neural Cross-Verification.
+    Uses ONNX for speed and Gemini-1.5-Flash for scientific validation.
     """
     if not file.content_type.startswith("image/"):
         raise HTTPException(400, "File must be an image.")
@@ -19,18 +21,30 @@ async def predict(file: UploadFile = File(...)):
     if len(raw) > 15 * 1024 * 1024:  # 15MB limit
         raise HTTPException(400, "File too large. Maximum 15MB.")
     
+    # 1. Primary Neural Scan (ONNX) - FAST
     result = ml_service.predict(raw)
     
     if not result.get("success"):
         return JSONResponse(result, status_code=200)
     
     kb = result.get("knowledge", {})
+    plant_name = kb.get("common_names", [result["class_name"]])[0]
+    
+    # 2. Parallel Secondary Verification (Gemini) - DEEP
+    # We do this asynchronously to keep response times acceptable
+    gemini_task = asyncio.create_task(
+        gemini_service.get_plant_analysis(
+            plant_name=plant_name,
+            confidence=result["confidence_pct"],
+            image_bytes=raw
+        )
+    )
     
     # Standard G9 Response Schema
     response = {
         "success": True,
         "plant": {
-            "name": kb.get("common_names", [result["class_name"]])[0],
+            "name": plant_name,
             "scientific_name": kb.get("scientific_name", result["class_name"]),
             "family": kb.get("family", "N/A"),
             "native_region": kb.get("native_region", "India"),
@@ -48,7 +62,11 @@ async def predict(file: UploadFile = File(...)):
             "active_compounds": kb.get("active_compounds", []),
             "contraindications": kb.get("contraindications", []),
         },
-        "botanical_intelligence": None,
+        "reasoning": {
+            "verdict": "Neural Scan Complete",
+            "analysis": "Scanning botanical features...",
+            "cross_check": "Pending"
+        },
         "gradcam": result.get("gradcam", {}),
         "quality": {
             "passed": result["quality_passed"],
@@ -62,10 +80,30 @@ async def predict(file: UploadFile = File(...)):
         }
     }
 
+    # 3. Wait for Gemini (with timeout)
+    try:
+        gemini_data = await asyncio.wait_for(gemini_task, timeout=12.0)
+        if gemini_data and "confirmed_name" in gemini_data:
+            response["reasoning"] = {
+                "verdict": "Verified" if gemini_data.get("confirmed_name").lower() in plant_name.lower() else "Mismatch Detected",
+                "analysis": gemini_data.get("vision_note", "Visual analysis complete."),
+                "scientific_confirmation": gemini_data.get("confirmed_name"),
+                "ayurvedic_profile": gemini_data.get("ayurvedic_name")
+            }
+            # If Gemini strongly disagrees and confidence is low, flag quality
+            if response["reasoning"]["verdict"] == "Mismatch Detected" and result["confidence_pct"] < 70:
+                response["quality"]["passed"] = False
+                response["quality"]["message"] = "Visual mismatch detected. This might not be the predicted plant."
+    except Exception as e:
+        response["reasoning"] = {
+            "verdict": "Limited Verification",
+            "analysis": "High-speed scan completed. Cloud reasoning was unreachable.",
+            "error": str(e)
+        }
+
     # --- PREMIUM INTELLIGENCE ENRICHMENT ---
     try:
         db = SessionLocal()
-        # Search by Scientific Name or Model Key
         plant_info = db.query(Plant).filter(
             (Plant.species_name == kb.get("scientific_name", "")) | 
             (Plant.common_name_en == result["class_name"])
@@ -89,7 +127,7 @@ async def predict(file: UploadFile = File(...)):
                 ]
             }
         else:
-            # Fallback to Local KB Intelligence (Zero-DB Mode)
+            # Fallback to Local KB Intelligence
             response["botanical_intelligence"] = {
                 "mechanism_of_action": kb.get("description", "Clinical mechanism under scientific review."),
                 "ayurvedic_balance": {
@@ -108,3 +146,4 @@ async def predict(file: UploadFile = File(...)):
         print(f"Intelligence Enrichment Exception: {e}")
 
     return response
+

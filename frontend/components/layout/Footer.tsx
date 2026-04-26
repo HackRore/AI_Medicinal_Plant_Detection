@@ -58,7 +58,7 @@ export const Footer = () => {
                                 SPEC v3.1 (OUTSTANDING)
                             </div>
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Developed By</p>
-                            <p className="text-white font-black mb-1">Group G9 (Botanical Engine Team)</p>
+                            <p className="text-white font-black mb-1">Neural Architects Collective</p>
                             <p className="text-[10px] text-gray-400 uppercase tracking-tight leading-relaxed">
                                 Dr. DY Patil College of Engineering<br/>and Innovation, Varale (Talegaon)
                             </p>

@@ -661,5 +661,31 @@
     "description": "Changeri is mentioned in Charaka Samhita as a digestive herb. Its sour taste makes it a traditional culinary medicine for stimulating digestion and appetite.",
     "contraindications": ["Kidney stones: high oxalate — avoid if prone", "Rheumatoid arthritis: limit intake", "Do not consume large amounts"],
     "references": ["Charaka Samhita, Sutrasthana", "Indian Journal of Traditional Knowledge, 2010"]
+  },
+  "Amruta Balli": {
+    "common_names": ["Amruta Balli","Giloy","Guduchi","Tinospora"],
+    "scientific_name": "Tinospora cordifolia",
+    "family": "Menispermaceae",
+    "toxicity": {"level":"safe","level_code":0,"notes":"Completely safe. One of the most balanced herbs in Ayurveda."},
+    "native_region": "Indian Subcontinent — tropical forests",
+    "ayurvedic_uses": ["Immunity booster (Immunomodulator)","Chronic fever and viral infections","Diabetes management","Anti-arthritic and Gout relief","Liver protection (Hepatoprotective)"],
+    "preparation": "Decoction (Kadha): Boil 10cm stem in 400ml water until reduced to 100ml. Juice: 20ml fresh stem juice with honey. Satva (Starch extraction): 500mg daily.",
+    "active_compounds": ["Tinosporin","Berberine","Palmatine","Tinocordifolin"],
+    "description": "Called 'Amrita' (Divine Nectar), Amruta Balli is a premier Rasayana that balances all three Doshas. It was officially recommended in national health protocols for immune support.",
+    "contraindications": ["Autoimmune disorders (stimulates immune response)","Use caution with immunosuppressant drugs","Monitor blood sugar if on medication"],
+    "references": ["Ayurvedic Pharmacopoeia of India, Vol. I","Phytomedicine (2016)"]
+  },
+  "Geranium": {
+    "common_names": ["Geranium","Cranesbill"],
+    "scientific_name": "Geranium maculatum",
+    "family": "Geraniaceae",
+    "toxicity": {"level":"safe","level_code":0,"notes":"Safe for external use. Use caution internally."},
+    "native_region": "Global — temperate regions",
+    "ayurvedic_uses": ["Astringent and haemostatic","Wound healing","Diarrhoea relief","Skin disorders"],
+    "preparation": "Decoction of root for diarrhoea. Leaf infusion as a skin wash.",
+    "active_compounds": ["Tannins","Geraniol","Linalool"],
+    "description": "Geranium is valued for its astringent properties, helping to constrict tissues and stop bleeding. It is often used in topical applications for skin health.",
+    "contraindications": ["None reported at standard doses."],
+    "references": ["PDR for Herbal Medicines"]
   }
 }

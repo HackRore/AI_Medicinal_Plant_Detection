@@ -4,6 +4,8 @@
  */
 "use client";
 
+export const revalidate = 0
+
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";

@@ -4,6 +4,8 @@
  */
 'use client'
 
+export const revalidate = 0
+
 import { useState, useRef, useCallback, useEffect } from "react"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"

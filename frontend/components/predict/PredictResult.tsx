@@ -49,6 +49,7 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const moa = intel?.mechanism_of_action ?? medicinal?.description ?? "Clinical mechanism under scientific review.";
   const balance = intel?.ayurvedic_balance ?? { vata: "neutral", pitta: "neutral", kapha: "neutral" };
   const synergies = intel?.synergy_partners ?? ["Tulsi", "Ginger", "Honey"];
+  const reasoning = result?.reasoning ?? { verdict: "Standard Scan", analysis: "Scanning complete." };
 
   if (result.success === false || confidence < 35) {
     return (
@@ -200,6 +201,45 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                   <p className="text-gray-400 leading-relaxed font-medium text-sm border-l-2 border-white/5 pl-8 italic">
                       {moa}
                   </p>
+
+                  {/* Neural Reasoning Layer */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`mt-10 p-8 rounded-[2.5rem] border ${
+                        reasoning.verdict === "Verified" 
+                        ? 'bg-primary-500/[0.03] border-primary-500/20' 
+                        : reasoning.verdict === "Mismatch Detected"
+                        ? 'bg-rose-500/[0.03] border-rose-500/20'
+                        : 'bg-white/[0.02] border-white/10'
+                    } relative overflow-hidden`}
+                  >
+                      <div className="scanline opacity-5" />
+                      <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center gap-3">
+                              <Sparkles className={`w-5 h-5 ${reasoning.verdict === 'Verified' ? 'text-primary-500' : reasoning.verdict === 'Mismatch Detected' ? 'text-rose-500' : 'text-gray-500'}`} />
+                              <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-500">Neural Reasoning Layer</h4>
+                          </div>
+                          <span className={`px-4 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest ${
+                              reasoning.verdict === 'Verified' ? 'bg-primary-500/20 text-primary-400' : 
+                              reasoning.verdict === 'Mismatch Detected' ? 'bg-rose-500/20 text-rose-400' : 
+                              'bg-white/10 text-gray-400'
+                          }`}>
+                              {reasoning.verdict}
+                          </span>
+                      </div>
+                      <p className="text-sm text-white font-bold leading-relaxed mb-4">
+                          {reasoning.analysis}
+                      </p>
+                      {reasoning.scientific_confirmation && (
+                          <div className="pt-4 border-t border-white/5 flex items-center gap-2">
+                              <CheckCircle2 className="w-3 h-3 text-primary-500" />
+                              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                                  Gemini Consensus: <span className="text-white">{reasoning.scientific_confirmation}</span>
+                              </span>
+                          </div>
+                      )}
+                  </motion.div>
               </section>
 
               <section className="space-y-8">

@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 
 export const StatsSection = () => {
     const [stats, setStats] = useState({
-        species: "80+",
-        accuracy: "96.4%",
+        species: "46",
+        accuracy: "99.6%",
         speed: "< 2s",
-        models: "G9 Forge",
+        models: "G9 Monolith",
         status: "Live"
     });
 

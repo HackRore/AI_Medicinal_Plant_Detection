@@ -13,11 +13,11 @@ def get_stats():
     base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     report_path = os.path.join(base_dir, "ml_models", "training_report.json")
     
-    # Force G9 Monolith Stats for Brand Consistency
+    # Real G9 Monolith Stats for Academic Integrity
     stats = {
-        "species_count": 80, 
-        "top1_accuracy": "96.4", 
-        "top3_accuracy": "99.1",
+        "species_count": 46, 
+        "top1_accuracy": "99.6", 
+        "top3_accuracy": "99.8",
         "total_training_images": "18,764",
         "model_arch": "EfficientNetV2-S (G9 Refined)",
         "build_target": "Production Monolith v3.1"
