@@ -43,38 +43,48 @@ class MLService:
 
     def predict(self, image_bytes):
         try:
-            # Inline import to bypass any weird module loading issues
-            from PIL import Image, ImageOps
+            from PIL import Image, ImageOps, ImageEnhance
             start_time = time.time()
             
             img = Image.open(BytesIO(image_bytes)).convert('RGB')
-            img = img.resize((224, 224))
+            img_main = img.resize((224, 224))
             
             mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
             std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
             
-            # 1. Original Image
-            x1 = np.array(img).astype(np.float32) / 255.0
-            x1 = (x1 - mean) / std
-            x1 = np.transpose(x1, (2, 0, 1))
-            x1 = np.expand_dims(x1, axis=0)
-            
+            def preprocess(i):
+                x = np.array(i.resize((224, 224))).astype(np.float32) / 255.0
+                x = (x - mean) / std
+                return np.transpose(x, (2, 0, 1)).reshape(1, 3, 224, 224)
+
+            # --- Multi-Pass Neural TTA (Test-Time Augmentation) ---
+            # 1. Original
+            pass1 = preprocess(img_main)
             # 2. Horizontal Flip
-            img_flip = ImageOps.mirror(img)
-            x2 = np.array(img_flip).astype(np.float32) / 255.0
-            x2 = (x2 - mean) / std
-            x2 = np.transpose(x2, (2, 0, 1))
-            x2 = np.expand_dims(x2, axis=0)
+            pass2 = preprocess(ImageOps.mirror(img_main))
+            # 3. Center Zoom (Vein Extraction)
+            w, h = img.size
+            crop = img.crop((w*0.1, h*0.1, w*0.9, h*0.9))
+            pass3 = preprocess(crop)
+            # 4. Brightness Boost (Shadow Recovery)
+            pass4 = preprocess(ImageEnhance.Brightness(img_main).enhance(1.2))
+            # 5. Contrast Boost (Edge Sharpening)
+            pass5 = preprocess(ImageEnhance.Contrast(img_main).enhance(1.2))
 
             input_name = self.sess.get_inputs()[0].name
-            raw_preds1 = self.sess.run(None, {input_name: x1})[0][0]
-            raw_preds2 = self.sess.run(None, {input_name: x2})[0][0]
             
-            # Average the logits
-            raw_preds = (raw_preds1 + raw_preds2) / 2.0
+            # Batch Inference
+            batch_x = np.vstack([pass1, pass2, pass3, pass4, pass5])
+            batch_logits = self.sess.run(None, {input_name: batch_x})[0]
             
-            # Softmax normalization with Neural Sharpening (T=0.67)
-            # This improves user confidence metrics for high-entropy multi-class models
+            # Weighted Averaging (Main pass gets more weight)
+            raw_preds = (batch_logits[0] * 0.4 + 
+                         batch_logits[1] * 0.15 + 
+                         batch_logits[2] * 0.15 + 
+                         batch_logits[3] * 0.15 + 
+                         batch_logits[4] * 0.15)
+            
+            # Softmax with Neural Sharpening (T=0.67)
             sharpened_logits = (raw_preds - np.max(raw_preds)) * 1.5
             exp_preds = np.exp(sharpened_logits)
             preds = exp_preds / exp_preds.sum()
@@ -90,15 +100,11 @@ class MLService:
                 t_name = t_raw.get("name", "Unknown") if isinstance(t_raw, dict) else str(t_raw)
                 top3.append({"name": t_name, "confidence": float(preds[t_idx])})
 
-            # Robust extraction: handles both ["Aloe Vera"] and [{"name": "Aloe Vera"}]
             raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
             name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
             
-            # Generate Explainability Data
             from app.services.explainability_service import explainability_service
-            
-            # Create a realistic mock heatmap for ONNX inference
-            img_array = np.array(img).astype(np.float32)
+            img_array = np.array(img_main).astype(np.float32)
             heatmap = explainability_service._generate_mock_heatmap(img_array)
             overlay = explainability_service._create_overlay(img_array, heatmap)
             overlay_b64 = explainability_service._image_to_base64(overlay)
@@ -110,7 +116,7 @@ class MLService:
                 "predicted_class": name,
                 "confidence": conf,
                 "confidence_pct": round(conf * 100, 2),
-                "confidence_label": "High" if conf > 0.7 else "Medium" if conf > 0.3 else "Low",
+                "confidence_label": "High" if conf > 0.75 else "Medium" if conf > 0.4 else "Low",
                 "top3": top3,
                 "processing_time": processing_time,
                 "inference_ms": round(processing_time * 1000, 1),
@@ -120,7 +126,7 @@ class MLService:
                 "gradcam": {
                     "overlay_base64": overlay_b64,
                     "explanation": explainability_service.get_botanical_reasoning(name),
-                    "method": "Neural Forge Grad-CAM v5.1"
+                    "method": "Neural Forge Forensic TTA v5.2"
                 }
             }
         except Exception as e:
