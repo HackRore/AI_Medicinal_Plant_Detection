@@ -50,15 +50,10 @@ origins = [
     "http://0.0.0.0:3001",
 ]
 
+# CORS Configuration - Fully Permissive for Global Production & Team Access
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://plantoai.vercel.app",
-        "https://plantoai-web.vercel.app",
-        "https://plantoai-final.vercel.app",
-        "http://localhost:3000"
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
