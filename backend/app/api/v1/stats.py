@@ -10,12 +10,17 @@ def get_stats():
     Live G9 Build Stats.
     Syncs frontend about page with training forge output.
     """
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    report_path = os.path.join(base_dir, "ml_models", "training_report.json")
-    
-    # Real G9 Monolith Stats for Academic Integrity
+    # Dynamic G9 Monolith Stats
+    try:
+        data_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data")
+        with open(os.path.join(data_dir, "class_names.json")) as f:
+            cnames = json.load(f)
+            count = len(cnames)
+    except:
+        count = 46
+
     stats = {
-        "species_count": 46, 
+        "species_count": count, 
         "top1_accuracy": "99.6", 
         "top3_accuracy": "99.8",
         "total_training_images": "18,764",
