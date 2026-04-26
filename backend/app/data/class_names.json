@@ -1,78 +1,82 @@
 [
-  {
-    "id": 0,
-    "name": "Alstonia Scholaris"
-  },
-  {
-    "id": 1,
-    "name": "Arjun"
-  },
-  {
-    "id": 2,
-    "name": "Bael"
-  },
-  {
-    "id": 3,
-    "name": "Basil"
-  },
-  {
-    "id": 4,
-    "name": "Chinar"
-  },
-  {
-    "id": 5,
-    "name": "Guava"
-  },
-  {
-    "id": 6,
-    "name": "Jackfruit"
-  },
-  {
-    "id": 7,
-    "name": "Jamun"
-  },
-  {
-    "id": 8,
-    "name": "Jatropha"
-  },
-  {
-    "id": 9,
-    "name": "Lemon"
-  },
-  {
-    "id": 10,
-    "name": "Mango"
-  },
-  {
-    "id": 11,
-    "name": "Neem"
-  },
-  {
-    "id": 12,
-    "name": "Pepper Bell"
-  },
-  {
-    "id": 13,
-    "name": "Pomegranate"
-  },
-  {
-    "id": 14,
-    "name": "Pongamia Pinnata"
-  },
-  {
-    "id": 15,
-    "name": "Raspberry leaf"
-  },
-  {
-    "id": 16,
-    "name": "Soyabean leaf"
-  },
-  {
-    "id": 17,
-    "name": "Sugarcane"
-  },
-  {
-    "id": 18,
-    "name": "Tea"
-  }
+  "Aloevera",
+  "Amla",
+  "Amruthaballi",
+  "Arali",
+  "Astma_weed",
+  "Badipala",
+  "Balloon_Vine",
+  "Bamboo",
+  "Beans",
+  "Betel",
+  "Bhrami",
+  "Bringaraja",
+  "Caricature",
+  "Castor",
+  "Catharanthus",
+  "Chakte",
+  "Chilly",
+  "Citron lime (herelikai)",
+  "Coffee",
+  "Common rue(naagdalli)",
+  "Coriender",
+  "Curry",
+  "Doddpathre",
+  "Drumstick",
+  "Ekka",
+  "Eucalyptus",
+  "Ganigale",
+  "Ganike",
+  "Gasagase",
+  "Ginger",
+  "Globe Amarnath",
+  "Guava",
+  "Henna",
+  "Hibiscus",
+  "Honge",
+  "Insulin",
+  "Jackfruit",
+  "Jasmine",
+  "Kambajala",
+  "Kasambruga",
+  "Kohlrabi",
+  "Lantana",
+  "Lemon",
+  "Lemongrass",
+  "Malabar_Nut",
+  "Malabar_Spinach",
+  "Mango",
+  "Marigold",
+  "Mint",
+  "Neem",
+  "Nelavembu",
+  "Nerale",
+  "Nooni",
+  "Onion",
+  "Padri",
+  "Palak(Spinach)",
+  "Papaya",
+  "Parijatha",
+  "Pea",
+  "Pepper",
+  "Pomoegranate",
+  "Pumpkin",
+  "Raddish",
+  "Rose",
+  "Sampige",
+  "Sapota",
+  "Seethaashoka",
+  "Seethapala",
+  "Spinach1",
+  "Tamarind",
+  "Taro",
+  "Tecoma",
+  "Thumbe",
+  "Tomato",
+  "Tulsi",
+  "Turmeric",
+  "ashoka",
+  "camphor",
+  "kamakasturi",
+  "kepala"
 ]
