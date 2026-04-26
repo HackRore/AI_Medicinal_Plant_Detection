@@ -14,8 +14,8 @@ async def predict(file: UploadFile = File(...)):
     Hardened G9 Predict Endpoint with Neural Cross-Verification.
     Uses ONNX for speed and Gemini-1.5-Flash for scientific validation.
     """
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(400, "File must be an image.")
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(400, "Invalid file type. Please upload a botanical image (JPG/PNG).")
     
     raw = await file.read()
     if len(raw) > 15 * 1024 * 1024:  # 15MB limit
