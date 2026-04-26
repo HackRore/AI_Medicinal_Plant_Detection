@@ -149,7 +149,7 @@ export default function PredictClient() {
       const formData = new FormData()
       formData.append("file", file)
       
-      const res = await fetch(`${API_BASE}/predict`, {
+      const res = await fetch(`${API_BASE}/api/v1/predict`, {
         method: "POST",
         body: formData,
       })
@@ -439,28 +439,80 @@ export default function PredictClient() {
               </div>
             </div>
 
-            {symptomResults && (
-              <div className="grid md:grid-cols-3 gap-10">
-                {(symptomResults?.recommendations ?? []).map((rec: any, i: number) => (
-                  <motion.div 
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass-card p-10 rounded-[2.5rem] group hover:border-primary-500/30 transition-all relative overflow-hidden"
-                  >
-                    <div className="scanline opacity-10" />
-                    <h4 className="text-3xl font-black text-primary-400 mb-4 tracking-tighter group-hover:text-glow transition-all">{rec?.plant || "Taxon Identified"}</h4>
-                    <p className="text-sm text-gray-400 font-medium mb-8 leading-relaxed italic">"{rec?.why || "Processing clinical rationale..."}"</p>
-                    <div className="pt-8 border-t border-white/5 space-y-4">
-                        <div className="flex justify-between items-center">
-                            <span className="text-[9px] font-black uppercase text-primary-500/40 tracking-widest">Protocol</span>
-                            <span className="text-[9px] text-white font-bold uppercase tracking-widest">{rec?.preparation ? "Defined" : "Clinical"}</span>
+            {symptomResults && !symptomResults.error && (
+              <div className="space-y-12">
+                {/* Results Grid */}
+                <div className="grid md:grid-cols-3 gap-8">
+                  {(symptomResults?.recommendations ?? []).map((rec: any, i: number) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      transition={{ delay: i * 0.12 }}
+                      className="glass-card rounded-[2.5rem] group hover:border-primary-500/40 transition-all relative overflow-hidden flex flex-col"
+                    >
+                      <div className="scanline opacity-10" />
+                      {/* Rank badge + top bar */}
+                      <div className="h-1 bg-gradient-to-r from-primary-600 to-emerald-400 w-0 group-hover:w-full transition-all duration-500" />
+                      <div className="p-8 flex flex-col flex-1 gap-4">
+                        <div className="flex items-start justify-between">
+                          <span className="text-[9px] font-black text-primary-500/50 uppercase tracking-widest bg-primary-500/10 px-3 py-1 rounded-full">#{rec?.rank ?? i+1}</span>
+                          <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full uppercase tracking-widest">Verified</span>
                         </div>
-                        <p className="text-xs text-gray-300 font-bold leading-relaxed">{rec?.preparation || "Consult practitioner for dosage."}</p>
-                    </div>
-                  </motion.div>
-                ))}
+                        <div>
+                          <h4 className="text-2xl font-black text-white tracking-tighter group-hover:text-primary-400 transition-colors">{rec?.plant || "Medicinal Herb"}</h4>
+                          <p className="text-[10px] text-primary-500/60 italic mt-1">{rec?.scientific_name} · {rec?.ayurvedic_name}</p>
+                        </div>
+                        <p className="text-sm text-gray-400 leading-relaxed">{rec?.why}</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/5">
+                            <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-1">Dosha Effect</p>
+                            <p className="text-[11px] text-emerald-400 font-medium">{rec?.dosha_effect}</p>
+                          </div>
+                          <div className="p-3 rounded-2xl bg-white/[0.03] border border-white/5">
+                            <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-1">Safety</p>
+                            <p className="text-[11px] text-amber-400 font-medium">{rec?.safety?.slice(0, 50)}...</p>
+                          </div>
+                        </div>
+                        <div className="pt-4 border-t border-white/5 space-y-2">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest">Preparation</p>
+                          <p className="text-xs text-gray-400 leading-relaxed">{rec?.preparation}</p>
+                        </div>
+                        <div className="pt-3 border-t border-white/5">
+                          <p className="text-[8px] font-black text-gray-600 uppercase tracking-widest mb-1">Dosage</p>
+                          <p className="text-xs text-gray-400">{rec?.dosage}</p>
+                        </div>
+                        <p className="text-[9px] text-gray-700 italic mt-auto pt-3 border-t border-white/5">{rec?.classical_reference}</p>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Lifestyle + Diet cards */}
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="grid md:grid-cols-2 gap-8">
+                  <div className="glass-card p-10 rounded-[2.5rem]">
+                    <p className="text-[9px] font-black text-primary-500/60 uppercase tracking-widest mb-3">☀️ Lifestyle Protocol</p>
+                    <p className="text-gray-300 text-sm leading-relaxed">{symptomResults.lifestyle_advice}</p>
+                  </div>
+                  <div className="glass-card p-10 rounded-[2.5rem]">
+                    <p className="text-[9px] font-black text-teal-500/60 uppercase tracking-widest mb-3">🌙 Dietary Guidance</p>
+                    <p className="text-gray-300 text-sm leading-relaxed">{symptomResults.diet_tip}</p>
+                  </div>
+                </motion.div>
+
+                {/* Medical Disclaimer */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/20 flex gap-4">
+                  <span className="text-2xl shrink-0">⚠️</span>
+                  <div>
+                    <p className="text-[9px] font-black text-amber-500 uppercase tracking-widest mb-1">Medical Disclaimer</p>
+                    <p className="text-xs text-gray-500 leading-relaxed">{symptomResults.warning}</p>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+            {symptomResults?.error && (
+              <div className="text-center p-12 glass-card rounded-[2.5rem]">
+                <p className="text-amber-400 font-bold">{symptomResults.error}</p>
               </div>
             )}
           </motion.div>
