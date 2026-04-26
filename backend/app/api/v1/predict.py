@@ -82,7 +82,7 @@ async def predict(file: UploadFile = File(...)):
 
     # 3. Wait for Gemini (with timeout)
     try:
-        gemini_data = await asyncio.wait_for(gemini_task, timeout=12.0)
+        gemini_data = await asyncio.wait_for(gemini_task, timeout=25.0)
         if gemini_data and "confirmed_name" in gemini_data:
             response["reasoning"] = {
                 "verdict": "Verified" if gemini_data.get("confirmed_name").lower() in plant_name.lower() else "Mismatch Detected",
