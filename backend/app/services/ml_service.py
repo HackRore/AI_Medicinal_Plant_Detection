@@ -50,15 +50,19 @@ class MLService:
             img = Image.open(BytesIO(image_bytes)).convert('RGB')
             img = img.resize((224, 224))
             
-            # --- Neural Forge TTA (Test-Time Augmentation) ---
+            mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+            std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+            
             # 1. Original Image
             x1 = np.array(img).astype(np.float32) / 255.0
+            x1 = (x1 - mean) / std
             x1 = np.transpose(x1, (2, 0, 1))
             x1 = np.expand_dims(x1, axis=0)
             
             # 2. Horizontal Flip
             img_flip = ImageOps.mirror(img)
             x2 = np.array(img_flip).astype(np.float32) / 255.0
+            x2 = (x2 - mean) / std
             x2 = np.transpose(x2, (2, 0, 1))
             x2 = np.expand_dims(x2, axis=0)
 
