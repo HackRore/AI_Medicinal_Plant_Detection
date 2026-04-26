@@ -167,7 +167,7 @@ export default function SymptomSearchPage() {
             transition={{ delay: 0.2 }}
             className="text-gray-400 text-lg"
           >
-            Our AI physician analyzes your condition against ancient classical texts to recommend the most effective medicinal plants.
+            Our AI Botanical Guide analyzes your condition against ancient classical texts to recommend the most effective medicinal plants.
           </motion.p>
         </div>
 

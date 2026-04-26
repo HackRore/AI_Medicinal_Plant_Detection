@@ -89,10 +89,10 @@ export default function AboutClient() {
         </div>
 
         {/* Team Section */}
-        <div className="space-y-12">
-           <div className="flex items-center gap-4 mb-16">
-              <div className="h-[1px] flex-1 bg-white/5" />
-              <h2 className="text-xs font-black text-primary-500/40 uppercase tracking-[0.5em]">The Collective</h2>
+            <div id="team" className="space-y-12">
+               <div className="flex items-center gap-4 mb-16">
+                  <div className="h-[1px] flex-1 bg-white/5" />
+                  <h2 className="text-xs font-black text-primary-500/40 uppercase tracking-[0.5em]">The Collective</h2>
               <div className="h-[1px] flex-1 bg-white/5" />
            </div>
 
