@@ -164,5 +164,12 @@ To ensure absolute production readiness, the system was stress-tested against **
 
 **Verdict: 100% SUCCESS.** All user-provided test specimens were correctly identified within safe clinical parameters. The **Neural Sharpening (T=0.67)** and **Threshold Calibration (12%)** are now active and verified in production.
 
+### **Mobile Stress Test Gallery (Live Proofs)**
+| Guava (Amruth) | Ganike (Black Nightshade) |
+| :---: | :---: |
+| ![Guava Result](screenshots/whatsapp_guava.png) | ![Ganike Result](screenshots/whatsapp_ganike.png) |
+| **Bamboo (Vamsha)** | **Tulsi (Holy Basil)** |
+| ![Bamboo Result](screenshots/whatsapp_bamboo.png) | ![Tulsi Result](screenshots/whatsapp_tulsi.png) |
+
 ---
 **Developed by Antigravity AI for the G9 Global Botanical Team.** 🏆
