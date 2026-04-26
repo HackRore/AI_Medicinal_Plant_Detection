@@ -7,6 +7,25 @@
 
 ---
 
+## 📸 Live Production Interface
+
+### The Neural Botanical Forge (Home)
+![Home Page](screenshots/home.png)
+
+### Neural Scanner (Predict)
+![Neural Scanner](screenshots/predict.png)
+
+### Symptom Analysis Guide
+![Symptom Search](screenshots/symptom_search.png)
+
+### The Botanical Database
+![Plant Database](screenshots/plants.png)
+
+### The Collective (About)
+![About Team](screenshots/about.png)
+
+---
+
 ## 🌟 The Vision
 PlantoAI is a world-class **Hybrid Intelligence Ecosystem** designed to bridge the gap between ancient Ayurvedic wisdom and modern Neural Computing. Unlike generalist plant apps, PlantoAI is a specialized monolith engineered for the high-fidelity identification and pharmacological analysis of medicinal species.
 
