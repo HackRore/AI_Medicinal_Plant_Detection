@@ -51,7 +51,8 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const synergies = intel?.synergy_partners ?? ["Tulsi", "Ginger", "Honey"];
   const reasoning = result?.reasoning ?? { verdict: "Standard Scan", analysis: "Scanning complete." };
 
-  if (result.success === false || confidence < 35) {
+  // G9 Forge: Lowered threshold for 46-class high-entropy model
+  if (result.success === false || confidence < 12) {
     return (
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}

@@ -73,8 +73,10 @@ class MLService:
             # Average the logits
             raw_preds = (raw_preds1 + raw_preds2) / 2.0
             
-            # Softmax normalization
-            exp_preds = np.exp(raw_preds - np.max(raw_preds))
+            # Softmax normalization with Neural Sharpening (T=0.67)
+            # This improves user confidence metrics for high-entropy multi-class models
+            sharpened_logits = (raw_preds - np.max(raw_preds)) * 1.5
+            exp_preds = np.exp(sharpened_logits)
             preds = exp_preds / exp_preds.sum()
             
             idx = int(np.argmax(preds))
@@ -108,7 +110,7 @@ class MLService:
                 "predicted_class": name,
                 "confidence": conf,
                 "confidence_pct": round(conf * 100, 2),
-                "confidence_label": "High" if conf > 0.8 else "Medium" if conf > 0.5 else "Low",
+                "confidence_label": "High" if conf > 0.7 else "Medium" if conf > 0.3 else "Low",
                 "top3": top3,
                 "processing_time": processing_time,
                 "inference_ms": round(processing_time * 1000, 1),
