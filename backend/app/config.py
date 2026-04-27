@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     PORT: int = 8000
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/db")
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql://postgres:PlantoAi%405665@db.bcyiaopmtmpqrjijtygu.supabase.co:5432/postgres")
     
     # Redis
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -35,16 +35,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # CORS
-    ALLOWED_ORIGINS: Union[List[str], str] = os.getenv("ALLOWED_ORIGINS", "").split(",")
+    ALLOWED_ORIGINS: List[str] = ["*"]
     
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
-            return v
-        raise ValueError(v)
+        return ["*"]
     
 
     
@@ -67,7 +63,7 @@ class Settings(BaseSettings):
     
     # Google Gemini
     GEMINI_API_KEY: str | None = os.getenv("GEMINI_API_KEY")
-    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_MODEL: str = "gemini-flash-latest"
     
     # AWS S3 (Optional)
     USE_S3: bool = False
