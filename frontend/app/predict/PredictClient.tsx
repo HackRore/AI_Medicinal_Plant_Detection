@@ -140,9 +140,33 @@ export default function PredictClient() {
   const [symptoms, setSymptoms] = useState("")
   const [useScaleReference, setUseScaleReference] = useState(false)
   const [symptomResults, setSymptomResults] = useState<any>(null)
+  const [feedbackSent, setFeedbackSent] = useState(false)
+  const [feedbackLoading, setFeedbackLoading] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const API_BASE = getApiBase()
+
+  // Sprint 5: Report Mismatch — Active Learning Feedback Loop
+  const reportMismatch = async () => {
+    if (!uploadedImages[0]?.file || feedbackSent) return
+    setFeedbackLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append("file", uploadedImages[0].file)
+      formData.append("predicted_class", predictMutation.data?.plant?.name ?? "unknown")
+      formData.append("correct_class", "unknown")
+      formData.append("user_note", "User reported mismatch via UI")
+      const res = await fetch(`${API_BASE}/api/v1/report-mismatch`, { method: "POST", body: formData })
+      if (res.ok) {
+        setFeedbackSent(true)
+        toast.success("Thanks! This image helps train our AI to be smarter.")
+      }
+    } catch (e) {
+      toast.error("Could not send feedback right now.")
+    } finally {
+      setFeedbackLoading(false)
+    }
+  }
 
   // Predict mutation
   const predictMutation = useMutation({
@@ -412,18 +436,28 @@ export default function PredictClient() {
                  )}
                  
                  {predictMutation.isSuccess && (
-                    <div className="mt-8 text-center">
-                       <Button 
-                         variant="outline" 
-                         className="h-16 px-12 rounded-2xl border-white/10 hover:bg-white/5 text-gray-400 font-black uppercase tracking-widest text-[10px]"
-                         onClick={() => {
-                           predictMutation.reset()
-                           setPreview(null)
-                           setUploadedImages([])
-                         }}
-                       >
-                         <Sparkles className="h-4 w-4 mr-2" /> Start New Neural Scan
-                       </Button>
+                    <div className="mt-8 space-y-4">
+                       {predictMutation.data?.vision_validation && (
+                         <div className={`flex items-center gap-3 p-4 rounded-2xl border text-xs font-bold uppercase tracking-wider ${predictMutation.data.vision_validation.matches_prediction ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'}`}>
+                           <span>{predictMutation.data.vision_validation.matches_prediction ? '✓' : '⚠'}</span>
+                           <span>Gemini: {predictMutation.data.vision_validation.matches_prediction ? 'Confirmed' : 'Flagged'}</span>
+                           <span className="ml-auto opacity-60">{Math.round((predictMutation.data.vision_validation.agreement_score ?? 0.5) * 100)}% agreement</span>
+                         </div>
+                       )}
+                       {!feedbackSent ? (
+                         <button onClick={reportMismatch} disabled={feedbackLoading}
+                           className="w-full py-3 rounded-2xl border border-red-500/20 bg-red-500/5 hover:bg-red-500/10 text-red-400 text-xs font-bold uppercase tracking-wider transition-all">
+                           {feedbackLoading ? 'Sending...' : '⚡ Report Wrong ID — Help Train Our AI'}
+                         </button>
+                       ) : (
+                         <div className="w-full py-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs font-bold uppercase tracking-wider text-center">✓ Feedback Received!</div>
+                       )}
+                       <div className="text-center">
+                          <Button variant="outline" className="h-16 px-12 rounded-2xl border-white/10 hover:bg-white/5 text-gray-400 font-black uppercase tracking-widest text-[10px]"
+                            onClick={() => { predictMutation.reset(); setPreview(null); setUploadedImages([]); setFeedbackSent(false) }}>
+                            <Sparkles className="h-4 w-4 mr-2" /> Start New Neural Scan
+                          </Button>
+                       </div>
                     </div>
                  )}
               </div>
