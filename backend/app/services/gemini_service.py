@@ -87,6 +87,58 @@ Provide a wise, authoritative analysis in JSON.
         raw = await self._call_rest_api(payload)
         return safe_parse_gemini_json(raw) or {"error": "AI Insight Offline"}
 
+    async def verify_is_leaf(self, image_bytes: bytes) -> Dict:
+        """Stage 2: Gemini Vision Pre-check — Is this actually a plant leaf?"""
+        b64_img = base64.b64encode(image_bytes).decode('utf-8')
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"inlineData": {"mimeType": "image/jpeg", "data": b64_img}},
+                    {"text": """Look at this image carefully. Answer ONLY with valid JSON:
+{
+  "is_leaf": true or false,
+  "is_plant": true or false,
+  "confidence": "high" or "medium" or "low",
+  "reason": "One sentence explanation"
+}
+Return true for is_leaf only if you can clearly see a plant leaf. Return false for hands, soil, concrete, food, or non-botanical objects."""}
+                ]
+            }],
+            "generationConfig": {"responseMimeType": "application/json"}
+        }
+        raw = await self._call_rest_api(payload)
+        result = safe_parse_gemini_json(raw)
+        if result:
+            return result
+        return {"is_leaf": True, "is_plant": True, "confidence": "low", "reason": "Vision check unavailable, proceeding."}
+
+    async def validate_prediction(self, plant_name: str, image_bytes: bytes) -> Dict:
+        """Stage 5: Gemini Vision Validation — Does this image actually match the predicted species?"""
+        b64_img = base64.b64encode(image_bytes).decode('utf-8')
+        payload = {
+            "contents": [{
+                "parts": [
+                    {"inlineData": {"mimeType": "image/jpeg", "data": b64_img}},
+                    {"text": f"""The neural network identified this plant as: {plant_name}
+
+As a botanist, look at this image and answer ONLY with valid JSON:
+{{
+  "matches": true or false,
+  "confidence": "high" or "medium" or "low",
+  "actual_observation": "What you actually see in the image",
+  "agreement_score": 0.0 to 1.0
+}}
+Be honest — if the image is blurry, partial, or unclear, say matches: true with low confidence. Only say matches: false if you are certain this is a different species."""}
+                ]
+            }],
+            "generationConfig": {"responseMimeType": "application/json"}
+        }
+        raw = await self._call_rest_api(payload)
+        result = safe_parse_gemini_json(raw)
+        if result:
+            return result
+        return {"matches": True, "confidence": "low", "actual_observation": "Validation unavailable.", "agreement_score": 0.5}
+
     async def get_symptom_recommendations(self, symptoms: str) -> Dict:
         """Analyze natural language symptoms and recommend 3 Ayurvedic remedies."""
         prompt = f"""You are a wise Ayurvedic Physician (Vaidya). 

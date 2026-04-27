@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 
 # Import Routers
-from app.api.v1 import predict, plants, stats, symptoms, auth
+from app.api.v1 import predict, plants, stats, symptoms, auth, feedback
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -65,6 +65,7 @@ app.include_router(plants.router, prefix="/api/v1/plants", tags=["Knowledge Base
 app.include_router(stats.router, prefix="/api/v1/stats", tags=["System"])
 app.include_router(symptoms.router, prefix="/api/v1", tags=["Intelligence"]) # /api/v1/symptom-search
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Security"])
+app.include_router(feedback.router, prefix="/api/v1", tags=["Feedback"])  # Sprint 5: Active Learning
 
 @app.get("/")
 def root():

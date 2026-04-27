@@ -20,18 +20,40 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
     raw = await file.read()
     if len(raw) > 15 * 1024 * 1024:  # 15MB limit
         raise HTTPException(400, "File too large. Maximum 15MB.")
-    
-    # 1. Primary Neural Scan (ONNX) - FAST
+
+    # === STAGE 2: Gemini Vision Pre-check (runs in parallel with ONNX) ===
+    leaf_check_task = asyncio.create_task(gemini_service.verify_is_leaf(raw))
+
+    # === STAGE 3: Primary Neural Scan (ONNX) - FAST ===
     result = ml_service.predict(raw)
-    
+
+    # Resolve Stage 2 result (with timeout so it never blocks)
+    try:
+        leaf_check = await asyncio.wait_for(leaf_check_task, timeout=8.0)
+        if not leaf_check.get("is_leaf", True) and leaf_check.get("confidence") == "high":
+            return JSONResponse({
+                "success": False,
+                "error": "Not a Plant Leaf",
+                "message": f"Our vision system detected: {leaf_check.get('reason', 'This does not appear to be a plant leaf.')}",
+                "stage2_check": leaf_check
+            }, status_code=200)
+    except Exception:
+        leaf_check = {"is_leaf": True, "confidence": "low", "reason": "Pre-check bypassed."}
+
     if not result.get("success"):
         return JSONResponse(result, status_code=200)
     
     kb = result.get("knowledge", {})
     plant_name = kb.get("common_names", [result["class_name"]])[0]
     
-    # 2. Parallel Secondary Verification (Gemini) - DEEP
-    # We do this asynchronously to keep response times acceptable
+    # === STAGE 4 (OOD Gate) is inside ml_service.predict already ===
+    
+    # === STAGE 5: Gemini Vision Validation (parallel with analysis) ===
+    validation_task = asyncio.create_task(
+        gemini_service.validate_prediction(plant_name=plant_name, image_bytes=raw)
+    )
+
+    # === STAGE 6 (Ayurvedic Analysis) in parallel ===
     gemini_task = asyncio.create_task(
         gemini_service.get_plant_analysis(
             plant_name=plant_name,
@@ -81,20 +103,39 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
         }
     }
 
-    # 3. Wait for Gemini (with timeout)
+    # === Stage 6: Wait for Gemini Analysis + Stage 5 Validation (parallel) ===
     try:
-        gemini_data = await asyncio.wait_for(gemini_task, timeout=25.0)
-        if gemini_data and "confirmed_name" in gemini_data:
+        gemini_data, validation_data = await asyncio.gather(
+            asyncio.wait_for(gemini_task, timeout=25.0),
+            asyncio.wait_for(validation_task, timeout=25.0),
+            return_exceptions=True
+        )
+        
+        # Process Stage 6 (Ayurvedic analysis)
+        if isinstance(gemini_data, dict) and "confirmed_name" in gemini_data:
             response["reasoning"] = {
-                "verdict": "Verified" if gemini_data.get("confirmed_name").lower() in plant_name.lower() else "Mismatch Detected",
+                "verdict": "Verified" if gemini_data.get("confirmed_name", "").lower() in plant_name.lower() else "Mismatch Detected",
                 "analysis": gemini_data.get("vision_note", "Visual analysis complete."),
                 "scientific_confirmation": gemini_data.get("confirmed_name"),
                 "ayurvedic_profile": gemini_data.get("ayurvedic_name")
             }
-            # If Gemini strongly disagrees and confidence is low, flag quality
             if response["reasoning"]["verdict"] == "Mismatch Detected" and result["confidence_pct"] < 70:
                 response["quality"]["passed"] = False
                 response["quality"]["message"] = "Visual mismatch detected. This might not be the predicted plant."
+
+        # Process Stage 5 (Species Validation)
+        if isinstance(validation_data, dict):
+            response["vision_validation"] = {
+                "stage": 5,
+                "matches_prediction": validation_data.get("matches", True),
+                "agreement_score": validation_data.get("agreement_score", 0.5),
+                "confidence": validation_data.get("confidence", "low"),
+                "observation": validation_data.get("actual_observation", "")
+            }
+            # Stage 5 override: if Gemini disagrees with high confidence, downgrade quality
+            if not validation_data.get("matches", True) and validation_data.get("confidence") in ["high", "medium"]:
+                response["quality"]["passed"] = False
+                response["quality"]["message"] = f"Vision mismatch: AI sees '{validation_data.get('actual_observation', 'a different plant')}'"
     except Exception as e:
         response["reasoning"] = {
             "verdict": "Limited Verification",
