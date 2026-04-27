@@ -20,11 +20,18 @@ try:
     from ultralytics import YOLO
     # Suppress YOLO logs
     logging.getLogger("ultralytics").setLevel(logging.WARNING)
-    # Using the standard yolov8n as placeholder until leaf-specific is fine-tuned
-    YOLO_MODEL_PATH = os.path.join(_BACKEND, 'ml_models', 'yolov8n.pt')
-    leaf_detector = YOLO(YOLO_MODEL_PATH if os.path.exists(YOLO_MODEL_PATH) else 'yolov8n.pt')
+    # Using the fine-tuned leaf detector, falling back to standard if not ready
+    YOLO_MODEL_PATH_LEAF = os.path.join(_BACKEND, 'ml_models', 'yolov8n_leaf.pt')
+    YOLO_MODEL_PATH_GENERIC = os.path.join(_BACKEND, 'ml_models', 'yolov8n.pt')
+    
+    if os.path.exists(YOLO_MODEL_PATH_LEAF):
+        leaf_detector = YOLO(YOLO_MODEL_PATH_LEAF)
+        logger.info("YOLOv8 Fine-Tuned Leaf Segmentation Engine: ONLINE")
+    else:
+        leaf_detector = YOLO(YOLO_MODEL_PATH_GENERIC if os.path.exists(YOLO_MODEL_PATH_GENERIC) else 'yolov8n.pt')
+        logger.info("YOLOv8 Generic Segmentation Engine: ONLINE")
+    
     YOLO_AVAILABLE = True
-    logger.info("YOLOv8 Segmentation Engine: ONLINE")
 except Exception as e:
     logger.warning(f"YOLOv8 Segmentation Engine unavailable: {e}")
 
