@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse
 from app.services.ml_service import ml_service
 from app.services.gemini_service import gemini_service
@@ -9,7 +9,7 @@ import asyncio
 router = APIRouter()
 
 @router.post("")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...), scale_reference: bool = Form(False)):
     """
     Hardened G9 Predict Endpoint with Neural Cross-Verification.
     Uses ONNX for speed and Gemini-1.5-Flash for scientific validation.
@@ -36,7 +36,8 @@ async def predict(file: UploadFile = File(...)):
         gemini_service.get_plant_analysis(
             plant_name=plant_name,
             confidence=result["confidence_pct"],
-            image_bytes=raw
+            image_bytes=raw,
+            has_scale_reference=scale_reference
         )
     )
     

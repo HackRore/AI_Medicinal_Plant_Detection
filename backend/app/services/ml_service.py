@@ -92,32 +92,46 @@ class MLService:
                 x = np.array(i.resize((224, 224))).astype(np.float32) / 255.0
                 return np.transpose(x, (2, 0, 1)).reshape(1, 3, 224, 224)
 
-            # --- Multi-Pass Neural TTA (Test-Time Augmentation) ---
-            # 1. Original
+            # --- Sprint 3: Multi-Scale Ensemble (TTA) ---
+            w, h = img_main.size
+            
+            # Crop helpers
+            def get_crop(img_obj, left, top, right, bottom):
+                return preprocess(img_obj.crop((int(left), int(top), int(right), int(bottom))))
+
+            # 1. Original (Full Scale)
             pass1 = preprocess(img_main)
-            # 2. Horizontal Flip
-            pass2 = preprocess(ImageOps.mirror(img_main))
-            # 3. Center Zoom (Vein Extraction)
-            w, h = img.size
-            crop = img.crop((w*0.1, h*0.1, w*0.9, h*0.9))
-            pass3 = preprocess(crop)
-            # 4. Brightness Boost (Shadow Recovery)
-            pass4 = preprocess(ImageEnhance.Brightness(img_main).enhance(1.2))
-            # 5. Contrast Boost (Edge Sharpening)
-            pass5 = preprocess(ImageEnhance.Contrast(img_main).enhance(1.2))
+            
+            # 2. Center Crop (85% - Vein detail preservation)
+            c_margin_w = w * 0.075
+            c_margin_h = h * 0.075
+            pass2 = get_crop(img_main, c_margin_w, c_margin_h, w - c_margin_w, h - c_margin_h)
+            
+            # 3-6. Five Corner Crops (Top-Left, Top-Right, Bottom-Left, Bottom-Right)
+            crop_size_w = w * 0.85
+            crop_size_h = h * 0.85
+            pass3 = get_crop(img_main, 0, 0, crop_size_w, crop_size_h) # TL
+            pass4 = get_crop(img_main, w - crop_size_w, 0, w, crop_size_h) # TR
+            pass5 = get_crop(img_main, 0, h - crop_size_h, crop_size_w, h) # BL
+            pass6 = get_crop(img_main, w - crop_size_w, h - crop_size_h, w, h) # BR
+            
+            # 7. Lighting normalization (Brightness/Contrast hybrid)
+            pass7 = preprocess(ImageEnhance.Contrast(ImageEnhance.Brightness(img_main).enhance(1.1)).enhance(1.1))
 
             input_name = self.sess.get_inputs()[0].name
             
-            # Batch Inference
-            batch_x = np.vstack([pass1, pass2, pass3, pass4, pass5])
+            # Batch Inference (7 passes)
+            batch_x = np.vstack([pass1, pass2, pass3, pass4, pass5, pass6, pass7])
             batch_logits = self.sess.run(None, {input_name: batch_x})[0]
             
-            # Weighted Averaging (Main pass gets more weight)
-            raw_preds = (batch_logits[0] * 0.4 + 
-                         batch_logits[1] * 0.15 + 
-                         batch_logits[2] * 0.15 + 
-                         batch_logits[3] * 0.15 + 
-                         batch_logits[4] * 0.15)
+            # Weighted Averaging (Main pass gets 40%, others split the rest)
+            raw_preds = (batch_logits[0] * 0.40 + 
+                         batch_logits[1] * 0.20 + 
+                         batch_logits[2] * 0.06 + 
+                         batch_logits[3] * 0.06 + 
+                         batch_logits[4] * 0.06 + 
+                         batch_logits[5] * 0.06 +
+                         batch_logits[6] * 0.16)
             
             # Softmax with Neural Sharpening (T=0.67)
             sharpened_logits = (raw_preds - np.max(raw_preds)) * 1.5

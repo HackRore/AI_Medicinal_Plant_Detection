@@ -138,6 +138,7 @@ export default function PredictClient() {
   const resultRef = useRef<HTMLDivElement>(null)
   const [activeModule, setActiveModule] = useState<'scanner' | 'symptoms'>('scanner')
   const [symptoms, setSymptoms] = useState("")
+  const [useScaleReference, setUseScaleReference] = useState(false)
   const [symptomResults, setSymptomResults] = useState<any>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -148,6 +149,9 @@ export default function PredictClient() {
     mutationFn: async (file: File) => {
       const formData = new FormData()
       formData.append("file", file)
+      if (useScaleReference) {
+        formData.append("scale_reference", "true")
+      }
       
       const res = await fetch(`${API_BASE}/api/v1/predict`, {
         method: "POST",
@@ -361,6 +365,20 @@ export default function PredictClient() {
                     <Camera className="mx-auto h-16 w-16 text-gray-600 group-hover:text-primary-400 mb-8 transition-all group-hover:scale-110" />
                     <p className="font-black text-white uppercase tracking-[0.3em] text-xs">Neural Lens</p>
                   </button>
+                </div>
+                
+                {/* Sprint 4: Scale Reference Toggle */}
+                <div className="flex items-center justify-center gap-4 bg-white/[0.02] border border-white/10 p-4 rounded-3xl">
+                  <input 
+                    type="checkbox" 
+                    id="scaleRefToggle" 
+                    checked={useScaleReference} 
+                    onChange={(e) => setUseScaleReference(e.target.checked)}
+                    className="w-5 h-5 accent-primary-500 bg-black border-white/20 rounded cursor-pointer"
+                  />
+                  <label htmlFor="scaleRefToggle" className="cursor-pointer text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+                    Enable 1-Rupee Coin Scale Reference
+                  </label>
                 </div>
 
                 {!predictMutation.isSuccess && !predictMutation.isPending && localHistory.length > 0 && (

@@ -41,10 +41,24 @@ class GeminiService:
             logger.error(f"Gemini Connection Failed: {e}")
             return ""
 
-    async def get_plant_analysis(self, plant_name: str, confidence: float, image_bytes: Optional[bytes] = None) -> Dict:
+    async def get_plant_analysis(self, plant_name: str, confidence: float, image_bytes: Optional[bytes] = None, has_scale_reference: bool = False) -> Dict:
         """Get sophisticated Ayurvedic analysis for identified specimens."""
+        
+        scale_prompt = ""
+        if has_scale_reference:
+            scale_prompt = """
+SCALE REFERENCE DETECTED: 
+This image contains a leaf and a 1-rupee coin (25mm diameter).
+Using the coin as a strict visual reference, calculate and estimate:
+1. Leaf length in cm
+2. Leaf width in cm  
+3. Leaf aspect ratio
+Include these physical dimension estimates prominently in your "vision_note" field.
+"""
+
         prompt = f"""You are a senior Ayurvedic Doctor (Vaidya). 
-Identification: {plant_name} (Confidence: {confidence*100:.1f}%)
+Identification: {plant_name} (Confidence: {confidence:.1f}%)
+{scale_prompt}
 
 Provide a wise, authoritative analysis in JSON.
 {{
