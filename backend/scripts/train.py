@@ -1,135 +1,115 @@
-"""
-Trains EfficientNetV2-S (ImageNet-21k pretrained).
-Optimized for Speed: Samples dataset to ~6,000 images for CPU feasibility.
-"""
-import os, json, sys, torch, torch.nn as nn
-from torch.utils.data import DataLoader, Subset
-from torchvision import datasets, transforms
-import timm, numpy as np
-from PIL import Image
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms, models
+import timm
+import os
+import json
+import time
+import sys
 
-DATASET_DIR = "dataset/unified_dataset"
-MODEL_OUT   = "backend/ml_models"
-DATA_OUT    = "backend/app/data"
-IMG_SIZE    = 224
-BATCH       = 32
-EPOCHS      = 15       # Reduced epochs for CPU speed, more than enough with ImageNet-21k weights
-LR          = 5e-4
-DEVICE      = "cpu"
+# --- CONFIGURATION ---
+DATA_DIR = "dataset/FINAL_MONOLITH"
+MODEL_NAME = "tf_efficientnetv2_s.in21k"
+BATCH_SIZE = 16 # Reduced for CPU stability
+EPOCHS = 30
+LEARNING_RATE = 0.001
+IMG_SIZE = 224
+SAVE_PATH = "backend/ml_models/plantoai_v2.onnx"
 
-class TDS(torch.utils.data.Dataset):
-    def __init__(self, base, indices, tfm):
-        self.base=base; self.idx=indices; self.tfm=tfm
-    def __len__(self): return len(self.idx)
-    def __getitem__(self,i):
-        path, lbl = self.base.imgs[self.idx[i]]
-        return self.tfm(Image.open(path).convert("RGB")), lbl
+def train_forge():
+    print(f"🚀 Initializing Neural Forge v2.0 Monolith...")
+    sys.stdout.flush()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"  Device: {device}")
 
-def train_model():
-    print(f"Neural Forge: Optimized CPU Training Flow")
-
-    if not os.path.isdir(DATASET_DIR):
-        print("ERROR: Dataset missing."); sys.exit(1)
-
-    tfm_tr = transforms.Compose([
+    transform = transforms.Compose([
         transforms.Resize((IMG_SIZE, IMG_SIZE)),
-        transforms.RandomHorizontalFlip(),
+        transforms.RandAugment(num_ops=2, magnitude=9),
         transforms.ToTensor(),
-        transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])
-    ])
-    tfm_vl = transforms.Compose([
-        transforms.Resize((IMG_SIZE, IMG_SIZE)), transforms.ToTensor(),
-        transforms.Normalize([0.485,0.456,0.406],[0.229,0.224,0.225])
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ])
 
-    raw = datasets.ImageFolder(DATASET_DIR)
-    NUM = len(raw.classes)
+    if not os.path.exists(DATA_DIR):
+        print(f"  ERROR: Data directory {DATA_DIR} not found.")
+        return
+
+    dataset = datasets.ImageFolder(DATA_DIR, transform=transform)
+    train_size = int(0.9 * len(dataset))
+    val_size = len(dataset) - train_size
+    train_ds, val_ds = torch.utils.data.random_split(dataset, [train_size, val_size])
+
+    # Windows Stability: num_workers=0
+    train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_ds, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+
+    class_names = dataset.classes
+    num_classes = len(class_names)
+    print(f"  Classes Found: {num_classes}")
+    print(f"  Total Images: {len(dataset)}")
+
+    os.makedirs(os.path.dirname(SAVE_PATH), exist_ok=True)
+    with open("backend/ml_models/class_names_v2.json", "w") as f:
+        json.dump(class_names, f)
+
+    print(f"  Loading {MODEL_NAME}...")
+    model = timm.create_model(MODEL_NAME, pretrained=True, num_classes=num_classes)
+    model = model.to(device)
+
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE)
+    scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=LEARNING_RATE, 
+                                            steps_per_epoch=len(train_loader), epochs=EPOCHS)
+
+    print(f"🔥 Forge Started. Target: 30 Epochs.")
+    sys.stdout.flush()
     
-    # ── Dataset Sampling for CPU feasible speed ────────────────────────
-    # Limits each class to 180 images. Total ~6000 images.
-    final_indices = []
-    class_counts = {}
-    indices = torch.randperm(len(raw)).tolist()
-    for idx in indices:
-        _, lbl = raw.imgs[idx]
-        class_counts[lbl] = class_counts.get(lbl, 0) + 1
-        if class_counts[lbl] <= 180:
-            final_indices.append(idx)
-    
-    print(f"Dataset Sampled: {len(final_indices)} images from {NUM} classes")
-    
-    os.makedirs(MODEL_OUT, exist_ok=True)
-    os.makedirs(DATA_OUT, exist_ok=True)
-
-    cnames = [{"id":i,"name":c.replace("_"," ")} for i,c in enumerate(raw.classes)]
-    with open(f"{DATA_OUT}/class_names.json","w") as f: json.dump(cnames,f,indent=2)
-
-    n = len(final_indices)
-    nval = int(n*.15); ntr = n - nval
-    tr_idx, va_idx = final_indices[:ntr], final_indices[ntr:]
-
-    tl = DataLoader(TDS(raw, tr_idx, tfm_tr), BATCH, shuffle=True, num_workers=0)
-    vl = DataLoader(TDS(raw, va_idx, tfm_vl), BATCH, num_workers=0)
-
-    print("Building EfficientNetV2-S (G9 Scientific Configuration)...")
-    # Load ImageNet weights first
-    model = timm.create_model("tf_efficientnetv2_s.in21k", pretrained=True, num_classes=NUM)
-
-    checkpoint_path = os.path.join(MODEL_OUT, "best.pt")
-    if os.path.exists(checkpoint_path):
-        print(f"Loading Base Intelligence from: {checkpoint_path}")
-        try:
-            # Load old weights (33 classes) into a 33-class model to extract base features
-            base_model = timm.create_model("tf_efficientnetv2_s.in21k", num_classes=33)
-            base_model.load_state_dict(torch.load(checkpoint_path, map_location="cpu"))
-            
-            # Transfer all weights except the classifier head
-            msg = model.load_state_dict(base_model.state_dict(), strict=False)
-            print(f"  Finetuning Sync: {msg}")
-        except Exception as e:
-            print(f"  Warning: Could not perform full intelligence transfer: {e}")
-
-    for p in model.parameters(): p.requires_grad = False
-    for p in model.classifier.parameters(): p.requires_grad = True
-    
-    # Use balanced learning rate for finetuning
-    opt   = torch.optim.AdamW(filter(lambda p:p.requires_grad, model.parameters()), lr=LR)
-    crit  = nn.CrossEntropyLoss(label_smoothing=0.1)
-    best  = 0.0
-
-    print("Running Neural Forge Epochs (Fine-Tuning Mode)...")
-    for ep in range(EPOCHS):
-        if ep == 3:
-            print("  Phase 2: Unfreezing all layers for convergence...")
-            for p in model.parameters(): p.requires_grad = True
-            opt = torch.optim.AdamW(model.parameters(), lr=LR/5)
-
+    best_acc = 0.0
+    for epoch in range(EPOCHS):
         model.train()
-        for i, (imgs, lbls) in enumerate(tl):
-            opt.zero_grad(); crit(model(imgs), lbls).backward(); opt.step()
-            if i % 20 == 0: print(f"  Ep {ep+1} | Batch {i}/{len(tl)}")
+        running_loss = 0.0
+        start_time = time.time()
+        
+        batch_idx = 0
+        for inputs, labels in train_loader:
+            inputs, labels = inputs.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+            running_loss += loss.item()
+            
+            if batch_idx % 50 == 0:
+                print(f"    Epoch {epoch+1} | Batch {batch_idx}/{len(train_loader)} | Loss: {loss.item():.4f}", end='\r')
+                sys.stdout.flush()
+            batch_idx += 1
 
-        model.eval(); vc=vt=0
+        # Validation
+        model.eval()
+        correct = 0
+        total = 0
         with torch.no_grad():
-            for imgs, lbls in vl:
-                vc += (model(imgs).argmax(1) == lbls).sum().item(); vt += len(lbls)
-        
-        vacc = vc/vt
-        print(f"Epoch {ep+1} | Val Acc: {vacc:.4f}")
-        
-        if vacc > best:
-            best = vacc
-            torch.save(model.state_dict(), f"{MODEL_OUT}/best.pt")
-            print(f"  Saved Best")
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                outputs = model(inputs)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
 
-    print("\nTraining complete. Exporting ONNX...")
-    model.load_state_dict(torch.load(f"{MODEL_OUT}/best.pt"))
-    torch.onnx.export(model, torch.randn(1, 3, IMG_SIZE, IMG_SIZE), f"{MODEL_OUT}/plantoai_model.onnx")
-    
-    report = {"top1_accuracy": round(best*100, 2), "num_classes": NUM, "train_images": ntr, "model_arch": "EfficientNetV2-S"}
-    with open(f"{MODEL_OUT}/training_report.json", "w") as f: json.dump(report, f, indent=3)
-    
-    print(f"\n✅ SYSTEM READY | Final Accuracy: {best*100:.2f}%")
+        acc = 100 * correct / total
+        print(f"\n  ✅ Epoch {epoch+1} Summary | Loss: {running_loss/len(train_loader):.4f} | Acc: {acc:.2f}% | Time: {time.time()-start_time:.1f}s")
+        sys.stdout.flush()
+
+        if acc > best_acc:
+            best_acc = acc
+            print(f"  ✨ Best Accuracy! Exporting ONNX...")
+            dummy_input = torch.randn(1, 3, IMG_SIZE, IMG_SIZE).to(device)
+            torch.onnx.export(model, dummy_input, SAVE_PATH, 
+                            input_names=['input'], output_names=['output'],
+                            dynamic_axes={'input': {0: 'batch_size'}, 'output': {0: 'batch_size'}})
 
 if __name__ == "__main__":
-    train_model()
+    train_forge()

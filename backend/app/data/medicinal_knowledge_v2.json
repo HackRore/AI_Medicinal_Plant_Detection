@@ -1,0 +1,101 @@
+[
+  {
+    "id": "neem",
+    "name": "Neem",
+    "scientific_name": "Azadirachta indica",
+    "family": "Meliaceae",
+    "ayurvedic_uses": ["Blood purification", "Antiseptic", "Skin disorders"],
+    "preparation": "Paste of leaves or decoction",
+    "toxicity": {"level": "safe", "notes": "Safe in moderation; avoid high internal doses."}
+  },
+  {
+    "id": "bhringraj",
+    "name": "Bhringraj",
+    "scientific_name": "Eclipta prostrata",
+    "family": "Asteraceae",
+    "ayurvedic_uses": ["Hair growth", "Liver rejuvenation", "Skin issues"],
+    "preparation": "Bhringraj oil or fresh leaf juice",
+    "toxicity": {"level": "safe", "notes": "Generally safe; consult for internal use."}
+  },
+  {
+    "id": "brahmi",
+    "name": "Brahmi",
+    "scientific_name": "Bacopa monnieri",
+    "family": "Plantaginaceae",
+    "ayurvedic_uses": ["Memory enhancement", "Anxiety relief", "Cognitive health"],
+    "preparation": "Brahmi Ghee or powder with honey",
+    "toxicity": {"level": "safe", "notes": "Safe in standard doses."}
+  },
+  {
+    "id": "doddapatre",
+    "name": "Doddapatre",
+    "scientific_name": "Plectranthus amboinicus",
+    "family": "Lamiaceae",
+    "ayurvedic_uses": ["Cough and cold", "Digestive support", "Bronchitis"],
+    "preparation": "Fresh leaf juice mixed with honey",
+    "toxicity": {"level": "safe", "notes": "Very safe, commonly used for children."}
+  },
+  {
+    "id": "nelavembu",
+    "name": "Nelavembu",
+    "scientific_name": "Andrographis paniculata",
+    "family": "Acanthaceae",
+    "ayurvedic_uses": ["Viral fever", "Liver tonic", "Immune booster"],
+    "preparation": "Nilavembu Kudineer (Decoction)",
+    "toxicity": {"level": "safe", "notes": "Strong bitter; avoid excessive long-term use."}
+  },
+  {
+    "id": "ekka",
+    "name": "Ekka",
+    "scientific_name": "Calotropis gigantea",
+    "family": "Apocynaceae",
+    "ayurvedic_uses": ["Inflammation", "Skin diseases"],
+    "preparation": "Processed latex (SHODHANA REQUIRED)",
+    "toxicity": {"level": "DANGER", "notes": "Highly toxic latex. Can cause blindness. NEVER use without expert guidance."}
+  },
+  {
+    "id": "tulsi",
+    "name": "Tulsi",
+    "scientific_name": "Ocimum sanctum",
+    "family": "Lamiaceae",
+    "ayurvedic_uses": ["Stress relief", "Respiratory health", "Immunity"],
+    "preparation": "Tea or leaf juice with honey",
+    "toxicity": {"level": "safe", "notes": "Highly safe; spiritual and medicinal powerhouse."}
+  },
+  {
+    "id": "amruta_balli",
+    "name": "Amruta Balli",
+    "scientific_name": "Tinospora cordifolia",
+    "family": "Menispermaceae",
+    "ayurvedic_uses": ["Chronic fever", "Immunity", "Diabetes"],
+    "preparation": "Stem decoction (Giloy Satva)",
+    "toxicity": {"level": "safe", "notes": "One of the best rejuvenators."}
+  },
+  {
+    "id": "ashoka",
+    "name": "Ashoka",
+    "scientific_name": "Saraca asoca",
+    "family": "Fabaceae",
+    "ayurvedic_uses": ["Uterine health", "Menorrhagia"],
+    "preparation": "Bark decoction (Ashokarishta)",
+    "toxicity": {"level": "safe", "notes": "Ensures women's reproductive health."}
+  },
+  {
+    "id": "nagadali",
+    "name": "Nagadali",
+    "scientific_name": "Ruta graveolens",
+    "family": "Rutaceae",
+    "ayurvedic_uses": ["Earache", "Vata disorders"],
+    "preparation": "External application",
+    "toxicity": {"level": "CAUTION", "notes": "Highly potent; can cause photosensitivity and skin irritation."}
+  },
+  {
+    "id": "parijatha",
+    "name": "Parijatha",
+    "scientific_name": "Nyctanthes arbor-tristis",
+    "family": "Oleaceae",
+    "ayurvedic_uses": ["Sciatica", "Arthritis", "Fever"],
+    "preparation": "Leaf juice or decoction",
+    "toxicity": {"level": "safe", "notes": "Known for potent anti-inflammatory properties."}
+  }
+]
