@@ -13,6 +13,30 @@ logger = logging.getLogger(__name__)
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _BACKEND = os.path.dirname(os.path.dirname(_HERE))
 
+# --- Sprint 2: YOLOv8 Leaf Segmentation Setup ---
+YOLO_AVAILABLE = False
+leaf_detector = None
+try:
+    from ultralytics import YOLO
+    # Suppress YOLO logs
+    logging.getLogger("ultralytics").setLevel(logging.WARNING)
+    # Using the standard yolov8n as placeholder until leaf-specific is fine-tuned
+    YOLO_MODEL_PATH = os.path.join(_BACKEND, 'ml_models', 'yolov8n.pt')
+    leaf_detector = YOLO(YOLO_MODEL_PATH if os.path.exists(YOLO_MODEL_PATH) else 'yolov8n.pt')
+    YOLO_AVAILABLE = True
+    logger.info("YOLOv8 Segmentation Engine: ONLINE")
+except Exception as e:
+    logger.warning(f"YOLOv8 Segmentation Engine unavailable: {e}")
+
+def add_padding(img, pad_pct=0.10):
+    from PIL import Image
+    w, h = img.size
+    pad_w = int(w * pad_pct)
+    pad_h = int(h * pad_pct)
+    new_img = Image.new(img.mode, (w + 2*pad_w, h + 2*pad_h), (0,0,0))
+    new_img.paste(img, (pad_w, pad_h))
+    return new_img
+
 def _find(fname, dirs):
     for d in dirs:
         p = os.path.normpath(os.path.join(_BACKEND, d, fname))
@@ -47,6 +71,21 @@ class MLService:
             start_time = time.time()
             
             img = Image.open(BytesIO(image_bytes)).convert('RGB')
+            
+            # --- Stage 1: YOLOv8 Segmentation ---
+            segmentation_status = "Bypassed"
+            if YOLO_AVAILABLE and leaf_detector:
+                results = leaf_detector(img, verbose=False)
+                if len(results[0].boxes) > 0:
+                    # Get highest confidence box
+                    box = results[0].boxes[0].xyxy[0].cpu().numpy()
+                    leaf_crop = img.crop((box[0], box[1], box[2], box[3]))
+                    img = add_padding(leaf_crop, 0.10)
+                    segmentation_status = "Active (Background Removed)"
+                else:
+                    segmentation_status = "No Leaf Detected (Using Full Image)"
+            
+            # --- Stage 2: Classification Preprocessing ---
             img_main = img.resize((224, 224))
             
             def preprocess(i):
@@ -142,8 +181,8 @@ class MLService:
                 "quality_score": round(float(1.0 - (entropy / 5.0)), 2), # Mock quality score based on certainty
                 "gradcam": {
                     "overlay_base64": overlay_b64,
-                    "explanation": explainability_service.get_botanical_reasoning(name),
-                    "method": "Neural Forge Forensic TTA v5.2"
+                    "explanation": f"[{segmentation_status}] " + explainability_service.get_botanical_reasoning(name),
+                    "method": "Neural Forge Forensic TTA v5.2 + YOLOv8 Seg"
                 }
             }
         except Exception as e:
