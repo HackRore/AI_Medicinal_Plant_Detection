@@ -64,5 +64,5 @@ print("\n" + "=" * 60)
 print("FINAL SUMMARY FOR README")
 print("=" * 60)
 for res in results:
-    icon = "✅" if res["confidence"] >= 12 else "⚠️"
+    icon = "OK" if res["confidence"] >= 12 else "WARN"
     print(f"| {res['image']} | {res['plant']} | {round(res['confidence'],1)}% | {res['label']} | {icon} |")
