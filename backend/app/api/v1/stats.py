@@ -28,6 +28,7 @@ def get_stats():
         "build_target": "Production Monolith v3.1"
     }
     
+    report_path = os.path.join(data_dir, "..", "ml_models", "training_report.json")
     if os.path.exists(report_path):
         try:
             with open(report_path) as f:
