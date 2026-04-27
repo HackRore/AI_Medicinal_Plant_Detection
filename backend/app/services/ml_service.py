@@ -96,8 +96,29 @@ class MLService:
                 t_name = t_raw.get("name", "Unknown") if isinstance(t_raw, dict) else str(t_raw)
                 top3.append({"name": t_name, "confidence": float(preds[t_idx])})
 
-            raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
-            name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
+            # Calculate Shannon Entropy for OOD Detection
+            entropy = -np.sum(preds * np.log(preds + 1e-9))
+            
+            # Hard Negative / Unknown Weed Trap
+            if entropy > 2.5 or conf < 0.45:
+                name = "Unknown / Not in Database"
+                kb_data = {
+                    "description": "This plant does not strongly match any of our verified medicinal species. It may be a weed, a non-medicinal plant, or an out-of-focus image.",
+                    "medicinal_properties": [
+                        {
+                            "ailment": "SAFETY WARNING",
+                            "usage_description": "Do not consume, ingest, or apply unidentified plants. They may be highly toxic."
+                        }
+                    ]
+                }
+                conf_label = "Rejected (OOD)"
+                is_quality_passed = False
+            else:
+                raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
+                name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
+                kb_data = self.kb.get(name, {})
+                conf_label = "High" if conf > 0.75 else "Medium" if conf > 0.55 else "Low"
+                is_quality_passed = True
             
             from app.services.explainability_service import explainability_service
             img_array = np.array(img_main).astype(np.float32)
@@ -112,13 +133,13 @@ class MLService:
                 "predicted_class": name,
                 "confidence": conf,
                 "confidence_pct": round(conf * 100, 2),
-                "confidence_label": "High" if conf > 0.75 else "Medium" if conf > 0.4 else "Low",
+                "confidence_label": conf_label,
                 "top3": top3,
                 "processing_time": processing_time,
                 "inference_ms": round(processing_time * 1000, 1),
-                "knowledge": self.kb.get(name, {}),
-                "quality_passed": True,
-                "quality_score": 0.95,
+                "knowledge": kb_data,
+                "quality_passed": is_quality_passed,
+                "quality_score": round(float(1.0 - (entropy / 5.0)), 2), # Mock quality score based on certainty
                 "gradcam": {
                     "overlay_base64": overlay_b64,
                     "explanation": explainability_service.get_botanical_reasoning(name),
