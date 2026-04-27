@@ -140,9 +140,8 @@ class MLService:
                          batch_logits[5] * 0.06 +
                          batch_logits[6] * 0.16)
             
-            # Softmax with Neural Sharpening (T=0.67)
-            sharpened_logits = (raw_preds - np.max(raw_preds)) * 1.5
-            exp_preds = np.exp(sharpened_logits)
+            # Standard Softmax (no artificial sharpening - it destroys probability distributions)
+            exp_preds = np.exp(raw_preds - np.max(raw_preds))
             preds = exp_preds / exp_preds.sum()
             
             idx = int(np.argmax(preds))
@@ -159,8 +158,14 @@ class MLService:
             # Calculate Shannon Entropy for OOD Detection
             entropy = -np.sum(preds * np.log(preds + 1e-9))
             
-            # Hard Negative / Unknown Weed Trap
-            if entropy > 2.5 or conf < 0.45:
+            # Always resolve the top predicted class first
+            raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
+            name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
+            kb_data = self.kb.get(name, {})
+            
+            # OOD Gate: only reject if genuinely ambiguous (very high entropy AND very low confidence)
+            # Thresholds are deliberately lenient to avoid rejecting real leaf photos
+            if entropy > 3.8 and conf < 0.12:
                 name = "Unknown / Not in Database"
                 kb_data = {
                     "description": "This plant does not strongly match any of our verified medicinal species. It may be a weed, a non-medicinal plant, or an out-of-focus image.",
@@ -174,11 +179,8 @@ class MLService:
                 conf_label = "Rejected (OOD)"
                 is_quality_passed = False
             else:
-                raw_class = self.class_names[idx] if idx < len(self.class_names) else "Unknown"
-                name = raw_class.get("name", "Unknown") if isinstance(raw_class, dict) else str(raw_class)
-                kb_data = self.kb.get(name, {})
-                conf_label = "High" if conf > 0.75 else "Medium" if conf > 0.55 else "Low"
-                is_quality_passed = True
+                conf_label = "High" if conf > 0.75 else "Medium" if conf > 0.45 else "Low"
+                is_quality_passed = conf > 0.30
             
             from app.services.explainability_service import explainability_service
             img_array = np.array(img_main).astype(np.float32)
