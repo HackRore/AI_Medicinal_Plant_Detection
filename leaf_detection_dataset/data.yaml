@@ -1,0 +1,7 @@
+
+path: D:\PROJECT FINAL\leaf_detection_dataset
+train: images/train
+val: images/val
+
+nc: 1
+names: ['leaf']

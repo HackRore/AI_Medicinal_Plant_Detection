@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en-US" class="" data-skin="light" prefix="og: https://ogp.me/ns#">
+<head>
+	<meta charset="UTF-8" />
+	<link rel="profile" href="https://gmpg.org/xfn/11" />
+	
+<meta http-equiv='x-dns-prefetch-control' content='on'>
+<link rel='dns-prefetch' href='//cdnjs.cloudflare.com' />
+<link rel='dns-prefetch' href='//ajax.googleapis.com' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//fonts.gstatic.com' />
+<link rel='dns-prefetch' href='//s.gravatar.com' />
+<link rel='dns-prefetch' href='//www.google-analytics.com' />
+<link rel='preload' as='script' href='https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js'>
+
+<!-- Search Engine Optimization by Rank Math - https://rankmath.com/ -->
+<title>Page not found - Ayur Times</title>
+<meta name="robots" content="follow, noindex"/>
+<meta property="og:locale" content="en_US" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Page not found - Ayur Times" />
+<meta property="og:site_name" content="Ayur Times" />
+<meta property="article:publisher" content="https://www.facebook.com/AyurTimes/" />
+<meta property="og:image" content="https://ayurtimes.com/wp-content/uploads/2022/12/Ayur-Times-Default-Social-Share-Image-1200-×-630-px.jpg" />
+<meta property="og:image:secure_url" content="https://ayurtimes.com/wp-content/uploads/2022/12/Ayur-Times-Default-Social-Share-Image-1200-×-630-px.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Page not found - Ayur Times" />
+<meta name="twitter:site" content="@ayurtimes" />
+<meta name="twitter:image" content="https://ayurtimes.com/wp-content/uploads/2022/12/Ayur-Times-Default-Social-Share-Image-1200-×-630-px.jpg" />
+<script type="application/ld+json" class="rank-math-schema">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://ayurtimes.com/#organization","name":"Ayur Times","url":"https://ayurtimes.com","sameAs":["https://www.facebook.com/AyurTimes/","https://twitter.com/ayurtimes"],"logo":{"@type":"ImageObject","@id":"https://ayurtimes.com/#logo","url":"https://ayurtimes.com/wp-content/uploads/2022/12/Ayur-Times-Logo-280x110-2.png","contentUrl":"https://ayurtimes.com/wp-content/uploads/2022/12/Ayur-Times-Logo-280x110-2.png","caption":"Ayur Times","inLanguage":"en-US","width":"560","height":"220"}},{"@type":"WebSite","@id":"https://ayurtimes.com/#website","url":"https://ayurtimes.com","name":"Ayur Times","alternateName":"Ayur Times","publisher":{"@id":"https://ayurtimes.com/#organization"},"inLanguage":"en-US"},{"@type":"WebPage","@id":"#webpage","url":"","name":"Page not found - Ayur Times","isPartOf":{"@id":"https://ayurtimes.com/#website"},"inLanguage":"en-US"}]}</script>
+<!-- /Rank Math WordPress SEO plugin -->
+
+<link rel='dns-prefetch' href='//www.googletagmanager.com' />
+<link rel='dns-prefetch' href='//stats.wp.com' />
+<link rel="alternate" type="application/rss+xml" title="Ayur Times &raquo; Feed" href="https://ayurtimes.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Ayur Times &raquo; Comments Feed" href="https://ayurtimes.com/comments/feed/" />
+		<script type="text/javascript">
+			try {
+				if( 'undefined' != typeof localStorage ){
+					var tieSkin = localStorage.getItem('tie-skin');
+				}
+
+				
+				var html = document.getElementsByTagName('html')[0].classList,
+						htmlSkin = 'light';
+
+				if( html.contains('dark-skin') ){
+					htmlSkin = 'dark';
+				}
+
+				if( tieSkin != null && tieSkin != htmlSkin ){
+					html.add('tie-skin-inverted');
+					var tieSkinInverted = true;
+				}
+
+				if( tieSkin == 'dark' ){
+					html.add('dark-skin');
+				}
+				else if( tieSkin == 'light' ){
+					html.remove( 'dark-skin' );
+				}
+				
+			} catch(e) { console.log( e ) }
+
+		</script>
+		
+		<style type="text/css">
+			:root{				
+			--tie-preset-gradient-1: linear-gradient(135deg, rgba(6, 147, 227, 1) 0%, rgb(155, 81, 224) 100%);
+			--tie-preset-gradient-2: linear-gradient(135deg, rgb(122, 220, 180) 0%, rgb(0, 208, 130) 100%);
+			--tie-preset-gradient-3: linear-gradient(135deg, rgba(252, 185, 0, 1) 0%, rgba(255, 105, 0, 1) 100%);
+			--tie-preset-gradient-4: linear-gradient(135deg, rgba(255, 105, 0, 1) 0%, rgb(207, 46, 46) 100%);
+			--tie-preset-gradient-5: linear-gradient(135deg, rgb(238, 238, 238) 0%, rgb(169, 184, 195) 100%);
+			--tie-preset-gradient-6: linear-gradient(135deg, rgb(74, 234, 220) 0%, rgb(151, 120, 209) 20%, rgb(207, 42, 186) 40%, rgb(238, 44, 130) 60%, rgb(251, 105, 98) 80%, rgb(254, 248, 76) 100%);
+			--tie-preset-gradient-7: linear-gradient(135deg, rgb(255, 206, 236) 0%, rgb(152, 150, 240) 100%);
+			--tie-preset-gradient-8: linear-gradient(135deg, rgb(254, 205, 165) 0%, rgb(254, 45, 45) 50%, rgb(107, 0, 62) 100%);
+			--tie-preset-gradient-9: linear-gradient(135deg, rgb(255, 203, 112) 0%, rgb(199, 81, 192) 50%, rgb(65, 88, 208) 100%);
+			--tie-preset-gradient-10: linear-gradient(135deg, rgb(255, 245, 203) 0%, rgb(182, 227, 212) 50%, rgb(51, 167, 181) 100%);
+			--tie-preset-gradient-11: linear-gradient(135deg, rgb(202, 248, 128) 0%, rgb(113, 206, 126) 100%);
+			--tie-preset-gradient-12: linear-gradient(135deg, rgb(2, 3, 129) 0%, rgb(40, 116, 252) 100%);
+			--tie-preset-gradient-13: linear-gradient(135deg, #4D34FA, #ad34fa);
+			--tie-preset-gradient-14: linear-gradient(135deg, #0057FF, #31B5FF);
+			--tie-preset-gradient-15: linear-gradient(135deg, #FF007A, #FF81BD);
+			--tie-preset-gradient-16: linear-gradient(135deg, #14111E, #4B4462);
+			--tie-preset-gradient-17: linear-gradient(135deg, #F32758, #FFC581);
+
+			
+					--main-nav-background: #1f2024;
+					--main-nav-secondry-background: rgba(0,0,0,0.2);
+					--main-nav-primary-color: #0088ff;
+					--main-nav-contrast-primary-color: #FFFFFF;
+					--main-nav-text-color: #FFFFFF;
+					--main-nav-secondry-text-color: rgba(225,255,255,0.5);
+					--main-nav-main-border-color: rgba(255,255,255,0.07);
+					--main-nav-secondry-border-color: rgba(255,255,255,0.04);
+				--tie-buttons-radius: 8px;
+			}
+		</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" /><style id='wp-img-auto-sizes-contain-inline-css' type='text/css'>
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<link rel='stylesheet' id='chart_js_style-css' href='https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/css/Chart.min.css?ver=2.0.2.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='modal_survey_style-css' href='https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/css/modal_survey.css?ver=2.0.2.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='circliful-css' href='https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/css/jquery.circliful.css?ver=2.0.2.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='ms-jquery-ui-css' href='https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/css/ms-jquery-ui.css?ver=2.0.2.1.1' type='text/css' media='all' />
+<link rel='stylesheet' id='modal_survey_themes-css' href='https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/css/themes.css?ver=2.0.2.1.1' type='text/css' media='all' />
+<style id='wp-emoji-styles-inline-css' type='text/css'>
+
+	img.wp-smiley, img.emoji {
+		display: inline !important;
+		border: none !important;
+		box-shadow: none !important;
+		height: 1em !important;
+		width: 1em !important;
+		margin: 0 0.07em !important;
+		vertical-align: -0.1em !important;
+		background: none !important;
+		padding: 0 !important;
+	}
+/*# sourceURL=wp-emoji-styles-inline-css */
+</style>
+<link rel='stylesheet' id='toc-screen-css' href='https://ayurtimes.com/wp-content/plugins/table-of-contents-plus/screen.min.css?ver=2411.1' type='text/css' media='all' />
+<style id='toc-screen-inline-css' type='text/css'>
+div#toc_container {background: #ffffff;border: 1px solid #008700;}div#toc_container p.toc_title {color: #008700;}
+/*# sourceURL=toc-screen-inline-css */
+</style>
+<link rel='stylesheet' id='jetpack-subscriptions-css' href='https://ayurtimes.com/wp-content/plugins/jetpack/_inc/build/subscriptions/subscriptions.min.css?ver=15.7.1' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-css-base-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/css/base.min.css?ver=7.6.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-css-styles-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/css/style.min.css?ver=7.6.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-css-widgets-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/css/widgets.min.css?ver=7.6.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-css-helpers-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/css/helpers.min.css?ver=7.6.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-fontawesome5-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/css/fontawesome.css?ver=7.6.5' type='text/css' media='all' />
+<link rel='stylesheet' id='tie-css-ilightbox-css' href='https://ayurtimes.com/wp-content/themes/jannah/assets/ilightbox/dark-skin/skin.css?ver=7.6.5' type='text/css' media='all' />
+<style id='tie-css-ilightbox-inline-css' type='text/css'>
+.wf-active .logo-text,.wf-active h1,.wf-active h2,.wf-active h3,.wf-active h4,.wf-active h5,.wf-active h6,.wf-active .the-subtitle{font-family: 'Poppins';}#the-post .entry-content,#the-post .entry-content p{font-size: 21px;line-height: 1.5;}.entry h2{text-transform: uppercase;}.entry h4{font-size: 21px;}.entry h5{font-size: 21px;}:root:root{--brand-color: #ff2b58;--dark-brand-color: #cd0026;--bright-color: #FFFFFF;--base-color: #2c2f34;}#reading-position-indicator{box-shadow: 0 0 10px rgba( 255,43,88,0.7);}:root:root{--brand-color: #ff2b58;--dark-brand-color: #cd0026;--bright-color: #FFFFFF;--base-color: #2c2f34;}#reading-position-indicator{box-shadow: 0 0 10px rgba( 255,43,88,0.7);}#content a:hover{text-decoration: underline !important;}#header-notification-bar{background: var( --tie-preset-gradient-2 );}#top-nav,#top-nav .sub-menu,#top-nav .comp-sub-menu,#top-nav .ticker-content,#top-nav .ticker-swipe,.top-nav-boxed #top-nav .topbar-wrapper,.top-nav-dark .top-menu ul,#autocomplete-suggestions.search-in-top-nav{background-color : #25282b;}#top-nav *,#autocomplete-suggestions.search-in-top-nav{border-color: rgba( #FFFFFF,0.08);}#top-nav .icon-basecloud-bg:after{color: #25282b;}#top-nav a:not(:hover),#top-nav input,#top-nav #search-submit,#top-nav .fa-spinner,#top-nav .dropdown-social-icons li a span,#top-nav .components > li .social-link:not(:hover) span,#autocomplete-suggestions.search-in-top-nav a{color: #ffffff;}#top-nav input::-moz-placeholder{color: #ffffff;}#top-nav input:-moz-placeholder{color: #ffffff;}#top-nav input:-ms-input-placeholder{color: #ffffff;}#top-nav input::-webkit-input-placeholder{color: #ffffff;}#top-nav .tie-google-search .gsc-search-box *{color: #ffffff !important;}#top-nav .tie-google-search .gsc-search-button-v2 svg {fill: #ffffff !important;}#top-nav,.search-in-top-nav{--tie-buttons-color: #ff2b58;--tie-buttons-border-color: #ff2b58;--tie-buttons-text: #FFFFFF;--tie-buttons-hover-color: #e10d3a;}#top-nav a:hover,#top-nav .menu li:hover > a,#top-nav .menu > .tie-current-menu > a,#top-nav .components > li:hover > a,#top-nav .components #search-submit:hover,#autocomplete-suggestions.search-in-top-nav .post-title a:hover{color: #ff2b58;}#top-nav,#top-nav .comp-sub-menu,#top-nav .tie-weather-widget{color: #aaaaaa;}#autocomplete-suggestions.search-in-top-nav .post-meta,#autocomplete-suggestions.search-in-top-nav .post-meta a:not(:hover){color: rgba( 170,170,170,0.7 );}#top-nav .weather-icon .icon-cloud,#top-nav .weather-icon .icon-basecloud-bg,#top-nav .weather-icon .icon-cloud-behind{color: #aaaaaa !important;}#main-nav,#main-nav .menu-sub-content,#main-nav .comp-sub-menu,#main-nav ul.cats-vertical li a.is-active,#main-nav ul.cats-vertical li a:hover,#autocomplete-suggestions.search-in-main-nav{background-color: #008700;}#main-nav{border-width: 0;}#theme-header #main-nav:not(.fixed-nav){bottom: 0;}#main-nav .icon-basecloud-bg:after{color: #008700;}#autocomplete-suggestions.search-in-main-nav{border-color: rgba(255,255,255,0.07);}.main-nav-boxed #main-nav .main-menu-wrapper{border-width: 0;}#main-nav a:not(:hover),#main-nav a.social-link:not(:hover) span,#main-nav .dropdown-social-icons li a span,#autocomplete-suggestions.search-in-main-nav a{color: #ffffff;}#main-nav .tie-google-search .gsc-search-box *{color: #ffffff !important;}#main-nav .tie-google-search .gsc-search-button-v2 svg {fill: #ffffff !important;}#theme-header:not(.main-nav-boxed) #main-nav,.main-nav-boxed .main-menu-wrapper{border-right: 0 none !important;border-left : 0 none !important;border-top : 0 none !important;}#theme-header:not(.main-nav-boxed) #main-nav,.main-nav-boxed .main-menu-wrapper{border-right: 0 none !important;border-left : 0 none !important;border-bottom : 0 none !important;}.main-nav,.search-in-main-nav{--main-nav-primary-color: #333333;--tie-buttons-color: #333333;--tie-buttons-border-color: #333333;--tie-buttons-text: #FFFFFF;--tie-buttons-hover-color: #151515;}#main-nav .mega-links-head:after,#main-nav .cats-horizontal a.is-active,#main-nav .cats-horizontal a:hover,#main-nav .spinner > div{background-color: #333333;}#main-nav .menu ul li:hover > a,#main-nav .menu ul li.current-menu-item:not(.mega-link-column) > a,#main-nav .components a:hover,#main-nav .components > li:hover > a,#main-nav #search-submit:hover,#main-nav .cats-vertical a.is-active,#main-nav .cats-vertical a:hover,#main-nav .mega-menu .post-meta a:hover,#main-nav .mega-menu .post-box-title a:hover,#autocomplete-suggestions.search-in-main-nav a:hover,#main-nav .spinner-circle:after{color: #333333;}#main-nav .menu > li.tie-current-menu > a,#main-nav .menu > li:hover > a,.theme-header #main-nav .mega-menu .cats-horizontal a.is-active,.theme-header #main-nav .mega-menu .cats-horizontal a:hover{color: #FFFFFF;}#main-nav .menu > li.tie-current-menu > a:before,#main-nav .menu > li:hover > a:before{border-top-color: #FFFFFF;}#main-nav,#main-nav input,#main-nav #search-submit,#main-nav .fa-spinner,#main-nav .comp-sub-menu,#main-nav .tie-weather-widget{color: #e8e8e8;}#main-nav input::-moz-placeholder{color: #e8e8e8;}#main-nav input:-moz-placeholder{color: #e8e8e8;}#main-nav input:-ms-input-placeholder{color: #e8e8e8;}#main-nav input::-webkit-input-placeholder{color: #e8e8e8;}#main-nav .mega-menu .post-meta,#main-nav .mega-menu .post-meta a,#autocomplete-suggestions.search-in-main-nav .post-meta{color: rgba(232,232,232,0.6);}#main-nav .weather-icon .icon-cloud,#main-nav .weather-icon .icon-basecloud-bg,#main-nav .weather-icon .icon-cloud-behind{color: #e8e8e8 !important;}@media (max-width: 1250px){.share-buttons-sticky{display: none;}}.jetpack_subscription_widget {background: #f2f2f2;}.entry-content p,li {text-align: justify;}.jetpack_subscription_widget {border:2px solid;}.jetpack_subscription_widget h2 {padding:10px;}#subscribe-submit {padding:10px;}.entry-content h2 {border-bottom:solid 2px;}.taxonomy-description h2 {border-bottom:solid 2px;}
+/*# sourceURL=tie-css-ilightbox-inline-css */
+</style>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/jquery.min.js?ver=3.7.1" id="jquery-core-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1" id="jquery-migrate-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/core.min.js?ver=1.13.3" id="jquery-ui-core-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/mouse.min.js?ver=1.13.3" id="jquery-ui-mouse-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/slider.min.js?ver=1.13.3" id="jquery-ui-slider-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/jquery.visible.min.js?ver=1.10.2" id="jquery-visible-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/msChart.min.js?ver=1.10.3" id="mschartjs-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/printthis.js?ver=1.0.0" id="printthis-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/modal_survey_answer.min.js?ver=2.0.2.1.1" id="modal_survey_answer_script-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/modal_survey.min.js?ver=2.0.2.1.1" id="modal_survey_script-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/jquery.circliful.min.js?ver=1.0.2" id="circliful-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/modal_survey/templates/assets/js/touch.punch.js?ver=1.0.2" id="touchpunch-js"></script>
+
+<!-- Google tag (gtag.js) snippet added by Site Kit -->
+<!-- Google Analytics snippet added by Site Kit -->
+<script type="text/javascript" src="https://www.googletagmanager.com/gtag/js?id=G-3VCB6CKCGS" id="google_gtagjs-js" async></script>
+<script type="text/javascript" id="google_gtagjs-js-after">
+/* <![CDATA[ */
+window.dataLayer = window.dataLayer || [];function gtag(){dataLayer.push(arguments);}
+gtag("set","linker",{"domains":["ayurtimes.com"]});
+gtag("js", new Date());
+gtag("set", "developer_id.dZTNiMT", true);
+gtag("config", "G-3VCB6CKCGS");
+//# sourceURL=google_gtagjs-js-after
+/* ]]> */
+</script>
+<link rel="https://api.w.org/" href="https://ayurtimes.com/wp-json/" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://ayurtimes.com/xmlrpc.php?rsd" />
+<meta name="generator" content="WordPress 6.9.4" />
+<meta name="generator" content="Site Kit by Google 1.177.0" /><meta name="generator" content="Powered by Modal Survey 2.0.2.1.1 - Survey, Poll and Quiz builder plugin for WordPress with interactive charts and detailed results." />
+	<style>img#wpstats{display:none}</style>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<!-- Google AdSense meta tags added by Site Kit -->
+<meta name="google-adsense-platform-account" content="ca-host-pub-2644536267352236">
+<meta name="google-adsense-platform-domain" content="sitekit.withgoogle.com">
+<!-- End Google AdSense meta tags added by Site Kit -->
+<link rel="icon" href="https://ayurtimes.com/wp-content/uploads/2020/10/cropped-Ayur-Times-App-Icon-32x32.png" sizes="32x32" />
+<link rel="icon" href="https://ayurtimes.com/wp-content/uploads/2020/10/cropped-Ayur-Times-App-Icon-192x192.png" sizes="192x192" />
+<link rel="apple-touch-icon" href="https://ayurtimes.com/wp-content/uploads/2020/10/cropped-Ayur-Times-App-Icon-180x180.png" />
+<meta name="msapplication-TileImage" content="https://ayurtimes.com/wp-content/uploads/2020/10/cropped-Ayur-Times-App-Icon-270x270.png" />
+<style id='global-styles-inline-css' type='text/css'>
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--color--global-color: #ff2b58;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}:where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}:where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+</head>
+
+<body id="tie-body" class="error404 wp-theme-jannah tie-no-js boxed-layout framed-layout wrapper-has-shadow block-head-7 magazine1 is-thumb-overlay-disabled is-desktop is-header-layout-2 full-width">
+
+
+
+<div class="background-overlay">
+
+	<div id="tie-container" class="site tie-container">
+
+		
+		<div id="tie-wrapper">
+			<div class="rainbow-line"></div>
+<header id="theme-header" class="theme-header header-layout-2 main-nav-dark main-nav-default-dark main-nav-below no-stream-item top-nav-active top-nav-light top-nav-default-light top-nav-above has-shadow has-normal-width-logo mobile-header-centered">
+	
+<nav id="top-nav"  class="has-menu-components top-nav header-nav" aria-label="Secondary Navigation">
+	<div class="container">
+		<div class="topbar-wrapper">
+
+			
+			<div class="tie-alignleft">
+				<div class="top-menu header-menu"><ul id="menu-top-menu" class="menu"><li id="menu-item-34159" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-34159"><a target="_blank" href="https://ayurtimes.com/ayurvedic-dosha-test/">Dosha Tests</a>
+<ul class="sub-menu">
+	<li id="menu-item-37009" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-37009"><a target="_blank" href="https://ayurtimes.com/ayurvedic-dosha-test/">Ayurveda Dosha Test</a></li>
+	<li id="menu-item-35440" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-35440"><a target="_blank" href="https://ayurtimes.com/ayurveda-skin-type-test/">Ayurvedic Skin Type Test</a></li>
+	<li id="menu-item-34160" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34160"><a target="_blank" href="https://ayurtimes.com/ayurvedic-hair-type-quiz/">Ayurvedic Hair Type Quiz</a></li>
+</ul>
+</li>
+<li id="menu-item-38564" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-38564"><a href="https://ayurtimes.com/contact/">Contact Us</a></li>
+<li id="menu-item-37005" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-37005"><a>Disclaimer, Terms &#038; Policies</a>
+<ul class="sub-menu">
+	<li id="menu-item-37007" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-37007"><a href="https://ayurtimes.com/disclaimer/">Disclaimer</a></li>
+	<li id="menu-item-37008" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-37008"><a href="https://ayurtimes.com/terms-conditions/">Terms of Use</a></li>
+	<li id="menu-item-37006" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-37006"><a rel="privacy-policy" href="https://ayurtimes.com/privacy-policy/">Privacy Policy</a></li>
+	<li id="menu-item-38673" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-38673"><a href="https://ayurtimes.com/refund-policy/">Refund &#038; Return Policy</a></li>
+</ul>
+</li>
+</ul></div>			</div><!-- .tie-alignleft /-->
+
+			<div class="tie-alignright">
+				<ul class="components"> <li class="social-icons-item"><a class="social-link facebook-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.facebook.com/AyurTimes/"><span class="tie-social-icon tie-icon-facebook"></span><span class="screen-reader-text">Facebook</span></a></li><li class="social-icons-item"><a class="social-link twitter-social-icon" rel="external noopener nofollow" target="_blank" href="https://twitter.com/ayurtimes"><span class="tie-social-icon tie-icon-twitter"></span><span class="screen-reader-text">X</span></a></li><li class="social-icons-item"><a class="social-link pinterest-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.pinterest.com.au/ayurtimes/"><span class="tie-social-icon tie-icon-pinterest"></span><span class="screen-reader-text">Pinterest</span></a></li><li class="social-icons-item"><a class="social-link youtube-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.youtube.com/channel/UCXaMNwIlKfJ0vEYsCUey8MA"><span class="tie-social-icon tie-icon-youtube"></span><span class="screen-reader-text">YouTube</span></a></li><li class="social-icons-item"><a class="social-link instagram-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.instagram.com/ayur_times/"><span class="tie-social-icon tie-icon-instagram"></span><span class="screen-reader-text">Instagram</span></a></li> 	<li class="random-post-icon menu-item custom-menu-link">
+		<a href="/wp-content/uploads/2016/01/Neem-Leaves-Benefits-Uses.jpg?random-post=1" class="random-post" title="Random Article" rel="nofollow">
+			<span class="tie-icon-random" aria-hidden="true"></span>
+			<span class="screen-reader-text">Random Article</span>
+		</a>
+	</li>
+		<li class="skin-icon menu-item custom-menu-link">
+		<a href="#" class="change-skin" title="Switch skin">
+			<span class="tie-icon-moon change-skin-icon" aria-hidden="true"></span>
+			<span class="screen-reader-text">Switch skin</span>
+		</a>
+	</li>
+			<li class="search-bar menu-item custom-menu-link" aria-label="Search">
+				<style>
+		/** Search Box */
+		.tie-google-search .gsc-search-box,
+		.tie-google-search .gsc-search-box *{
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+			font-size: inherit !important;
+			font-family: inherit !important;
+			color: #777 !important;
+		}
+
+		.tie-google-search .gsc-search-box *{
+			background: none !important;
+		}
+
+		.tie-google-search .gsc-search-box .gsc-search-button button{
+			padding: 0 15px !important;
+		}
+
+		.tie-google-search .gsc-search-button-v2 svg{
+			fill: #777;
+			width: 16px;
+			height: 16px;
+			margin-top: 5px !important;
+		}
+
+		.tie-google-search .gsc-search-box div.gsc-input-box{
+			padding-left: 10px !important;
+		}
+		@media( max-width: 991px ){
+			.gssb_c{
+				display: none !important;
+			}
+		}
+		
+		.gssb_c{
+			width: 187px !important;
+			margin-top: 30px !important;
+			margin-left: -9px !important;
+		}
+
+		 .gssb_c *{
+			font-family: inherit !important;
+			font-size: inherit !important;
+			box-shadow: none !important;
+		}
+
+		.gsc-completion-container td{
+			padding-top: 3px !important;
+			padding-bottom: 3px !important;
+		}
+		
+		.dark-skin .gsc-completion-container tr:nth-child(2n){
+			background: rgba(0,0,0,0.08) !important;
+		}
+
+		.dark-skin .gsc-completion-container tr:hover{
+			background: rgba(0,0,0,0.1) !important;
+		}
+
+		.dark-skin .gsc-completion-container{
+			background: #1f2024;
+			border: 1px solid rgba(255,255,255,0.07);
+		}
+
+		#mobile-search .tie-google-search form.gsc-search-box{
+			padding: 4px 15px !important;
+			border-radius: 50px !important;
+			background-color: rgba(0,0,0,0.05) !important;
+			border: 1px solid rgba(255,255,255,0.1) !important;
+		}
+
+		#mobile-search .tie-google-search input.gsc-input{
+			color: #fff !important
+		}
+		#mobile-search .tie-google-search .gsc-search-button-v2 svg{
+			fill: #fff !important
+		}
+
+		.search-bar .tie-google-search,
+		.search-bar .tie-google-search > div{
+			width: 200px;
+		}
+	</style>
+	
+	<div class="tie-google-search">
+		<div class="gcse-searchbox-only" data-resultsUrl="https://ayurtimes.com/?s="></div>
+	</div>
+			</li>
+		</ul><!-- Components -->			</div><!-- .tie-alignright /-->
+
+		</div><!-- .topbar-wrapper /-->
+	</div><!-- .container /-->
+</nav><!-- #top-nav /-->
+
+<div class="container header-container">
+	<div class="tie-row logo-row">
+
+		
+		<div class="logo-wrapper">
+			<div class="tie-col-md-4 logo-container clearfix">
+				<div id="mobile-header-components-area_1" class="mobile-header-components"><ul class="components"><li class="mobile-component_menu custom-menu-link"><a href="#" id="mobile-menu-icon" class="menu-text-wrapper"><span class="tie-mobile-menu-icon tie-icon-grid-9"></span><span class="menu-text">Menu</span></a></li></ul></div>
+		<div id="logo" class="image-logo" >
+
+			
+			<a title="Ayur Times" href="https://ayurtimes.com/">
+				
+				<picture class="tie-logo-default tie-logo-picture">
+					
+					<source class="tie-logo-source-default tie-logo-source" srcset="https://ayurtimes.com/wp-content/uploads/2019/04/Ayur-Times-Logo-560x220-Live-healthier-happier-and-longer-life.png 2x, https://ayurtimes.com/wp-content/uploads/2019/04/Ayur-Times-Logo-280x110-Live-healthier-happier-and-longer-life.png 1x">
+					<img class="tie-logo-img-default tie-logo-img" src="https://ayurtimes.com/wp-content/uploads/2019/04/Ayur-Times-Logo-280x110-Live-healthier-happier-and-longer-life.png" alt="Ayur Times" width="280" height="110" style="max-height:110px; width: auto;" />
+				</picture>
+						</a>
+
+			
+		</div><!-- #logo /-->
+
+		<div id="mobile-header-components-area_2" class="mobile-header-components"><ul class="components"><li class="mobile-component_search custom-menu-link">
+				<a href="#" class="tie-search-trigger-mobile">
+					<span class="tie-icon-search tie-search-icon" aria-hidden="true"></span>
+					<span class="screen-reader-text">Search for</span>
+				</a>
+			</li> <li class="mobile-component_skin custom-menu-link">
+				<a href="#" class="change-skin" title="Switch skin">
+					<span class="tie-icon-moon change-skin-icon" aria-hidden="true"></span>
+					<span class="screen-reader-text">Switch skin</span>
+				</a>
+			</li></ul></div>			</div><!-- .tie-col /-->
+		</div><!-- .logo-wrapper /-->
+
+		
+	</div><!-- .tie-row /-->
+</div><!-- .container /-->
+
+<div class="main-nav-wrapper">
+	<nav id="main-nav"  class="main-nav header-nav menu-style-default menu-style-solid-bg"  aria-label="Primary Navigation">
+		<div class="container">
+
+			<div class="main-menu-wrapper">
+
+				
+				<div id="menu-components-wrap">
+
+					
+					<div class="main-menu main-menu-wrap">
+						<div id="main-nav-menu" class="main-menu header-menu"><ul id="menu-main-menu" class="menu"><li id="menu-item-38976" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-38976"><a href="https://ayurtimes.com/">Home</a></li>
+<li id="menu-item-34079" class="menu-have-icon menu-icon-type-fontawesome menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-34079"><a href="https://ayurtimes.com/category/plants-herbs/">Plants &#038; Herbs</a>
+<ul class="sub-menu menu-sub-content">
+	<li id="menu-item-34080" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34080"><a href="https://ayurtimes.com/category/plants-herbs/medicinal-plants/">Medicinal Plants</a></li>
+	<li id="menu-item-34081" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34081"><a href="https://ayurtimes.com/category/plants-herbs/essential-oils/">Essential Oils</a></li>
+	<li id="menu-item-34082" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34082"><a href="https://ayurtimes.com/category/plants-herbs/herbal-extracts/">Herbal Extracts</a></li>
+	<li id="menu-item-35547" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-35547"><a href="https://ayurtimes.com/category/plants-herbs/herbal-water/">Herbal Water</a></li>
+	<li id="menu-item-34083" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34083"><a href="https://ayurtimes.com/category/plants-herbs/herbal-tea/">Herbal Tea</a></li>
+	<li id="menu-item-34084" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34084"><a href="https://ayurtimes.com/category/plants-herbs/phytochemicals/">Phytochemicals</a></li>
+</ul>
+</li>
+<li id="menu-item-34072" class="menu-have-icon menu-icon-type-fontawesome menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-34072"><a href="https://ayurtimes.com/category/ayurveda/">Ayurveda</a>
+<ul class="sub-menu menu-sub-content">
+	<li id="menu-item-38980" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-38980"><a target="_blank" href="https://dosha.ayurtimes.com/ayurveda-dosha-test/">Ayurveda Dosha Quiz</a></li>
+	<li id="menu-item-38981" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-38981"><a target="_blank" href="https://dosha.ayurtimes.com/ayurveda-skin-type-test/">Ayurveda Skin Type Test</a></li>
+	<li id="menu-item-38982" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-38982"><a target="_blank" href="https://dosha.ayurtimes.com/ayurvedic-hair-type-quiz/">Ayurvedic Hair Type Quiz</a></li>
+	<li id="menu-item-38761" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38761"><a href="https://ayurtimes.com/category/ayurveda/ayurvedic-principles/">Ayurvedic Principles</a></li>
+	<li id="menu-item-35197" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-35197"><a href="https://ayurtimes.com/category/ayurveda/preventive-ayurveda/">Preventive Ayurveda</a></li>
+	<li id="menu-item-35192" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-35192"><a href="https://ayurtimes.com/category/ayurveda/ayurvedic-diet/">Ayurvedic Diet</a></li>
+	<li id="menu-item-34077" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34077"><a href="https://ayurtimes.com/category/ayurveda/rasayana/">Rejuvenation Therapy</a></li>
+	<li id="menu-item-34076" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34076"><a href="https://ayurtimes.com/category/ayurveda/panchakarma/">Panchakarma Therapies</a></li>
+	<li id="menu-item-34075" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34075"><a href="https://ayurtimes.com/category/ayurveda/ayurvedic-treatment/">Ayurvedic Treatment</a></li>
+	<li id="menu-item-35215" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-35215"><a href="https://ayurtimes.com/category/ayurveda/ayurvedic-formulations/">Ayurvedic Formulations</a>
+	<ul class="sub-menu menu-sub-content">
+		<li id="menu-item-34074" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-34074"><a href="https://ayurtimes.com/ayurvedic-medicine/">Ayurvedic Medicine List</a></li>
+	</ul>
+</li>
+	<li id="menu-item-34085" class="menu-have-icon menu-icon-type-fontawesome menu-item menu-item-type-custom menu-item-object-custom menu-item-34085"><a href="https://ayurtimes.com/category/ayurveda/home-remedies/">Home Remedies</a></li>
+	<li id="menu-item-38978" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38978"><a href="https://ayurtimes.com/category/ayurveda/hair-care/">Hair Care</a></li>
+	<li id="menu-item-38977" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38977"><a href="https://ayurtimes.com/category/ayurveda/skin-care/">Skin Care</a></li>
+	<li id="menu-item-38439" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-38439"><a href="https://ayurtimes.com/category/ayurveda/healing/">Healing Guides</a>
+	<ul class="sub-menu menu-sub-content">
+		<li id="menu-item-37581" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37581"><a href="https://ayurtimes.com/fasting-for-healing/">Fasting for Healing</a></li>
+		<li id="menu-item-38445" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-38445"><a href="https://ayurtimes.com/lifestyle-guide/">Lifestyle Guide</a></li>
+		<li id="menu-item-38446" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-38446"><a href="https://ayurtimes.com/sunbath/">Sunbath Guide</a></li>
+		<li id="menu-item-37825" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37825"><a href="https://ayurtimes.com/sattvic-food/">Sattvic Food</a></li>
+	</ul>
+</li>
+</ul>
+</li>
+<li id="menu-item-38447" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-38447 mega-menu mega-links mega-links-3col "><a href="https://ayurtimes.com/category/food-nutrition/">Food &amp; Nutrition</a>
+<div class="mega-menu-block menu-sub-content"  >
+
+<ul class="sub-menu-columns">
+	<li id="menu-item-37337" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-has-children menu-item-37337 mega-link-column "><a class="mega-links-head"  href="https://ayurtimes.com/category/food-nutrition/food-guide/">Food Guides</a>
+	<ul class="sub-menu-columns-item">
+		<li id="menu-item-37344" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37344"><a href="https://ayurtimes.com/dietary-guidelines/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Dietary Guidelines</a></li>
+		<li id="menu-item-37497" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37497"><a href="https://ayurtimes.com/fruit-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Fruits’ Guide</a></li>
+		<li id="menu-item-37488" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37488"><a href="https://ayurtimes.com/vegetable-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Vegetable Guide</a></li>
+		<li id="menu-item-37790" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37790"><a href="https://ayurtimes.com/fresh-herbs-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Fresh Herbs Guide</a></li>
+		<li id="menu-item-37568" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37568"><a href="https://ayurtimes.com/whole-grain-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Whole Grain Guide</a></li>
+		<li id="menu-item-37653" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37653"><a href="https://ayurtimes.com/legume-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Legume Guide</a></li>
+		<li id="menu-item-37652" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37652"><a href="https://ayurtimes.com/nuts-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Nuts Guide</a></li>
+		<li id="menu-item-37660" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37660"><a href="https://ayurtimes.com/seeds-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Seeds Guide</a></li>
+		<li id="menu-item-37789" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37789"><a href="https://ayurtimes.com/spices-guide/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Spices Guide</a></li>
+		<li id="menu-item-37332" class="menu-item menu-item-type-post_type menu-item-object-post menu-item-37332"><a href="https://ayurtimes.com/vitamin-b12/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Vitamin B12 Guide</a></li>
+	</ul>
+</li>
+	<li id="menu-item-38470" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-38470 mega-link-column "><a class="mega-links-head" >Food</a>
+	<ul class="sub-menu-columns-item">
+		<li id="menu-item-38454" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38454"><a href="https://ayurtimes.com/category/food-nutrition/fruits/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Fruits</a></li>
+		<li id="menu-item-38457" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38457"><a href="https://ayurtimes.com/category/food-nutrition/vegetables/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Vegetables</a></li>
+		<li id="menu-item-38476" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38476"><a href="https://ayurtimes.com/category/food-nutrition/fresh-herbs/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Fresh Herbs</a></li>
+		<li id="menu-item-38455" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38455"><a href="https://ayurtimes.com/category/food-nutrition/grains/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Whole Grains</a></li>
+		<li id="menu-item-38477" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38477"><a href="https://ayurtimes.com/category/food-nutrition/legumes/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Legumes</a></li>
+		<li id="menu-item-38475" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38475"><a href="https://ayurtimes.com/category/food-nutrition/nuts-seeds/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Nuts &amp; Seeds</a></li>
+		<li id="menu-item-38478" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38478"><a href="https://ayurtimes.com/category/food-nutrition/spices/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Spices</a></li>
+		<li id="menu-item-38448" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38448"><a href="https://ayurtimes.com/category/food-nutrition/beverage/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Beverage</a></li>
+		<li id="menu-item-38451" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38451"><a href="https://ayurtimes.com/category/food-nutrition/edible-oils/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Edible Oils</a></li>
+		<li id="menu-item-38452" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38452"><a href="https://ayurtimes.com/category/food-nutrition/food-additives/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Food Additives</a></li>
+	</ul>
+</li>
+	<li id="menu-item-38472" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-38472 mega-link-column "><a class="mega-links-head" >Nutrition</a>
+	<ul class="sub-menu-columns-item">
+		<li id="menu-item-38473" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38473"><a href="https://ayurtimes.com/category/food-nutrition/nutrients/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Nutrients</a></li>
+		<li id="menu-item-38474" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38474"><a href="https://ayurtimes.com/category/food-nutrition/nutrition-facts/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Nutrition Facts</a></li>
+		<li id="menu-item-38979" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-38979"><a href="https://ayurtimes.com/category/food-nutrition/healthy-recipes/"> <span aria-hidden="true" class="mega-links-default-icon"></span>Healthy Recipes</a></li>
+	</ul>
+</li>
+</ul>
+
+</div><!-- .mega-menu-block --> 
+</li>
+<li id="menu-item-39247" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-39247"><a href="https://ayurtimes.com/category/reviews/">Product Reviews</a></li>
+</ul></div>					</div><!-- .main-menu /-->
+
+					<ul class="components">		<li class="list-social-icons menu-item custom-menu-link">
+			<a href="#" class="follow-btn">
+				<span class="tie-icon-plus" aria-hidden="true"></span>
+				<span class="follow-text">Follow</span>
+			</a>
+			<ul class="dropdown-social-icons comp-sub-menu"><li class="social-icons-item"><a class="social-link facebook-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.facebook.com/AyurTimes/"><span class="tie-social-icon tie-icon-facebook"></span><span class="social-text">Facebook</span></a></li><li class="social-icons-item"><a class="social-link twitter-social-icon" rel="external noopener nofollow" target="_blank" href="https://twitter.com/ayurtimes"><span class="tie-social-icon tie-icon-twitter"></span><span class="social-text">X</span></a></li><li class="social-icons-item"><a class="social-link pinterest-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.pinterest.com.au/ayurtimes/"><span class="tie-social-icon tie-icon-pinterest"></span><span class="social-text">Pinterest</span></a></li><li class="social-icons-item"><a class="social-link youtube-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.youtube.com/channel/UCXaMNwIlKfJ0vEYsCUey8MA"><span class="tie-social-icon tie-icon-youtube"></span><span class="social-text">YouTube</span></a></li><li class="social-icons-item"><a class="social-link instagram-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.instagram.com/ayur_times/"><span class="tie-social-icon tie-icon-instagram"></span><span class="social-text">Instagram</span></a></li></ul><!-- #dropdown-social-icons /-->		</li><!-- #list-social-icons /-->
+			<li class="skin-icon menu-item custom-menu-link">
+		<a href="#" class="change-skin" title="Switch skin">
+			<span class="tie-icon-moon change-skin-icon" aria-hidden="true"></span>
+			<span class="screen-reader-text">Switch skin</span>
+		</a>
+	</li>
+			<li class="search-bar menu-item custom-menu-link" aria-label="Search">
+				<style>
+		/** Search Box */
+		.tie-google-search .gsc-search-box,
+		.tie-google-search .gsc-search-box *{
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+			font-size: inherit !important;
+			font-family: inherit !important;
+			color: #777 !important;
+		}
+
+		.tie-google-search .gsc-search-box *{
+			background: none !important;
+		}
+
+		.tie-google-search .gsc-search-box .gsc-search-button button{
+			padding: 0 15px !important;
+		}
+
+		.tie-google-search .gsc-search-button-v2 svg{
+			fill: #777;
+			width: 16px;
+			height: 16px;
+			margin-top: 5px !important;
+		}
+
+		.tie-google-search .gsc-search-box div.gsc-input-box{
+			padding-left: 10px !important;
+		}
+		@media( max-width: 991px ){
+			.gssb_c{
+				display: none !important;
+			}
+		}
+		
+		.gssb_c{
+			width: 187px !important;
+			margin-top: 30px !important;
+			margin-left: -9px !important;
+		}
+
+		 .gssb_c *{
+			font-family: inherit !important;
+			font-size: inherit !important;
+			box-shadow: none !important;
+		}
+
+		.gsc-completion-container td{
+			padding-top: 3px !important;
+			padding-bottom: 3px !important;
+		}
+		
+		.dark-skin .gsc-completion-container tr:nth-child(2n){
+			background: rgba(0,0,0,0.08) !important;
+		}
+
+		.dark-skin .gsc-completion-container tr:hover{
+			background: rgba(0,0,0,0.1) !important;
+		}
+
+		.dark-skin .gsc-completion-container{
+			background: #1f2024;
+			border: 1px solid rgba(255,255,255,0.07);
+		}
+
+		#mobile-search .tie-google-search form.gsc-search-box{
+			padding: 4px 15px !important;
+			border-radius: 50px !important;
+			background-color: rgba(0,0,0,0.05) !important;
+			border: 1px solid rgba(255,255,255,0.1) !important;
+		}
+
+		#mobile-search .tie-google-search input.gsc-input{
+			color: #fff !important
+		}
+		#mobile-search .tie-google-search .gsc-search-button-v2 svg{
+			fill: #fff !important
+		}
+
+		.search-bar .tie-google-search,
+		.search-bar .tie-google-search > div{
+			width: 200px;
+		}
+	</style>
+	
+	<div class="tie-google-search">
+		<div class="gcse-searchbox-only" data-resultsUrl="https://ayurtimes.com/?s="></div>
+	</div>
+			</li>
+		</ul><!-- Components -->
+				</div><!-- #menu-components-wrap /-->
+			</div><!-- .main-menu-wrapper /-->
+		</div><!-- .container /-->
+
+			</nav><!-- #main-nav /-->
+</div><!-- .main-nav-wrapper /-->
+
+</header>
+
+		<script type="text/javascript">
+			try{if("undefined"!=typeof localStorage){var header,mnIsDark=!1,tnIsDark=!1;(header=document.getElementById("theme-header"))&&((header=header.classList).contains("main-nav-default-dark")&&(mnIsDark=!0),header.contains("top-nav-default-dark")&&(tnIsDark=!0),"dark"==tieSkin?(header.add("main-nav-dark","top-nav-dark"),header.remove("main-nav-light","top-nav-light")):"light"==tieSkin&&(mnIsDark||(header.remove("main-nav-dark"),header.add("main-nav-light")),tnIsDark||(header.remove("top-nav-dark"),header.add("top-nav-light"))))}}catch(a){console.log(a)}
+		</script>
+		<div id="content" class="site-content container"><div id="main-content-row" class="tie-row main-content-row">
+	<div class="main-content tie-col-md-12" role="main">
+
+		<div class="container-404">
+
+			
+			<img class="img-404" src="https://ayurtimes.com/wp-content/uploads/2019/04/Ayur-Times-Default-Thumbnail-1.jpg" alt="" />
+			<h2>404 :(</h2>
+			<h3>Oops! That page can&rsquo;t be found.</h3>
+
+
+			
+				<h4>It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help.</h4>
+				<div id="content-404">
+					<form role="search" method="get" class="search-form" action="https://ayurtimes.com/">
+				<label>
+					<span class="screen-reader-text">Search for:</span>
+					<input type="search" class="search-field" placeholder="Search &hellip;" value="" name="s" />
+				</label>
+				<input type="submit" class="search-submit" value="Search" />
+			</form>				</div><!-- #content-404 /-->
+
+			
+
+			
+		</div><!-- .container-404 /-->
+
+	</div><!-- .main-content /-->
+
+</div><!-- .main-content-row /--></div><!-- #content /-->
+<footer id="footer" class="site-footer dark-skin dark-widgetized-area">
+
+	
+			<div id="site-info" class="site-info">
+				<div class="container">
+					<div class="tie-row">
+						<div class="tie-col-md-12">
+
+							<div class="copyright-text copyright-text-first">Copyright  &copy; 2013 - 2026 <a href="https://ayurtimes.com">AYUR TIMES</a>. All Rights Reserved.</div><div class="copyright-text copyright-text-second"><div class="legal-disclaimer">
+<p><strong>Disclaimer:</strong> Information provided on this website is not intended to diagnose, prevent, treat, or cure any disease. See a licensed medical professional for your health condition. <strong><a href="https://ayurtimes.com/disclaimer/">Read More</a></strong>. </p>
+
+<p>By using, reading or accessing any page on this website, you agree that you have read, understood and will abide by the <strong><a href="https://ayurtimes.com/disclaimer/">Disclaimer</a></strong>, <strong><a href="https://ayurtimes.com/privacy-policy/">Privacy Policy</a></strong> and <strong><a href="https://ayurtimes.com/terms-conditions/">Terms of Use</a></strong>.</p>
+</div></div><div class="footer-menu"><ul id="menu-footer-menu" class="menu"><li id="menu-item-31849" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-31849"><a href="https://ayurtimes.com/about/">ABOUT US</a></li>
+<li id="menu-item-11078" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11078"><a href="https://ayurtimes.com/disclaimer/">DISCLAIMER</a></li>
+<li id="menu-item-10629" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-privacy-policy menu-item-10629"><a rel="privacy-policy" href="https://ayurtimes.com/privacy-policy/">PRIVACY POLICY</a></li>
+<li id="menu-item-10630" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-10630"><a href="https://ayurtimes.com/terms-conditions/">TERMS OF USE</a></li>
+<li id="menu-item-38675" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-38675"><a href="https://ayurtimes.com/refund-policy/">REFUND &#038; RETURN POLICY</a></li>
+<li id="menu-item-23945" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-23945"><a href="https://ayurtimes.com/dmca-notification/">DMCA</a></li>
+<li id="menu-item-30517" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-30517"><a href="https://ayurtimes.com/contact/">CONTACT</a></li>
+</ul></div><ul class="social-icons"><li class="social-icons-item"><a class="social-link facebook-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.facebook.com/AyurTimes/"><span class="tie-social-icon tie-icon-facebook"></span><span class="screen-reader-text">Facebook</span></a></li><li class="social-icons-item"><a class="social-link twitter-social-icon" rel="external noopener nofollow" target="_blank" href="https://twitter.com/ayurtimes"><span class="tie-social-icon tie-icon-twitter"></span><span class="screen-reader-text">X</span></a></li><li class="social-icons-item"><a class="social-link pinterest-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.pinterest.com.au/ayurtimes/"><span class="tie-social-icon tie-icon-pinterest"></span><span class="screen-reader-text">Pinterest</span></a></li><li class="social-icons-item"><a class="social-link youtube-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.youtube.com/channel/UCXaMNwIlKfJ0vEYsCUey8MA"><span class="tie-social-icon tie-icon-youtube"></span><span class="screen-reader-text">YouTube</span></a></li><li class="social-icons-item"><a class="social-link instagram-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.instagram.com/ayur_times/"><span class="tie-social-icon tie-icon-instagram"></span><span class="screen-reader-text">Instagram</span></a></li></ul> 
+
+						</div><!-- .tie-col /-->
+					</div><!-- .tie-row /-->
+				</div><!-- .container /-->
+			</div><!-- #site-info /-->
+			
+</footer><!-- #footer /-->
+
+
+		<a id="go-to-top" class="go-to-top-button" href="#go-to-tie-body">
+			<span class="tie-icon-angle-up"></span>
+			<span class="screen-reader-text">Back to top button</span>
+		</a>
+	
+		</div><!-- #tie-wrapper /-->
+
+		
+	<aside class=" side-aside normal-side dark-skin dark-widgetized-area appear-from-left" aria-label="Secondary Sidebar" style="visibility: hidden;">
+		<div data-height="100%" class="side-aside-wrapper has-custom-scroll">
+
+			<a href="#" class="close-side-aside remove big-btn">
+				<span class="screen-reader-text">Close</span>
+			</a><!-- .close-side-aside /-->
+
+
+			
+				<div id="mobile-container">
+
+											<div id="mobile-search">
+								<style>
+		/** Search Box */
+		.tie-google-search .gsc-search-box,
+		.tie-google-search .gsc-search-box *{
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+			font-size: inherit !important;
+			font-family: inherit !important;
+			color: #777 !important;
+		}
+
+		.tie-google-search .gsc-search-box *{
+			background: none !important;
+		}
+
+		.tie-google-search .gsc-search-box .gsc-search-button button{
+			padding: 0 15px !important;
+		}
+
+		.tie-google-search .gsc-search-button-v2 svg{
+			fill: #777;
+			width: 16px;
+			height: 16px;
+			margin-top: 5px !important;
+		}
+
+		.tie-google-search .gsc-search-box div.gsc-input-box{
+			padding-left: 10px !important;
+		}
+		@media( max-width: 991px ){
+			.gssb_c{
+				display: none !important;
+			}
+		}
+		
+		.gssb_c{
+			width: 187px !important;
+			margin-top: 30px !important;
+			margin-left: -9px !important;
+		}
+
+		 .gssb_c *{
+			font-family: inherit !important;
+			font-size: inherit !important;
+			box-shadow: none !important;
+		}
+
+		.gsc-completion-container td{
+			padding-top: 3px !important;
+			padding-bottom: 3px !important;
+		}
+		
+		.dark-skin .gsc-completion-container tr:nth-child(2n){
+			background: rgba(0,0,0,0.08) !important;
+		}
+
+		.dark-skin .gsc-completion-container tr:hover{
+			background: rgba(0,0,0,0.1) !important;
+		}
+
+		.dark-skin .gsc-completion-container{
+			background: #1f2024;
+			border: 1px solid rgba(255,255,255,0.07);
+		}
+
+		#mobile-search .tie-google-search form.gsc-search-box{
+			padding: 4px 15px !important;
+			border-radius: 50px !important;
+			background-color: rgba(0,0,0,0.05) !important;
+			border: 1px solid rgba(255,255,255,0.1) !important;
+		}
+
+		#mobile-search .tie-google-search input.gsc-input{
+			color: #fff !important
+		}
+		#mobile-search .tie-google-search .gsc-search-button-v2 svg{
+			fill: #fff !important
+		}
+
+		.search-bar .tie-google-search,
+		.search-bar .tie-google-search > div{
+			width: 200px;
+		}
+	</style>
+	
+	<div class="tie-google-search">
+		<div class="gcse-searchbox-only" data-resultsUrl="https://ayurtimes.com/?s="></div>
+	</div>
+								</div><!-- #mobile-search /-->
+						
+					<div id="mobile-menu" class="hide-menu-icons">
+											</div><!-- #mobile-menu /-->
+
+											<div id="mobile-social-icons" class="social-icons-widget solid-social-icons">
+							<ul><li class="social-icons-item"><a class="social-link facebook-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.facebook.com/AyurTimes/"><span class="tie-social-icon tie-icon-facebook"></span><span class="screen-reader-text">Facebook</span></a></li><li class="social-icons-item"><a class="social-link twitter-social-icon" rel="external noopener nofollow" target="_blank" href="https://twitter.com/ayurtimes"><span class="tie-social-icon tie-icon-twitter"></span><span class="screen-reader-text">X</span></a></li><li class="social-icons-item"><a class="social-link pinterest-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.pinterest.com.au/ayurtimes/"><span class="tie-social-icon tie-icon-pinterest"></span><span class="screen-reader-text">Pinterest</span></a></li><li class="social-icons-item"><a class="social-link youtube-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.youtube.com/channel/UCXaMNwIlKfJ0vEYsCUey8MA"><span class="tie-social-icon tie-icon-youtube"></span><span class="screen-reader-text">YouTube</span></a></li><li class="social-icons-item"><a class="social-link instagram-social-icon" rel="external noopener nofollow" target="_blank" href="https://www.instagram.com/ayur_times/"><span class="tie-social-icon tie-icon-instagram"></span><span class="screen-reader-text">Instagram</span></a></li></ul> 
+						</div><!-- #mobile-social-icons /-->
+						
+				</div><!-- #mobile-container /-->
+			
+
+			
+		</div><!-- .side-aside-wrapper /-->
+	</aside><!-- .side-aside /-->
+
+	
+	</div><!-- #tie-container /-->
+</div><!-- .background-overlay /-->
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/jannah/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<div id="is-scroller-outer"><div id="is-scroller"></div></div><div id="fb-root"></div>		<div id="tie-popup-search-mobile" class="tie-popup tie-popup-search-wrap" style="display: none;">
+			<a href="#" class="tie-btn-close remove big-btn light-btn">
+				<span class="screen-reader-text">Close</span>
+			</a>
+			<div class="popup-search-wrap-inner">
+
+				<div class="live-search-parent pop-up-live-search" data-skin="live-search-popup" aria-label="Search">
+
+					<style>
+		/** Search Box */
+		.tie-google-search .gsc-search-box,
+		.tie-google-search .gsc-search-box *{
+			margin: 0 !important;
+			padding: 0 !important;
+			border: none !important;
+			font-size: inherit !important;
+			font-family: inherit !important;
+			color: #777 !important;
+		}
+
+		.tie-google-search .gsc-search-box *{
+			background: none !important;
+		}
+
+		.tie-google-search .gsc-search-box .gsc-search-button button{
+			padding: 0 15px !important;
+		}
+
+		.tie-google-search .gsc-search-button-v2 svg{
+			fill: #777;
+			width: 16px;
+			height: 16px;
+			margin-top: 5px !important;
+		}
+
+		.tie-google-search .gsc-search-box div.gsc-input-box{
+			padding-left: 10px !important;
+		}
+		@media( max-width: 991px ){
+			.gssb_c{
+				display: none !important;
+			}
+		}
+		
+		.gssb_c{
+			width: 187px !important;
+			margin-top: 30px !important;
+			margin-left: -9px !important;
+		}
+
+		 .gssb_c *{
+			font-family: inherit !important;
+			font-size: inherit !important;
+			box-shadow: none !important;
+		}
+
+		.gsc-completion-container td{
+			padding-top: 3px !important;
+			padding-bottom: 3px !important;
+		}
+		
+		.dark-skin .gsc-completion-container tr:nth-child(2n){
+			background: rgba(0,0,0,0.08) !important;
+		}
+
+		.dark-skin .gsc-completion-container tr:hover{
+			background: rgba(0,0,0,0.1) !important;
+		}
+
+		.dark-skin .gsc-completion-container{
+			background: #1f2024;
+			border: 1px solid rgba(255,255,255,0.07);
+		}
+
+		#mobile-search .tie-google-search form.gsc-search-box{
+			padding: 4px 15px !important;
+			border-radius: 50px !important;
+			background-color: rgba(0,0,0,0.05) !important;
+			border: 1px solid rgba(255,255,255,0.1) !important;
+		}
+
+		#mobile-search .tie-google-search input.gsc-input{
+			color: #fff !important
+		}
+		#mobile-search .tie-google-search .gsc-search-button-v2 svg{
+			fill: #fff !important
+		}
+
+		.search-bar .tie-google-search,
+		.search-bar .tie-google-search > div{
+			width: 200px;
+		}
+	</style>
+	
+	<div class="tie-google-search">
+		<div class="gcse-searchbox-only" data-resultsUrl="https://ayurtimes.com/?s="></div>
+	</div>
+	
+				</div><!-- .pop-up-live-search /-->
+
+			</div><!-- .popup-search-wrap-inner /-->
+		</div><!-- .tie-popup-search-wrap /-->
+		<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/datepicker.min.js?ver=1.13.3" id="jquery-ui-datepicker-js"></script>
+<script type="text/javascript" id="jquery-ui-datepicker-js-after">
+/* <![CDATA[ */
+jQuery(function(jQuery){jQuery.datepicker.setDefaults({"closeText":"Close","currentText":"Today","monthNames":["January","February","March","April","May","June","July","August","September","October","November","December"],"monthNamesShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"nextText":"Next","prevText":"Previous","dayNames":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"dayNamesShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"dayNamesMin":["S","M","T","W","T","F","S"],"dateFormat":"MM d, yy","firstDay":1,"isRTL":false});});
+//# sourceURL=jquery-ui-datepicker-js-after
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/effect.min.js?ver=1.13.3" id="jquery-effects-core-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/effect-drop.min.js?ver=1.13.3" id="jquery-effects-drop-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/effect-fade.min.js?ver=1.13.3" id="jquery-effects-fade-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-includes/js/jquery/ui/effect-slide.min.js?ver=1.13.3" id="jquery-effects-slide-js"></script>
+<script type="text/javascript" id="toc-front-js-extra">
+/* <![CDATA[ */
+var tocplus = {"smooth_scroll":"1","visibility_show":"show","visibility_hide":"hide","width":"Auto"};
+//# sourceURL=toc-front-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/plugins/table-of-contents-plus/front.min.js?ver=2411.1" id="toc-front-js"></script>
+<script type="text/javascript" id="tie-scripts-js-extra">
+/* <![CDATA[ */
+var tie = {"is_rtl":"","ajaxurl":"https://ayurtimes.com/wp-admin/admin-ajax.php","is_side_aside_light":"","is_taqyeem_active":"","is_sticky_video":"","mobile_menu_top":"1","mobile_menu_active":"area_1","mobile_menu_parent":"","lightbox_all":"true","lightbox_gallery":"true","lightbox_skin":"dark","lightbox_thumb":"horizontal","lightbox_arrows":"true","is_singular":"","autoload_posts":"","reading_indicator":"true","lazyload":"","select_share":"true","select_share_twitter":"true","select_share_facebook":"true","select_share_linkedin":"true","select_share_email":"","facebook_app_id":"5303202981","twitter_username":"ayurtimes","responsive_tables":"true","ad_blocker_detector":"","sticky_behavior":"upwards","sticky_desktop":"true","sticky_mobile":"true","sticky_mobile_behavior":"upwards","ajax_loader":"\u003Cdiv class=\"loader-overlay\"\u003E\u003Cdiv class=\"spinner-circle\"\u003E\u003C/div\u003E\u003C/div\u003E","type_to_search":"","lang_no_results":"Nothing Found","sticky_share_mobile":"","sticky_share_post":"true","sticky_share_post_menu":""};
+//# sourceURL=tie-scripts-js-extra
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/themes/jannah/assets/js/scripts.min.js?ver=7.6.5" id="tie-scripts-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/themes/jannah/assets/ilightbox/lightbox.js?ver=7.6.5" id="tie-js-ilightbox-js"></script>
+<script type="text/javascript" src="https://ayurtimes.com/wp-content/themes/jannah/assets/js/desktop.min.js?ver=7.6.5" id="tie-js-desktop-js"></script>
+<script type="text/javascript" id="jetpack-stats-js-before">
+/* <![CDATA[ */
+_stq = window._stq || [];
+_stq.push([ "view", {"v":"ext","blog":"66299686","post":"0","tz":"9.5","srv":"ayurtimes.com","arch_err":"/wp-content/uploads/2016/01/Neem-Leaves-Benefits-Uses.jpg","j":"1:15.7.1"} ]);
+_stq.push([ "clickTrackerInit", "66299686", "0" ]);
+//# sourceURL=jetpack-stats-js-before
+/* ]]> */
+</script>
+<script type="text/javascript" src="https://stats.wp.com/e-202617.js" id="jetpack-stats-js" defer="defer" data-wp-strategy="defer"></script>
+<script type="text/javascript" src="https://cse.google.com/cse.js?cx=006083991044732993515%3Ait4mrjq9066&amp;ver=1" id="tie-google-search-js"></script>
+<script id="wp-emoji-settings" type="application/json">
+{"baseUrl":"https://s.w.org/images/core/emoji/17.0.2/72x72/","ext":".png","svgUrl":"https://s.w.org/images/core/emoji/17.0.2/svg/","svgExt":".svg","source":{"concatemoji":"https://ayurtimes.com/wp-includes/js/wp-emoji-release.min.js?ver=6.9.4"}}
+</script>
+<script type="module">
+/* <![CDATA[ */
+/*! This file is auto-generated */
+const a=JSON.parse(document.getElementById("wp-emoji-settings").textContent),o=(window._wpemojiSettings=a,"wpEmojiSettingsSupports"),s=["flag","emoji"];function i(e){try{var t={supportTests:e,timestamp:(new Date).valueOf()};sessionStorage.setItem(o,JSON.stringify(t))}catch(e){}}function c(e,t,n){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);t=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(n,0,0);const a=new Uint32Array(e.getImageData(0,0,e.canvas.width,e.canvas.height).data);return t.every((e,t)=>e===a[t])}function p(e,t){e.clearRect(0,0,e.canvas.width,e.canvas.height),e.fillText(t,0,0);var n=e.getImageData(16,16,1,1);for(let e=0;e<n.data.length;e++)if(0!==n.data[e])return!1;return!0}function u(e,t,n,a){switch(t){case"flag":return n(e,"\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f","\ud83c\udff3\ufe0f\u200b\u26a7\ufe0f")?!1:!n(e,"\ud83c\udde8\ud83c\uddf6","\ud83c\udde8\u200b\ud83c\uddf6")&&!n(e,"\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f","\ud83c\udff4\u200b\udb40\udc67\u200b\udb40\udc62\u200b\udb40\udc65\u200b\udb40\udc6e\u200b\udb40\udc67\u200b\udb40\udc7f");case"emoji":return!a(e,"\ud83e\u1fac8")}return!1}function f(e,t,n,a){let r;const o=(r="undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?new OffscreenCanvas(300,150):document.createElement("canvas")).getContext("2d",{willReadFrequently:!0}),s=(o.textBaseline="top",o.font="600 32px Arial",{});return e.forEach(e=>{s[e]=t(o,e,n,a)}),s}function r(e){var t=document.createElement("script");t.src=e,t.defer=!0,document.head.appendChild(t)}a.supports={everything:!0,everythingExceptFlag:!0},new Promise(t=>{let n=function(){try{var e=JSON.parse(sessionStorage.getItem(o));if("object"==typeof e&&"number"==typeof e.timestamp&&(new Date).valueOf()<e.timestamp+604800&&"object"==typeof e.supportTests)return e.supportTests}catch(e){}return null}();if(!n){if("undefined"!=typeof Worker&&"undefined"!=typeof OffscreenCanvas&&"undefined"!=typeof URL&&URL.createObjectURL&&"undefined"!=typeof Blob)try{var e="postMessage("+f.toString()+"("+[JSON.stringify(s),u.toString(),c.toString(),p.toString()].join(",")+"));",a=new Blob([e],{type:"text/javascript"});const r=new Worker(URL.createObjectURL(a),{name:"wpTestEmojiSupports"});return void(r.onmessage=e=>{i(n=e.data),r.terminate(),t(n)})}catch(e){}i(n=f(s,u,c,p))}t(n)}).then(e=>{for(const n in e)a.supports[n]=e[n],a.supports.everything=a.supports.everything&&a.supports[n],"flag"!==n&&(a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&a.supports[n]);var t;a.supports.everythingExceptFlag=a.supports.everythingExceptFlag&&!a.supports.flag,a.supports.everything||((t=a.source||{}).concatemoji?r(t.concatemoji):t.wpemoji&&t.twemoji&&(r(t.twemoji),r(t.wpemoji)))});
+//# sourceURL=https://ayurtimes.com/wp-includes/js/wp-emoji-loader.min.js
+/* ]]> */
+</script>
+<script>
+				WebFontConfig ={
+					google:{
+						families: [ 'Poppins:600,regular:latin&display=swap' ]
+					}
+				};
+
+				(function(){
+					var wf   = document.createElement('script');
+					wf.src   = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+					wf.type  = 'text/javascript';
+					wf.defer = 'true';
+					var s = document.getElementsByTagName('script')[0];
+					s.parentNode.insertBefore(wf, s);
+				})();
+			</script>		<script type='text/javascript'>
+			!function(t){"use strict";t.loadCSS||(t.loadCSS=function(){});var e=loadCSS.relpreload={};if(e.support=function(){var e;try{e=t.document.createElement("link").relList.supports("preload")}catch(t){e=!1}return function(){return e}}(),e.bindMediaToggle=function(t){var e=t.media||"all";function a(){t.addEventListener?t.removeEventListener("load",a):t.attachEvent&&t.detachEvent("onload",a),t.setAttribute("onload",null),t.media=e}t.addEventListener?t.addEventListener("load",a):t.attachEvent&&t.attachEvent("onload",a),setTimeout(function(){t.rel="stylesheet",t.media="only x"}),setTimeout(a,3e3)},e.poly=function(){if(!e.support())for(var a=t.document.getElementsByTagName("link"),n=0;n<a.length;n++){var o=a[n];"preload"!==o.rel||"style"!==o.getAttribute("as")||o.getAttribute("data-loadcss")||(o.setAttribute("data-loadcss",!0),e.bindMediaToggle(o))}},!e.support()){e.poly();var a=t.setInterval(e.poly,500);t.addEventListener?t.addEventListener("load",function(){e.poly(),t.clearInterval(a)}):t.attachEvent&&t.attachEvent("onload",function(){e.poly(),t.clearInterval(a)})}"undefined"!=typeof exports?exports.loadCSS=loadCSS:t.loadCSS=loadCSS}("undefined"!=typeof global?global:this);
+		</script>
+
+		<script type='text/javascript'>
+			var c = document.body.className;
+			c = c.replace(/tie-no-js/, 'tie-js');
+			document.body.className = c;
+		</script>
+		
+</body>
+</html>

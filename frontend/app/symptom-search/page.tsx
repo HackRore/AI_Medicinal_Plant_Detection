@@ -134,73 +134,88 @@ export default function SymptomSearchPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#05080a] text-white pt-24 pb-20">
+    <div className="min-h-screen bg-[#020202] text-white pt-32 pb-24 relative overflow-hidden">
       {/* Background Decor */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-emerald-900/40 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-teal-900/30 rounded-full blur-[100px]" />
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-teal-900/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[1000px] h-[1000px] bg-primary-900/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_10%,transparent_100%)]" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        {/* Hero Section */}
-        <div className="max-w-3xl mx-auto text-center mb-12">
+        <div className="max-w-4xl mx-auto text-center mb-16">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest mb-6"
+            className="inline-flex items-center gap-4 px-6 py-2 rounded-full bg-black/50 border border-teal-500/30 text-teal-400 text-[10px] font-black uppercase tracking-[0.5em] mb-8 shadow-[0_0_30px_rgba(20,184,166,0.15)] backdrop-blur-md relative overflow-hidden group"
           >
-            <Stethoscope className="w-3 h-3" />
-            AI Symptom Analysis
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[1.5s]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse shadow-[0_0_10px_rgba(20,184,166,1)]" />
+            Clinical Symptom Engine
           </motion.div>
+          
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black mb-6 bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent"
+            className="text-6xl md:text-[7rem] font-black tracking-tighter uppercase mb-8 leading-[0.85] text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           >
-            Describe your symptoms. <br />
-            <span className="text-emerald-500">Expert Clinical Guidance.</span>
+            Diagnostic <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-primary-500 drop-shadow-[0_0_60px_rgba(20,184,166,0.4)]">Synthesis</span>
           </motion.h1>
+          
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-gray-400 text-lg"
+            className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto italic"
           >
-            Our AI Botanical Guide analyzes your condition against ancient classical texts to recommend the most effective medicinal plants.
+            Our AI Botanical Guide analyzes your condition against thousands of verified Ayurvedic monographs. Describe your symptoms.
           </motion.p>
         </div>
 
-        {/* Search Box */}
+        {/* Main Search Interface */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3 }}
-          className="max-w-2xl mx-auto"
+          className="max-w-3xl mx-auto"
         >
-          <Card className="bg-white/5 border-white/10 backdrop-blur-sm overflow-hidden">
-            <CardContent className="p-6">
-              <div className="relative">
-                <textarea
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-primary-500 to-teal-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-pulse" />
+            <div className="relative glass-card p-4 rounded-[2.5rem] bg-black/60 backdrop-blur-2xl border border-white/10 flex gap-4">
+              <div className="relative flex-1">
+                <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+                  <MessageSquare className="h-6 w-6 text-gray-500 group-focus-within:text-teal-400 transition-colors" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="e.g., severe migraine, joint pain, or persistent dry cough..."
                   value={symptoms}
                   onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="Describe how you feel... (e.g., I have fever, body aches and low energy for 3 days...)"
-                  className="w-full h-40 bg-black/40 border border-white/10 rounded-2xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-emerald-500/50 transition-all resize-none mb-4"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && symptoms.trim() && !searchMutation.isPending) {
+                      searchMutation.mutate(symptoms)
+                    }
+                  }}
+                  className="w-full bg-transparent border-none text-white text-xl placeholder:text-gray-600 focus:ring-0 pl-16 pr-6 h-16 font-medium italic"
+                  disabled={searchMutation.isPending}
                 />
-                <div className="absolute bottom-6 right-4 text-xs text-gray-500 font-mono">
-                  {symptoms.length} chars
-                </div>
               </div>
               <Button
                 onClick={() => searchMutation.mutate(symptoms)}
-                disabled={searchMutation.isPending || symptoms.length < 5}
-                className="w-full h-14 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl gap-2 shadow-lg shadow-emerald-900/20 transition-all active:scale-[0.98]"
+                disabled={!symptoms.trim() || searchMutation.isPending}
+                className="h-16 px-10 rounded-[2rem] bg-teal-500 text-black font-black uppercase tracking-[0.2em] hover:bg-teal-400 shadow-[0_0_30px_rgba(20,184,166,0.3)] transition-all flex items-center gap-3 shrink-0"
               >
-                {searchMutation.isPending ? "Analyzing Conditions..." : "Find Ayurvedic Remedy"}
-                <ArrowRight className="w-5 h-5" />
+                {searchMutation.isPending ? "Analyzing..." : (
+                  <>
+                    Initiate
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
 
         <AnimatePresence>

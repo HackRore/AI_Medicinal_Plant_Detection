@@ -320,42 +320,44 @@ export default function PredictClient() {
       <DisclaimerBanner />
       <DisclaimerModal />
       
-      <header className="text-center space-y-8 mb-20">
+      <header className="text-center space-y-10 mb-24 relative z-20">
         <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-3 px-6 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4 shadow-[0_0_30px_rgba(16,185,129,0.1)]"
+            initial={{ opacity: 0, y: -20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="inline-flex items-center gap-4 px-8 py-3 bg-black/40 backdrop-blur-xl border border-primary-500/30 rounded-full mb-4 shadow-[0_0_50px_rgba(16,185,129,0.15)] overflow-hidden relative group"
         >
-            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-ping" />
-            <span className="text-[9px] font-black uppercase tracking-[0.4em] text-primary-400">Spec v2.1 Tactical Neural Lens</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[1.5s]" />
+            <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(16,185,129,1)] animate-ping" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-400 drop-shadow-md">Spec v5.1 Tactical Neural Lens</span>
         </motion.div>
         
-        <h1 className="text-7xl md:text-[8rem] font-black text-white tracking-tighter leading-none uppercase text-glow-white">
-          Neural <span className="text-primary-500 text-glow">Scanner</span>
+        <h1 className="text-7xl md:text-[9rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 tracking-tighter leading-[0.8] uppercase drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+          Neural <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-teal-600 drop-shadow-[0_0_80px_rgba(16,185,129,0.3)]">Scanner</span>
         </h1>
         
-        <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto italic leading-relaxed">
-          The world's most precise botanical identification engine. Trained on high-fidelity clinical datasets for superior Ayurvedic accuracy.
+        <p className="text-xl md:text-2xl text-gray-400 font-medium max-w-3xl mx-auto italic leading-relaxed">
+          Initialize the world's most precise botanical identification engine. Upload the bio-signature for immediate Ayurvedic decoding.
         </p>
         
-        <div className="flex justify-center gap-8 pt-12">
+        <div className="flex justify-center gap-6 pt-16 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -z-10" />
           <button 
             onClick={() => setActiveModule('scanner')}
-            className={`group relative h-20 px-12 rounded-[2rem] font-black uppercase tracking-[0.2em] transition-all overflow-hidden ${
-                activeModule === 'scanner' ? 'bg-primary-500 text-black shadow-[0_0_50px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-gray-500 border border-white/10'
+            className={`group relative h-20 md:h-24 px-12 md:px-16 rounded-[2.5rem] font-black uppercase tracking-[0.3em] transition-all overflow-hidden ${
+                activeModule === 'scanner' ? 'bg-white text-black shadow-[0_0_80px_rgba(255,255,255,0.2)] scale-105' : 'bg-black/50 backdrop-blur-xl text-gray-500 border border-white/10 hover:border-white/30'
             }`}
           >
-            {activeModule === 'scanner' && <div className="absolute inset-0 glass-reflection" />}
-            Neural Scanner
+            {activeModule === 'scanner' && <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />}
+            Target Acq
           </button>
           <button 
             onClick={() => setActiveModule('symptoms')}
-            className={`group relative h-20 px-12 rounded-[2rem] font-black uppercase tracking-[0.2em] transition-all overflow-hidden ${
-                activeModule === 'symptoms' ? 'bg-primary-500 text-black shadow-[0_0_50px_rgba(16,185,129,0.2)]' : 'bg-white/5 text-gray-500 border border-white/10'
+            className={`group relative h-20 md:h-24 px-12 md:px-16 rounded-[2.5rem] font-black uppercase tracking-[0.3em] transition-all overflow-hidden ${
+                activeModule === 'symptoms' ? 'bg-white text-black shadow-[0_0_80px_rgba(255,255,255,0.2)] scale-105' : 'bg-black/50 backdrop-blur-xl text-gray-500 border border-white/10 hover:border-white/30'
             }`}
           >
-            {activeModule === 'symptoms' && <div className="absolute inset-0 glass-reflection" />}
-            Symptom Engine
+            {activeModule === 'symptoms' && <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />}
+            Symptoms
           </button>
         </div>
       </header>
@@ -372,22 +374,43 @@ export default function PredictClient() {
           >
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-12">
-                <div className="grid md:grid-cols-2 gap-8">
-                  <label className="group relative cursor-pointer block p-16 bg-white/[0.02] border-2 border-dashed border-white/10 rounded-[3rem] hover:border-primary-500/50 hover:bg-white/[0.05] transition-all text-center overflow-hidden">
-                    <div className="scanline opacity-10" />
+                <div className="grid md:grid-cols-2 gap-8 relative">
+                  {/* Tactical Crosshairs */}
+                  <div className="absolute -inset-8 border border-white/[0.03] rounded-[4rem] pointer-events-none" />
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-primary-500/30 flex items-center justify-center pointer-events-none">
+                     <div className="w-full h-[1px] bg-current" />
+                     <div className="w-[1px] h-full bg-current absolute" />
+                  </div>
+
+                  <label className="group relative cursor-pointer block h-80 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[3rem] hover:border-primary-500/60 hover:bg-primary-900/10 transition-all text-center overflow-hidden shadow-[0_0_0_rgba(16,185,129,0)] hover:shadow-[0_0_60px_rgba(16,185,129,0.15)] flex flex-col items-center justify-center transform-gpu hover:-translate-y-2">
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-primary-500 to-transparent translate-y-[-100%] group-hover:translate-y-[4000%] transition-transform duration-[3s] ease-in-out" />
                     <input type="file" accept="image/*" onChange={handleFileSelect} className="sr-only" disabled={predictMutation.isPending} />
-                    <Upload className="mx-auto h-16 w-16 text-gray-600 group-hover:text-primary-400 mb-8 transition-all group-hover:scale-110" />
-                    <p className="font-black text-white uppercase tracking-[0.3em] text-xs">Upload Signature</p>
+                    
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-primary-500/20 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
+                        <Upload className="relative z-10 h-20 w-20 text-gray-500 group-hover:text-primary-400 mb-8 transition-all duration-500 group-hover:scale-110" />
+                    </div>
+                    
+                    <p className="font-black text-white uppercase tracking-[0.4em] text-xs relative z-10">Inject Image Data</p>
+                    <p className="font-bold text-gray-600 uppercase tracking-widest text-[9px] mt-3 relative z-10">High Res Signature Required</p>
                   </label>
                   
                   <button 
                     onClick={() => setIsCameraOpen(true)} 
-                    className="group relative p-16 bg-white/[0.02] border border-white/10 rounded-[3rem] hover:border-primary-500/50 hover:bg-white/[0.05] transition-all text-center overflow-hidden"
+                    className="group relative h-80 bg-black/40 backdrop-blur-2xl border border-white/10 rounded-[3rem] hover:border-teal-500/60 hover:bg-teal-900/10 transition-all text-center overflow-hidden shadow-[0_0_0_rgba(20,184,166,0)] hover:shadow-[0_0_60px_rgba(20,184,166,0.15)] flex flex-col items-center justify-center transform-gpu hover:-translate-y-2"
                     disabled={predictMutation.isPending}
                   >
-                    <div className="scanline opacity-10" />
-                    <Camera className="mx-auto h-16 w-16 text-gray-600 group-hover:text-primary-400 mb-8 transition-all group-hover:scale-110" />
-                    <p className="font-black text-white uppercase tracking-[0.3em] text-xs">Neural Lens</p>
+                    <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                    <div className="absolute bottom-0 left-0 w-[2px] h-full bg-gradient-to-b from-transparent via-teal-500 to-transparent translate-x-[-100%] group-hover:translate-x-[4000%] transition-transform duration-[3s] ease-in-out" />
+                    
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-teal-500/20 blur-2xl rounded-full scale-0 group-hover:scale-150 transition-transform duration-700" />
+                        <Camera className="relative z-10 h-20 w-20 text-gray-500 group-hover:text-teal-400 mb-8 transition-all duration-500 group-hover:scale-110" />
+                    </div>
+
+                    <p className="font-black text-white uppercase tracking-[0.4em] text-xs relative z-10">Live Scanner</p>
+                    <p className="font-bold text-gray-600 uppercase tracking-widest text-[9px] mt-3 relative z-10">Engage Optical Sensors</p>
                   </button>
                 </div>
                 

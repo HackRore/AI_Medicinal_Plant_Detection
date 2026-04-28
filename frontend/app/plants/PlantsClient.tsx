@@ -51,36 +51,69 @@ export default function PlantsClient() {
   }, [search, retryCount]);
 
   return (
-    <main className="min-h-screen bg-[#050505] pt-32 pb-24 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 bg-primary-500/5 pointer-events-none" />
+    <main className="min-h-[100vh] bg-[#020202] pt-32 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-teal-900/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute bottom-[-20%] left-[-10%] w-[1000px] h-[1000px] bg-primary-900/20 rounded-full blur-[150px] mix-blend-screen" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black_10%,transparent_100%)]" />
+      </div>
+
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-20 text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary-400">Neural Botanical Repository</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter uppercase leading-none">
-            Neural <span className="text-primary-500">Knowledge</span> Base
-          </h1>
-          <p className="text-gray-500 max-w-2xl mx-auto font-medium italic">
+        <div className="mb-20 text-center space-y-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-4 px-6 py-2 rounded-full bg-black/50 border border-primary-500/30 text-primary-400 text-[10px] font-black uppercase tracking-[0.5em] mb-4 shadow-[0_0_30px_rgba(16,185,129,0.15)] backdrop-blur-md relative overflow-hidden group"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[1.5s]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,1)]" />
+            Neural Botanical Repository
+          </motion.div>
+          
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-6xl md:text-[8rem] font-black tracking-tighter uppercase leading-[0.85] text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
+          >
+            Knowledge <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-teal-500 drop-shadow-[0_0_60px_rgba(16,185,129,0.4)]">Base</span>
+          </motion.h1>
+          
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-xl md:text-2xl text-gray-400 font-medium max-w-3xl mx-auto italic"
+          >
             Synchronized clinical monographs. Verified against ancient Ayurvedic taxonomies and modern botanical datasets.
-          </p>
+          </motion.p>
         </div>
 
         {/* Search Bar */}
-        <div className="relative max-w-2xl mx-auto mb-24">
-          <input 
-            value={search} 
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search by common name, scientific name, or family..." 
-            className="w-full h-20 pl-8 pr-16 bg-white/5 border border-white/10 rounded-3xl text-white placeholder-gray-700 focus:outline-none focus:border-primary-500/50 transition-all font-medium backdrop-blur-3xl text-lg" 
-          />
-          <div className="absolute right-8 top-1/2 -translate-y-1/2 text-primary-500">
-            <svg className="w-8 h-8 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.3 }}
+          className="relative max-w-3xl mx-auto mb-24 group"
+        >
+          <div className="absolute -inset-1 bg-gradient-to-r from-primary-500 via-teal-500 to-primary-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-pulse" />
+          <div className="relative">
+            <input 
+              value={search} 
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search by common name, scientific name, or family..." 
+              className="w-full h-20 pl-10 pr-20 bg-black/60 border border-white/10 rounded-[2.5rem] text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-all font-medium backdrop-blur-2xl text-xl italic" 
+            />
+            <div className="absolute right-8 top-1/2 -translate-y-1/2 text-primary-500 pointer-events-none">
+              <svg className="w-8 h-8 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Status/Error */}
         {error && (
