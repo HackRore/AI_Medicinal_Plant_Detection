@@ -5,7 +5,9 @@ from app.services.gemini_service import gemini_service
 from app.database import SessionLocal
 from app.models.plant import Plant
 import asyncio
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 @router.post("")
@@ -71,8 +73,16 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
                 "stage2_check": leaf_check
             }, status_code=200)
 
-    except Exception:
-        leaf_check = {"is_leaf": True, "image_quality": "good", "confidence": "low", "user_guidance": None}
+    except asyncio.TimeoutError:
+        # Gemini took too long — fail open, proceed to ONNX
+        logger.warning("Gemini Stage 2 timeout — failing open to ONNX")
+        leaf_check = {"is_leaf": True, "image_quality": "good", "confidence": "low",
+                      "user_guidance": None, "skipped": True, "skip_reason": "timeout"}
+    except Exception as e:
+        # Any Gemini failure (rate limit, network, parse error) — fail open
+        logger.warning(f"Gemini Stage 2 exception ({type(e).__name__}) — failing open: {e}")
+        leaf_check = {"is_leaf": True, "image_quality": "good", "confidence": "low",
+                      "user_guidance": None, "skipped": True, "skip_reason": str(type(e).__name__)}
 
     if not result.get("success"):
         return JSONResponse(result, status_code=200)

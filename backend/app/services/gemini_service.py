@@ -13,7 +13,7 @@ class GeminiService:
     """Bulletproof REST-based AI Service for Botanical Reasoning and Symptom Analysis."""
     
     def __init__(self):
-        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+        self.base_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
     def _get_api_key(self) -> str:
         return os.environ.get("GEMINI_API_KEY", "")
@@ -30,7 +30,10 @@ class GeminiService:
         
         try:
             async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload, headers=headers, timeout=20.0)
+                response = await client.post(url, json=payload, headers=headers, timeout=10.0)
+                if response.status_code == 429:
+                    logger.warning("Gemini rate limit (429) hit — failing open")
+                    return ""
                 if response.status_code != 200:
                     logger.error(f"Gemini REST Error {response.status_code}: {response.text}")
                     return ""
@@ -94,26 +97,33 @@ Provide a wise, authoritative analysis in JSON.
             "contents": [{
                 "parts": [
                     {"inlineData": {"mimeType": "image/jpeg", "data": b64_img}},
-                    {"text": """You are a plant identification quality inspector. Carefully analyze this image.
+                    {"text": """You are a botanical image validator. Analyze this image and determine if it contains a plant leaf suitable for medicinal plant identification.
 
-Return ONLY valid JSON with this exact structure:
+Answer YES (is_leaf: true) if:
+- A leaf is clearly visible, even if held in hand or against a background
+- The leaf occupies at least 20% of the image
+- The leaf texture or venation is at least partially visible
+
+Answer NO (is_leaf: false) ONLY if:
+- There is no plant material at all (e.g. just a hand, a mug, concrete, food)
+- The image is completely blurred with no identifiable features
+- The image shows food, animals, screens, or manufactured objects only
+
+For image_quality:
+- good: leaf visible, reasonable lighting, identifiable
+- poor: leaf visible but blurry, too dark, far away, partially covered
+- unusable: cannot tell what the object is at all
+
+Return ONLY valid JSON:
 {
   "is_leaf": true or false,
   "is_plant": true or false,
   "image_quality": "good" or "poor" or "unusable",
   "confidence": "high" or "medium" or "low",
-  "what_i_see": "One sentence describing exactly what is in this image",
+  "what_i_see": "One sentence describing what is in this image",
   "rejection_reason": null or "specific reason why this cannot be identified",
   "user_guidance": null or "Specific actionable tip for the user to retake a better photo"
-}
-
-Rules:
-- is_leaf = true: A PLANT LEAF is clearly visible and occupies most of the frame
-- is_leaf = false: Image shows a hand, face, food, building, animal, screen, document, blurry mess, or anything that is NOT a plant leaf
-- image_quality = poor: Leaf is visible but blurry, too dark, too far away, heavily cropped, or mostly covered by fingers
-- image_quality = unusable: Cannot tell what the object is at all
-- For user_guidance give a short, friendly, specific tip like: 'Hold the leaf flat and photograph from 20cm above in natural light' or 'Remove your fingers from the leaf and fill the frame with just the leaf'
-- Be strict: if you are not sure it is a leaf, say is_leaf=false"""}
+}"""}
                 ]
             }],
             "generationConfig": {"responseMimeType": "application/json"}
