@@ -17,31 +17,31 @@ export default function AboutClient() {
 
   const TEAM = [
     {
+      name: "Samruddhi Mahadev Gholap",
+      role: "Data Engineer",
+      focus: "Dept of Artificial Intelligence and Data Science",
+      bio: "DYPCOEI, Pune, India",
+      links: { github: "#", linkedin: "mailto:gholapsamruddhi7@gmail.com" }
+    },
+    {
       name: "Pranali Vishwanath Ghugarkar",
       role: "Research Lead",
-      focus: "Neural Architecture & Data Science",
-      bio: "Lead researcher specializing in deep learning optimization at DYPCOEI, Pune. Instrumental in refining the botanical classification framework.",
+      focus: "Dept of Artificial Intelligence and Data Science",
+      bio: "DYPCOEI, Pune, India",
       links: { github: "#", linkedin: "mailto:pranalighugarkar673@gmail.com" }
     },
     {
       name: "Madhura Raju Wankhade",
       role: "Design Lead",
-      focus: "Botanical UX & Taxonomy Sync",
-      bio: "Expert in human-botanical interfaces at DYPCOEI, Pune. Spearheaded the tactical HUD design and metadata orchestration.",
+      focus: "Dept of Artificial Intelligence and Data Science",
+      bio: "DYPCOEI, Pune, India",
       links: { github: "#", linkedin: "mailto:madhurawankhade04@gmail.com" }
-    },
-    {
-      name: "Samruddhi Mahadev Gholap",
-      role: "Data Engineer",
-      focus: "Neural Calibration & Datasets",
-      bio: "Data optimization expert at DYPCOEI, Pune. Specialized in high-fidelity specimen validation and preprocessing pipelines.",
-      links: { github: "#", linkedin: "mailto:gholapsamruddhi7@gmail.com" }
     },
     {
       name: "Ravindra Pandit Ahire",
       role: "Systems Lead",
-      focus: "Neural Engineering & Infrastructure",
-      bio: "Full-stack architect at DYPCOEI, Pune. Engineered the PlantoAI production monolith and high-speed ONNX inference pipeline.",
+      focus: "Dept of Artificial Intelligence and Data Science",
+      bio: "DYPCOEI, Pune, India",
       links: { github: "https://github.com/HackRore", linkedin: "mailto:hackrore@gmail.com" }
     }
   ]
