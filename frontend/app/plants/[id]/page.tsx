@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Leaf, ChevronLeft, Activity, Microscope, ShieldAlert, Thermometer, FlaskConical } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default function PlantDetailPage() {
     const params = useParams()
     const router = useRouter()
