@@ -88,20 +88,32 @@ Provide a wise, authoritative analysis in JSON.
         return safe_parse_gemini_json(raw) or {"error": "AI Insight Offline"}
 
     async def verify_is_leaf(self, image_bytes: bytes) -> Dict:
-        """Stage 2: Gemini Vision Pre-check — Is this actually a plant leaf?"""
+        """Stage 2: Gemini Vision Pre-check — Smart leaf and quality gatekeeper."""
         b64_img = base64.b64encode(image_bytes).decode('utf-8')
         payload = {
             "contents": [{
                 "parts": [
                     {"inlineData": {"mimeType": "image/jpeg", "data": b64_img}},
-                    {"text": """Look at this image carefully. Answer ONLY with valid JSON:
+                    {"text": """You are a plant identification quality inspector. Carefully analyze this image.
+
+Return ONLY valid JSON with this exact structure:
 {
   "is_leaf": true or false,
   "is_plant": true or false,
+  "image_quality": "good" or "poor" or "unusable",
   "confidence": "high" or "medium" or "low",
-  "reason": "One sentence explanation"
+  "what_i_see": "One sentence describing exactly what is in this image",
+  "rejection_reason": null or "specific reason why this cannot be identified",
+  "user_guidance": null or "Specific actionable tip for the user to retake a better photo"
 }
-Return true for is_leaf only if you can clearly see a plant leaf. Return false for hands, soil, concrete, food, or non-botanical objects."""}
+
+Rules:
+- is_leaf = true: A PLANT LEAF is clearly visible and occupies most of the frame
+- is_leaf = false: Image shows a hand, face, food, building, animal, screen, document, blurry mess, or anything that is NOT a plant leaf
+- image_quality = poor: Leaf is visible but blurry, too dark, too far away, heavily cropped, or mostly covered by fingers
+- image_quality = unusable: Cannot tell what the object is at all
+- For user_guidance give a short, friendly, specific tip like: 'Hold the leaf flat and photograph from 20cm above in natural light' or 'Remove your fingers from the leaf and fill the frame with just the leaf'
+- Be strict: if you are not sure it is a leaf, say is_leaf=false"""}
                 ]
             }],
             "generationConfig": {"responseMimeType": "application/json"}
@@ -110,7 +122,9 @@ Return true for is_leaf only if you can clearly see a plant leaf. Return false f
         result = safe_parse_gemini_json(raw)
         if result:
             return result
-        return {"is_leaf": True, "is_plant": True, "confidence": "low", "reason": "Vision check unavailable, proceeding."}
+        # Fallback: allow through if Gemini is offline, do not block user
+        return {"is_leaf": True, "is_plant": True, "image_quality": "good", "confidence": "low", 
+                "what_i_see": "Vision check unavailable", "rejection_reason": None, "user_guidance": None}
 
     async def validate_prediction(self, plant_name: str, image_bytes: bytes) -> Dict:
         """Stage 5: Gemini Vision Validation — Does this image actually match the predicted species?"""

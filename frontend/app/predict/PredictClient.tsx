@@ -428,14 +428,53 @@ export default function PredictClient() {
                  <AIThinkingOverlay isVisible={predictMutation.isPending} />
                  <ColdStartWarning isVisible={predictMutation.isPending} />
                  
-                 {predictMutation.isSuccess && (
+                 {/* Smart Rejection Panel: Not a leaf or poor image quality */}
+                 {predictMutation.isSuccess && !predictMutation.data?.success && predictMutation.data?.error && (
+                    <div className="space-y-6 p-8 rounded-[2.5rem] bg-amber-500/5 border border-amber-500/20">
+                       <div className="flex items-start gap-4">
+                         <span className="text-4xl shrink-0">{predictMutation.data.error === 'Not a Plant Leaf' ? '🌿' : '📷'}</span>
+                         <div>
+                           <h3 className="text-xl font-black text-amber-400 uppercase tracking-wider mb-2">{predictMutation.data.error}</h3>
+                           <p className="text-gray-300 text-sm leading-relaxed">{predictMutation.data.message}</p>
+                           {predictMutation.data.what_ai_sees && (
+                             <p className="text-gray-500 text-xs mt-2 italic">Our AI sees: "{predictMutation.data.what_ai_sees}"</p>
+                           )}
+                         </div>
+                       </div>
+                       {predictMutation.data.user_guidance && (
+                         <div className="p-4 rounded-2xl bg-primary-500/10 border border-primary-500/20">
+                           <p className="text-[9px] font-black text-primary-500 uppercase tracking-widest mb-1">Tip</p>
+                           <p className="text-primary-300 text-sm">{predictMutation.data.user_guidance}</p>
+                         </div>
+                       )}
+                       {predictMutation.data.tips && (
+                         <div className="space-y-2">
+                           <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest">How to take a better photo</p>
+                           {predictMutation.data.tips.map((tip: string, i: number) => (
+                             <div key={i} className="flex items-start gap-3 text-xs text-gray-400">
+                               <span className="text-primary-500 font-black shrink-0">{i + 1}.</span>
+                               <span>{tip}</span>
+                             </div>
+                           ))}
+                         </div>
+                       )}
+                       <button
+                         onClick={() => { predictMutation.reset(); setPreview(null); setUploadedImages([]) }}
+                         className="w-full py-4 rounded-2xl bg-primary-500 hover:bg-primary-400 text-black font-black uppercase tracking-wider text-sm transition-all"
+                       >
+                         Try Again with a Better Photo
+                       </button>
+                    </div>
+                 )}
+
+                 {predictMutation.isSuccess && predictMutation.data?.success && (
                     <PredictResult 
                       result={predictMutation.data} 
                       imageUrl={uploadedImages[0]?.preview || preview || ""} 
                     />
                  )}
                  
-                 {predictMutation.isSuccess && (
+                 {predictMutation.isSuccess && predictMutation.data?.success && (
                     <div className="mt-8 space-y-4">
                        {predictMutation.data?.vision_validation && (
                          <div className={`flex items-center gap-3 p-4 rounded-2xl border text-xs font-bold uppercase tracking-wider ${predictMutation.data.vision_validation.matches_prediction ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-amber-500/10 border-amber-500/30 text-amber-400'}`}>

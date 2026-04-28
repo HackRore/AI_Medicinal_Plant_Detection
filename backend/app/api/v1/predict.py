@@ -29,16 +29,50 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
 
     # Resolve Stage 2 result (with timeout so it never blocks)
     try:
-        leaf_check = await asyncio.wait_for(leaf_check_task, timeout=8.0)
-        if not leaf_check.get("is_leaf", True) and leaf_check.get("confidence") == "high":
+        leaf_check = await asyncio.wait_for(leaf_check_task, timeout=10.0)
+        is_leaf = leaf_check.get("is_leaf", True)
+        quality = leaf_check.get("image_quality", "good")
+        confidence = leaf_check.get("confidence", "low")
+        guidance = leaf_check.get("user_guidance")
+        what_i_see = leaf_check.get("what_i_see", "")
+
+        # Hard reject: clearly not a leaf (Gemini is certain)
+        if not is_leaf and confidence == "high":
             return JSONResponse({
                 "success": False,
                 "error": "Not a Plant Leaf",
-                "message": f"Our vision system detected: {leaf_check.get('reason', 'This does not appear to be a plant leaf.')}",
+                "what_ai_sees": what_i_see,
+                "message": leaf_check.get("rejection_reason", "This image does not appear to contain a plant leaf."),
+                "user_guidance": guidance or "Please photograph a plant leaf clearly with good lighting, filling most of the frame.",
+                "tips": [
+                    "Hold the leaf flat and photograph from directly above",
+                    "Ensure the leaf fills at least 60% of the frame",
+                    "Use natural daylight or a bright indoor light",
+                    "Remove fingers, shadows, and background clutter",
+                    "Hold your phone steady to avoid blur"
+                ],
                 "stage2_check": leaf_check
             }, status_code=200)
+
+        # Soft reject: leaf found but image quality is too poor for accurate ID
+        if is_leaf and quality == "unusable" and confidence in ["high", "medium"]:
+            return JSONResponse({
+                "success": False,
+                "error": "Image Quality Too Poor",
+                "what_ai_sees": what_i_see,
+                "message": "A leaf was detected but the image is too blurry or dark for accurate identification.",
+                "user_guidance": guidance or "Please retake the photo with better lighting and hold the phone steady.",
+                "tips": [
+                    "Move to a brighter location or near a window",
+                    "Hold your phone very still or rest it on a surface",
+                    "Clean your camera lens",
+                    "Get closer to the leaf — aim for 15-25cm distance"
+                ],
+                "stage2_check": leaf_check
+            }, status_code=200)
+
     except Exception:
-        leaf_check = {"is_leaf": True, "confidence": "low", "reason": "Pre-check bypassed."}
+        leaf_check = {"is_leaf": True, "image_quality": "good", "confidence": "low", "user_guidance": None}
 
     if not result.get("success"):
         return JSONResponse(result, status_code=200)
