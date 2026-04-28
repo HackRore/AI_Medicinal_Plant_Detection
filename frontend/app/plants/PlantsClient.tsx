@@ -57,7 +57,7 @@ export default function PlantsClient() {
         {/* Header */}
         <div className="mb-20 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-500/10 border border-primary-500/20 rounded-full mb-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary-400">G9 Botanical Repository</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-primary-400">Neural Botanical Repository</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-black text-white mb-4 tracking-tighter uppercase leading-none">
             Neural <span className="text-primary-500">Knowledge</span> Base

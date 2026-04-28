@@ -32,6 +32,10 @@ const nextConfig = {
   },
   reactStrictMode: true,
   swcMinify: true,
+  generateBuildId: async () => {
+    // Force Vercel CDN cache bust — updated 2026-04-28
+    return 'plantoai-v3-build-20260428'
+  },
 }
 
 module.exports = withPWA(nextConfig)
