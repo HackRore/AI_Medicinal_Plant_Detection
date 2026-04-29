@@ -165,12 +165,12 @@ Be honest — if the image is blurry, partial, or unclear, say matches: true wit
 
     async def get_symptom_recommendations(self, symptoms: str) -> Dict:
         """Analyze natural language symptoms and recommend 3 Ayurvedic remedies."""
-        prompt = f"""You are a wise Ayurvedic Physician (Vaidya). 
+        prompt = f"""You are a highly analytical Botanical Intelligence Engine, specifically trained in classical Ayurvedic texts. 
 Patient description: "{symptoms}"
 
-Understand the symptoms informally and provide an empathetic JSON response.
+Understand the symptoms informally and provide an empathetic JSON response based purely on botanical literature.
 {{
-  "doctor_note": "A warm opening address.",
+  "clinical_note": "A warm, professional opening statement.",
   "diagnosis": "Dosha (Vata/Pitta/Kapha) perspective.",
   "recommendations": [
     {{
@@ -181,7 +181,7 @@ Understand the symptoms informally and provide an empathetic JSON response.
     }}
   ],
   "lifestyle_advice": "Holistic tip",
-  "warning": "Medical disclaimer"
+  "warning": "Medical disclaimer: This is botanical information, not medical advice. Consult a healthcare provider."
 }}"""
         payload = {
             "contents": [{"parts": [{"text": prompt}]}],
@@ -189,7 +189,7 @@ Understand the symptoms informally and provide an empathetic JSON response.
         }
         
         raw = await self._call_rest_api(payload)
-        return safe_parse_gemini_json(raw) or {"error": "The Doctor is currently offline."}
+        return safe_parse_gemini_json(raw) or {"error": "The Symptom Engine is currently offline."}
 
 gemini_service = GeminiService()
 def get_gemini_service(): return gemini_service
