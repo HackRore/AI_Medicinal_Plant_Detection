@@ -97,6 +97,10 @@ class MLService:
             
             def preprocess(i):
                 x = np.array(i.resize((224, 224))).astype(np.float32) / 255.0
+                # ImageNet Normalization (CRITICAL for EfficientNetV2)
+                mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
+                std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
+                x = (x - mean) / std
                 return np.transpose(x, (2, 0, 1)).reshape(1, 3, 224, 224)
 
             # --- Sprint 3: Multi-Scale Ensemble (TTA) ---
