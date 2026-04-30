@@ -87,11 +87,11 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
     if not result.get("success"):
         return JSONResponse(result, status_code=200)
 
-    # === HARD CONFIDENCE GATE ===
-    # If CNN confidence is below 40%, the image is ambiguous — could be a non-leaf,
-    # a blurry photo, or a species the model hasn't learned. Reject cleanly.
+    # === CONFIDENCE GATE ===
+    # Below 15%: completely unrecognisable — hard reject
+    # 15-45%: low confidence — pass through but flag clearly so UI can warn the user
     cnn_confidence = result.get("confidence_pct", 0)
-    if cnn_confidence < 40.0:
+    if cnn_confidence < 15.0:
         return JSONResponse({
             "success": False,
             "error": "Cannot Identify",
@@ -99,10 +99,10 @@ async def predict(file: UploadFile = File(...), scale_reference: bool = Form(Fal
             "message": "This does not appear to be a recognisable medicinal plant leaf. Please upload a clear, well-lit photo of a single leaf.",
             "user_guidance": "Hold the leaf flat, ensure it fills most of the frame, and photograph in good daylight.",
             "tips": [
-                "Ensure the leaf is clearly visible and fills the frame",
+                "Ensure the leaf is clearly visible and fills at least 60% of the frame",
                 "Use natural daylight or a bright indoor light",
                 "Hold your phone steady to avoid blur",
-                "Avoid backgrounds with many other leaves"
+                "Remove fingers, shadows and background clutter"
             ]
         }, status_code=200)
     
