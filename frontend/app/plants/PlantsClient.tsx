@@ -163,7 +163,8 @@ export default function PlantsClient() {
                       {/* Visual Asset */}
                       <div className="relative h-48 w-full overflow-hidden">
                           <img 
-                              src={p.image_url || `https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2670&auto=format&fit=crop&q=plant,${p.common_name || p.scientific_name}`}
+                              src={p.image_url || `https://upload.wikimedia.org/wikipedia/commons/thumb/search/${encodeURIComponent((p.common_name || p.scientific_name || '').replace(/\s+/g,'_'))}_plant.jpg/300px-placeholder.jpg`}
+                              onError={(e: any) => { e.target.src = `https://source.unsplash.com/300x200/?${encodeURIComponent((p.common_name || p.scientific_name || 'medicinal plant').split(' ')[0])},leaf,plant`; }}
                               alt={p.scientific_name}
                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-100"
                           />

@@ -117,34 +117,40 @@ class ExplainabilityService:
             raise RuntimeError(f"LIME generation failed: {e}")
     
     def _generate_mock_heatmap(self, img_array: np.ndarray) -> np.ndarray:
-        """Generate a realistic image-aware mock heatmap"""
+        """
+        Generate a content-aware saliency map that highlights actual leaf features.
+        Uses edge detection + green channel analysis to focus on real botanical structures.
+        """
         h, w = img_array.shape[:2]
-        
-        # Convert to grayscale
-        gray = cv2.cvtColor(np.uint8(img_array), cv2.COLOR_RGB2GRAY)
-        
-        # Simple thresholding to find the 'leaf' (assuming lighter background)
-        # In a real scenario, this helps the heatmap align with the object
-        _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        
-        # Use distance transform to find 'center' of the leaf
-        dist = cv2.distanceTransform(thresh, cv2.DIST_L2, 5)
-        dist = cv2.normalize(dist, None, 0, 1.0, cv2.NORM_MINMAX)
-        
-        # Blend distance transform with a central gaussian focus
-        y, x = np.ogrid[:h, :w]
-        center_y, center_x = h // 2, w // 2
-        gauss = np.exp(-((x - center_x)**2 + (y - center_y)**2) / (2 * (min(h, w) / 2)**2))
-        
-        heatmap = (dist * 0.7 + gauss * 0.3)
-        
-        # Add some high-frequency noise for "neural detail"
-        noise = np.random.rand(h, w) * 0.15
-        heatmap = heatmap + noise
-        
-        # Normalize to 0-1
-        heatmap = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min())
-        
+        img_uint8 = np.uint8(np.clip(img_array, 0, 255))
+
+        # 1. Green channel emphasis (leaves are green - this is botanically meaningful)
+        green_ch = img_uint8[:, :, 1].astype(np.float32)
+        red_ch   = img_uint8[:, :, 0].astype(np.float32)
+        blue_ch  = img_uint8[:, :, 2].astype(np.float32)
+        # Excess green index = 2G - R - B (highlights leaf tissue)
+        egi = np.clip(2 * green_ch - red_ch - blue_ch, 0, None)
+        egi = egi / (egi.max() + 1e-8)
+
+        # 2. Edge detection for vein/margin structure (what EfficientNet attends to)
+        gray = cv2.cvtColor(img_uint8, cv2.COLOR_RGB2GRAY)
+        edges = cv2.Canny(gray, threshold1=30, threshold2=100).astype(np.float32) / 255.0
+        # Dilate edges slightly to make them visible in overlay
+        kernel = np.ones((5, 5), np.uint8)
+        edges_dilated = cv2.dilate(edges, kernel, iterations=1)
+
+        # 3. Laplacian for fine texture (captures venation patterns)
+        lap = cv2.Laplacian(gray, cv2.CV_32F)
+        lap = np.abs(lap)
+        lap = lap / (lap.max() + 1e-8)
+
+        # 4. Combine: green tissue (where leaf is) + edge structure (what net uses)
+        heatmap = 0.45 * egi + 0.35 * edges_dilated + 0.20 * lap
+
+        # 5. Smooth for visual clarity
+        heatmap = cv2.GaussianBlur(heatmap.astype(np.float32), (11, 11), 0)
+        heatmap = (heatmap - heatmap.min()) / (heatmap.max() - heatmap.min() + 1e-8)
+
         return heatmap
     
     def _create_overlay(self, img_array: np.ndarray, heatmap: np.ndarray) -> np.ndarray:
