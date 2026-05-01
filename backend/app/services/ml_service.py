@@ -51,7 +51,7 @@ def _find(fname, dirs):
             return p
     return fname
 
-MODEL_PATH = _find('plantoai_model.onnx', ['ml_models'])
+MODEL_PATH = _find('plantoai_v3.onnx', ['ml_models'])
 CLASS_PATH = _find('class_names.json',    ['app/data'])
 KB_PATH    = _find('medicinal_knowledge.json', ['app/data'])
 
@@ -93,15 +93,15 @@ class MLService:
                     segmentation_status = "No Leaf Detected (Using Full Image)"
             
             # --- Stage 2: Classification Preprocessing ---
-            img_main = img.resize((224, 224))
+            img_main = img.resize((384, 384))
             
             def preprocess(i):
-                x = np.array(i.resize((224, 224))).astype(np.float32) / 255.0
+                x = np.array(i.resize((384, 384))).astype(np.float32) / 255.0
                 # ImageNet Normalization (CRITICAL for EfficientNetV2)
                 mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
                 std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
                 x = (x - mean) / std
-                return np.transpose(x, (2, 0, 1)).reshape(1, 3, 224, 224)
+                return np.transpose(x, (2, 0, 1)).reshape(1, 3, 384, 384)
 
             # --- Sprint 3: Multi-Scale Ensemble (TTA) ---
             w, h = img_main.size
