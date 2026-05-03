@@ -133,7 +133,8 @@ function ColdStartWarning({ isVisible }: { isVisible: boolean }) {
 export default function PredictClient() {
   const [preview, setPreview] = useState<string | null>(null)
   const [isCameraOpen, setIsCameraOpen] = useState(false)
-  const [uploadedImages, setUploadedImages] = useState<{file: File, preview: string}[]>([])
+  const [uploadedImages, setUploadedImages] = useState<{file: File | null, preview: string}[]>([])
+  const [remoteUrl, setRemoteUrl] = useState("")
   const [localHistory, setLocalHistory] = useState<any[]>([])
   const resultRef = useRef<HTMLDivElement>(null)
   const [activeModule, setActiveModule] = useState<'scanner' | 'symptoms'>('scanner')
@@ -170,14 +171,14 @@ export default function PredictClient() {
 
   // Predict mutation
   const predictMutation = useMutation({
-    mutationFn: async (file: File) => {
+    mutationFn: async ({ file, url }: { file?: File, url?: string }) => {
       const formData = new FormData()
-      formData.append("file", file)
-      if (useScaleReference) {
-        formData.append("scale_reference", "true")
-      }
+      if (file) formData.append("file", file)
+      if (url) formData.append("url", url)
+      if (useScaleReference) formData.append("scale_reference", "true")
       
-      const res = await fetch(`${API_BASE}/api/v1/predict`, {
+      const endpoint = url ? `${API_BASE}/api/v1/predict-url` : `${API_BASE}/api/v1/predict`
+      const res = await fetch(endpoint, {
         method: "POST",
         body: formData,
       })
@@ -275,7 +276,14 @@ export default function PredictClient() {
     const previewUrl = URL.createObjectURL(file)
     updatePreview(previewUrl)
     setUploadedImages([{file, preview: previewUrl}])
-    predictMutation.mutate(file)
+    predictMutation.mutate({ file })
+  }
+
+  const handleUrlSubmit = () => {
+    if (!remoteUrl) return
+    updatePreview(remoteUrl)
+    setUploadedImages([{file: null, preview: remoteUrl}])
+    predictMutation.mutate({ url: remoteUrl })
   }
 
   const handleCapture = useCallback(() => {
@@ -412,6 +420,27 @@ export default function PredictClient() {
                     <p className="font-black text-white uppercase tracking-[0.4em] text-xs relative z-10">Live Scanner</p>
                     <p className="font-bold text-gray-600 uppercase tracking-widest text-[9px] mt-3 relative z-10">Engage Optical Sensors</p>
                   </button>
+                </div>
+
+                {/* Neural Remote Scan - URL Feature */}
+                <div className="glass-card p-6 rounded-[2.5rem] border border-white/5 bg-white/[0.01]">
+                   <p className="text-[9px] font-black text-primary-500/60 uppercase tracking-[0.4em] mb-4 ml-2">Neural Remote Scan</p>
+                   <div className="flex gap-4">
+                      <input 
+                        type="text" 
+                        value={remoteUrl}
+                        onChange={(e) => setRemoteUrl(e.target.value)}
+                        placeholder="Paste image URL (e.g. from iNaturalist)..."
+                        className="flex-1 bg-black/40 border border-white/10 rounded-2xl px-6 text-sm text-white placeholder-gray-700 focus:border-primary-500/50 outline-none"
+                      />
+                      <Button 
+                        onClick={handleUrlSubmit}
+                        disabled={!remoteUrl || predictMutation.isPending}
+                        className="h-14 px-8 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-[10px]"
+                      >
+                         Execute
+                      </Button>
+                   </div>
                 </div>
                 
                 {/* Sprint 4: Scale Reference Toggle */}
