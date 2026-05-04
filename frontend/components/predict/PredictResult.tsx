@@ -51,7 +51,7 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const synergies = intel?.synergy_partners ?? ["Tulsi", "Ginger", "Honey"];
   const reasoning = result?.reasoning ?? { verdict: "Standard Scan", analysis: "Scanning complete." };
 
-  // G9 Forge: Lowered threshold for 46-class high-entropy model
+  // G9 Forge: Lowered threshold for 88-class high-entropy model
   if (result.success === false || confidence < 12) {
     return (
       <motion.div 
@@ -105,7 +105,7 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
             </motion.div>
           )}
 
-          <div className="relative aspect-[16/9] md:aspect-[21/9] rounded-[3.5rem] overflow-hidden border border-white/10 bg-zinc-950/50 shadow-2xl">
+          <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[21/9] rounded-[3.5rem] overflow-hidden border border-white/10 bg-zinc-950/50 shadow-2xl">
               <motion.img 
                 key={heatmap ? "heat" : "orig"}
                 initial={{ opacity: 0, scale: 1.05 }}

@@ -83,16 +83,16 @@ export const HeroSection = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1.2, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                        className="flex flex-col sm:flex-row gap-6 items-start"
+                        className="flex flex-col sm:flex-row gap-6 items-stretch sm:items-start w-full sm:w-auto"
                     >
-                        <Link href="/predict">
-                            <Button className="group h-16 md:h-20 px-10 md:px-14 rounded-2xl bg-white hover:bg-gray-100 text-black font-black uppercase tracking-[0.2em] transition-all shadow-[0_0_80px_rgba(255,255,255,0.15)] hover:shadow-[0_0_100px_rgba(255,255,255,0.3)] active:scale-95 flex items-center gap-4">
+                        <Link href="/predict" className="w-full sm:w-auto">
+                            <Button className="group h-16 md:h-20 w-full sm:px-10 md:px-14 rounded-2xl bg-white hover:bg-gray-100 text-black font-black uppercase tracking-[0.2em] transition-all shadow-[0_0_80px_rgba(255,255,255,0.15)] hover:shadow-[0_0_100px_rgba(255,255,255,0.3)] active:scale-95 flex items-center justify-center gap-4">
                                 <Fingerprint className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 Initiate Scan
                             </Button>
                         </Link>
-                        <Link href="/symptom-search">
-                            <Button variant="outline" className="h-16 md:h-20 px-10 rounded-2xl border-white/10 text-white font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all backdrop-blur-xl group flex items-center gap-4">
+                        <Link href="/symptom-search" className="w-full sm:w-auto">
+                            <Button variant="outline" className="h-16 md:h-20 w-full sm:px-10 rounded-2xl border-white/10 text-white font-black uppercase tracking-[0.2em] hover:bg-white/5 transition-all backdrop-blur-xl group flex items-center justify-center gap-4">
                                 <Database className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
                                 Clinical Search
                             </Button>
@@ -166,12 +166,12 @@ export const HeroSection = () => {
                 </motion.div>
             </div>
 
-            {/* Scroll Indicator */}
+            {/* Scroll Indicator - Hidden on mobile to prevent overlap */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 2, duration: 1 }}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 z-20"
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-3 z-20"
             >
                 <span className="text-[9px] font-black text-gray-500 uppercase tracking-[0.4em] rotate-90 translate-y-[-10px] origin-bottom">Scroll</span>
                 <div className="w-[1px] h-16 bg-gradient-to-b from-primary-500/50 to-transparent" />

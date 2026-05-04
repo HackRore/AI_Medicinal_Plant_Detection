@@ -18,7 +18,7 @@ import { getApiBase } from "@/utils/api";
 const THINKING_STEPS = [
   { icon: "🔬", text: "Spectral Boundary Calibration..." },
   { icon: "🌿", text: "Neural Venation Extraction..." },
-  { icon: "🧬", text: "Monolithic Cross-Reference (46 Species)..." },
+  { icon: "🧬", text: "Monolithic Cross-Reference (88 Species)..." },
   { icon: "🧪", text: "Clinical Mechanism Synthesis..." },
   { icon: "📚", text: "Ayurvedic Homeostasis Projection..." },
 ]
@@ -347,7 +347,7 @@ export default function PredictClient() {
           Initialize the world's most precise botanical identification engine. Upload the bio-signature for immediate Ayurvedic decoding.
         </p>
         
-        <div className="flex justify-center gap-6 pt-16 relative">
+        <div className="flex flex-col sm:flex-row justify-center gap-6 pt-16 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent -z-10" />
           <button 
             onClick={() => setActiveModule('scanner')}

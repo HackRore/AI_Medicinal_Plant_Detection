@@ -75,8 +75,8 @@ export default function AboutClient() {
         <div className="grid md:grid-cols-4 gap-8 mb-32">
           {[
             { label: "Neural Forge Accuracy", value: stats?.validation_accuracy || "99.6%", icon: <BrainCircuit /> },
-            { label: "Supported Species", value: stats?.species_count || "46", icon: <Database /> },
-            { label: "Ayurvedic Monographs", value: "46+", icon: <ShieldCheck /> },
+            { label: "Supported Species", value: stats?.species_count || "88", icon: <Database /> },
+            { label: "Ayurvedic Monographs", value: "88+", icon: <ShieldCheck /> },
             { label: "Global Deployments", value: "3", icon: <Award /> }
           ].map((stat, i) => (
             <motion.div 
