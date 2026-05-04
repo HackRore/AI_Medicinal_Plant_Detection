@@ -12,33 +12,37 @@ import { DisclaimerBanner } from "@/components/predict/DisclaimerBanner";
 import DisclaimerModal from "@/components/predict/DisclaimerModal"
 import { Card } from "@/components/ui/Card"
 import React from "react"
+import { APP_VERSION } from "@/lib/constants"
 
 import { getApiBase } from "@/utils/api";
 
 const THINKING_STEPS = [
-  { icon: "🔬", text: "Spectral Boundary Calibration..." },
-  { icon: "🌿", text: "Neural Venation Extraction..." },
-  { icon: "🧬", text: "Monolithic Cross-Reference (88 Species)..." },
-  { icon: "🧪", text: "Clinical Mechanism Synthesis..." },
-  { icon: "📚", text: "Ayurvedic Homeostasis Projection..." },
+  { icon: "🔬", text: "Waking inference engine... (first request ~30s)", time: 0 },
+  { icon: "🌿", text: "Processing leaf signature...", time: 8000 },
+  { icon: "🧬", text: "Cross-checking with Gemini Vision...", time: 20000 },
 ]
 
 function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [completedSteps, setCompletedSteps] = useState<number[]>([])
+  const [elapsed, setElapsed] = useState(0)
 
   useEffect(() => {
     if (!isVisible) {
       setCurrentStep(0)
-      setCompletedSteps([])
+      setElapsed(0)
       return
     }
+    const startTime = Date.now()
     const interval = setInterval(() => {
-      setCurrentStep(prev => {
-        setCompletedSteps(c => [...c, prev])
-        return Math.min(prev + 1, THINKING_STEPS.length - 1)
-      })
-    }, 900)
+      const ms = Date.now() - startTime
+      setElapsed(ms)
+      
+      let step = 0
+      if (ms >= 20000) step = 2
+      else if (ms >= 8000) step = 1
+      
+      setCurrentStep(step)
+    }, 100)
     return () => clearInterval(interval)
   }, [isVisible])
 
@@ -67,23 +71,29 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
             key={i}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: i <= currentStep ? 1 : 0.2, x: 0 }}
-            transition={{ delay: i * 0.1 }}
             className="flex items-center gap-3"
           >
             <span className="text-base w-6">{step.icon}</span>
             <span className={`text-xs font-bold flex-1 ${
               i === currentStep ? 'text-white' :
-              completedSteps.includes(i) ? 'text-gray-500 line-through' :
+              i < currentStep ? 'text-gray-500 line-through' :
               'text-gray-600'
             }`}>
               {step.text}
             </span>
-            {completedSteps.includes(i) && (
+            {i < currentStep && (
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className="text-primary-400 text-xs"
               >✓</motion.span>
+            )}
+            {i === currentStep && (
+              <motion.span
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                className="text-primary-400 text-xs inline-block w-3 h-3 border-2 border-primary-400 border-t-transparent rounded-full"
+              />
             )}
           </motion.div>
         ))}
@@ -91,43 +101,24 @@ function AIThinkingOverlay({ isVisible }: { isVisible: boolean }) {
       <div className="mt-5 h-1.5 bg-white/5 rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-primary-400 rounded-full"
-          animate={{ width: `${((currentStep + 1) / THINKING_STEPS.length) * 100}%` }}
-          transition={{ duration: 0.5 }}
+          animate={{ width: `${Math.min((elapsed / 30000) * 100, 100)}%` }}
+          transition={{ duration: 0.1 }}
         />
       </div>
+      
+      {elapsed > 35000 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-4 p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl"
+        >
+          <p className="text-[9px] text-amber-400 uppercase tracking-widest text-center">
+            Backend is cold-starting on free tier. This only happens once per session.
+          </p>
+        </motion.div>
+      )}
     </motion.div>
   )
-}
-
-function ColdStartWarning({ isVisible }: { isVisible: boolean }) {
-  const [show, setShow] = useState(false);
-  
-  useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isVisible) {
-      timer = setTimeout(() => setShow(true), 5000); // Show after 5s of waiting
-    } else {
-      setShow(false);
-    }
-    return () => clearTimeout(timer);
-  }, [isVisible]);
-
-  if (!show) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="mt-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl text-center"
-    >
-      <p className="text-[10px] font-black text-amber-500 uppercase tracking-widest animate-pulse">
-        Neural Engine Cold Start Detected
-      </p>
-      <p className="text-[9px] text-amber-200/50 uppercase tracking-tighter mt-1">
-        Waking up the Render instance... This may take up to 30 seconds.
-      </p>
-    </motion.div>
-  );
 }
 
 export default function PredictClient() {
@@ -143,9 +134,21 @@ export default function PredictClient() {
   const [symptomResults, setSymptomResults] = useState<any>(null)
   const [feedbackSent, setFeedbackSent] = useState(false)
   const [feedbackLoading, setFeedbackLoading] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const API_BASE = getApiBase()
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !localStorage.getItem("plantoai_onboarded")) {
+      setShowOnboarding(true)
+    }
+  }, [])
+
+  const dismissOnboarding = () => {
+    localStorage.setItem("plantoai_onboarded", "true")
+    setShowOnboarding(false)
+  }
 
   // Sprint 5: Report Mismatch — Active Learning Feedback Loop
   const reportMismatch = async () => {
@@ -299,7 +302,7 @@ export default function PredictClient() {
             const url = URL.createObjectURL(blob)
             updatePreview(url)
             setUploadedImages([{file, preview: url}])
-            predictMutation.mutate(file)
+            predictMutation.mutate({ file })
             setIsCameraOpen(false)
           }
         }, 'image/jpeg', 0.9)
@@ -336,7 +339,7 @@ export default function PredictClient() {
         >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[1.5s]" />
             <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_10px_rgba(16,185,129,1)] animate-ping" />
-            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-400 drop-shadow-md">Spec v5.1 Tactical Neural Lens</span>
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-400 drop-shadow-md">Spec {APP_VERSION} Tactical Neural Lens</span>
         </motion.div>
         
         <h1 className="text-7xl md:text-[9rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-500 tracking-tighter leading-[0.8] uppercase drop-shadow-[0_0_40px_rgba(255,255,255,0.1)]">
@@ -382,6 +385,28 @@ export default function PredictClient() {
           >
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-12">
+                
+                {showOnboarding && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-6 bg-primary-500/10 border border-primary-500/30 rounded-[2.5rem] relative"
+                  >
+                    <button 
+                      onClick={dismissOnboarding}
+                      className="absolute top-6 right-6 text-[10px] font-black uppercase tracking-widest text-primary-500 hover:text-white transition-colors"
+                    >
+                      Got it
+                    </button>
+                    <h3 className="text-sm font-black text-white uppercase tracking-widest mb-3">Welcome to Neural Scanner</h3>
+                    <ul className="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium leading-relaxed">
+                      <li><span className="text-white">Supported:</span> 46 medicinal species (Neem, Tulsi, Aloe Vera, Ashwagandha...)</li>
+                      <li><span className="text-white">For best results:</span> single leaf, plain background, good lighting, photo taken straight-on</li>
+                      <li><span className="text-white">Not supported:</span> flowers, fruit, whole plants, or non-Indian species</li>
+                    </ul>
+                  </motion.div>
+                )}
+
                 <div className="grid md:grid-cols-2 gap-8 relative">
                   {/* Tactical Crosshairs */}
                   <div className="absolute -inset-8 border border-white/[0.03] rounded-[4rem] pointer-events-none" />
@@ -457,6 +482,33 @@ export default function PredictClient() {
                   </label>
                 </div>
 
+                {/* Sample Leaf Images */}
+                <div className="glass-card p-6 rounded-[2.5rem] border border-white/5 bg-white/[0.01]">
+                   <p className="text-[9px] font-black text-primary-500/60 uppercase tracking-[0.4em] mb-4 ml-2">Try a sample</p>
+                   <div className="flex gap-4">
+                      {['neem.jpg', 'tulsi.jpg', 'aloe.jpg'].map(sample => (
+                          <button
+                            key={sample}
+                            disabled={predictMutation.isPending}
+                            onClick={() => {
+                              toast.info(`Loading ${sample}...`);
+                              fetch(`/samples/${sample}`)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                   const file = new File([blob], sample, { type: "image/jpeg" });
+                                   setUploadedImages([{ file, preview: URL.createObjectURL(blob) }]);
+                                   predictMutation.mutate({ file });
+                                })
+                                .catch(err => toast.error("Failed to load sample image"));
+                            }}
+                            className="flex-1 py-4 bg-black/40 border border-white/10 hover:border-primary-500/50 rounded-2xl text-[10px] text-gray-400 hover:text-white font-black uppercase tracking-widest transition-all"
+                          >
+                            {sample.replace('.jpg', '')}
+                          </button>
+                      ))}
+                   </div>
+                </div>
+
                 {!predictMutation.isSuccess && !predictMutation.isPending && localHistory.length > 0 && (
                   <div className="space-y-6 pt-12 border-t border-white/5">
                     <h3 className="text-xs font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-3">
@@ -478,7 +530,6 @@ export default function PredictClient() {
 
               <div ref={resultRef}>
                  <AIThinkingOverlay isVisible={predictMutation.isPending} />
-                 <ColdStartWarning isVisible={predictMutation.isPending} />
                  
                  {/* Smart Rejection Panel: Not a leaf or poor image quality */}
                  {predictMutation.isSuccess && !predictMutation.data?.success && predictMutation.data?.error && (
@@ -565,16 +616,41 @@ export default function PredictClient() {
               <div className="scanline opacity-5" />
               <div className="space-y-6">
                 <label className="text-[10px] font-black uppercase tracking-[0.5em] text-primary-500/60 ml-4">Initialize Physiological Assessment</label>
-                <textarea 
-                  value={symptoms} 
-                  onChange={e => setSymptoms(e.target.value)}
-                  className="w-full h-56 rounded-[2.5rem] bg-white/[0.02] border border-white/10 p-12 focus:border-primary-500/50 outline-none text-2xl text-white placeholder-gray-800 transition-all font-medium shadow-inner"
-                  placeholder="Describe symptoms for neural synthesis (e.g. chronic inflammation, digestive imbalance)..."
-                />
+                
+                {/* Example Chips */}
+                <div className="flex flex-wrap gap-3 mb-4 ml-4">
+                  {[
+                    "I have joint pain and swelling",
+                    "Fever with digestive issues",
+                    "Skin rash and itching",
+                    "Chronic fatigue and low immunity"
+                  ].map((chip, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSymptoms(chip)}
+                      className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-primary-500/10 hover:text-primary-400 hover:border-primary-500/30 text-[10px] text-gray-400 transition-all uppercase tracking-widest"
+                    >
+                      {chip}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative">
+                  <textarea 
+                    value={symptoms} 
+                    onChange={e => setSymptoms(e.target.value)}
+                    className="w-full h-56 rounded-[2.5rem] bg-white/[0.02] border border-white/10 p-12 focus:border-primary-500/50 outline-none text-2xl text-white placeholder-gray-800 transition-all font-medium shadow-inner"
+                    placeholder="Describe your symptoms in detail, e.g. 'I have joint inflammation and digestive problems...'"
+                  />
+                  <div className={`absolute bottom-6 right-8 text-xs font-bold uppercase tracking-widest ${symptoms.length < 30 ? 'text-amber-500' : 'text-emerald-400'}`}>
+                    {symptoms.length} / 30 min chars
+                  </div>
+                </div>
+                
                 <button 
                   onClick={() => symptomMutation.mutate(symptoms)} 
-                  disabled={symptomMutation.isPending || symptoms.length < 5}
-                  className="group relative w-full h-24 rounded-[2.5rem] bg-primary-500 hover:bg-primary-400 text-black font-black text-xl uppercase tracking-[0.3em] transition-all overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)] active:scale-[0.98]"
+                  disabled={symptomMutation.isPending || symptoms.length < 30}
+                  className="group relative w-full h-24 rounded-[2.5rem] bg-primary-500 hover:bg-primary-400 text-black font-black text-xl uppercase tracking-[0.3em] transition-all overflow-hidden shadow-[0_0_60px_rgba(16,185,129,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="absolute inset-0 glass-reflection" />
                   {symptomMutation.isPending ? "Neural Synthesis in Progress..." : "Execute Clinical Analysis"}

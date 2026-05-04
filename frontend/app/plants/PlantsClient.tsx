@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { getApiBase } from "@/utils/api";
 
+const WIKI_IMG_BASE = "https://upload.wikimedia.org/wikipedia/commons/thumb/search";
+const UNSPLASH_IMG_BASE = "https://source.unsplash.com/300x200";
+
 export default function PlantsClient() {
   const [plants, setPlants]   = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,13 +37,33 @@ export default function PlantsClient() {
         setLoading(false);
         setIsWaking(false);
       })
-      .catch(() => {
-        if (retryCount < 3) {
-            setTimeout(() => setRetryCount(prev => prev + 1), 3000);
-        } else {
-            setError("Neural engine is taking longer than usual to initialize.");
+      .catch(async () => {
+        try {
+            console.warn("Backend API unavailable. Falling back to static JSON...");
+            const fallbackRes = await fetch("/data/plants.json");
+            const fallbackData = await fallbackRes.json();
+            
+            // Apply search filter locally
+            let localPlants = fallbackData || [];
+            if (search) {
+                const s = search.toLowerCase();
+                localPlants = localPlants.filter((p: any) => 
+                    (p.common_name && p.common_name.toLowerCase().includes(s)) || 
+                    (p.scientific_name && p.scientific_name.toLowerCase().includes(s)) ||
+                    (p.family && p.family.toLowerCase().includes(s))
+                );
+            }
+            setPlants(localPlants);
             setLoading(false);
             setIsWaking(false);
+        } catch (e) {
+            if (retryCount < 3) {
+                setTimeout(() => setRetryCount(prev => prev + 1), 3000);
+            } else {
+                setError("Neural engine and static fallback failed to initialize.");
+                setLoading(false);
+                setIsWaking(false);
+            }
         }
       });
 
@@ -163,8 +186,8 @@ export default function PlantsClient() {
                       {/* Visual Asset */}
                       <div className="relative h-48 w-full overflow-hidden">
                           <img 
-                              src={p.image_url || `https://upload.wikimedia.org/wikipedia/commons/thumb/search/${encodeURIComponent((p.common_name || p.scientific_name || '').replace(/\s+/g,'_'))}_plant.jpg/300px-placeholder.jpg`}
-                              onError={(e: any) => { e.target.src = `https://source.unsplash.com/300x200/?${encodeURIComponent((p.common_name || p.scientific_name || 'medicinal plant').split(' ')[0])},leaf,plant`; }}
+                              src={p.image_url || `${WIKI_IMG_BASE}/${encodeURIComponent((p.common_name || p.scientific_name || '').replace(/\s+/g,'_'))}_plant.jpg/300px-placeholder.jpg`}
+                              onError={(e: any) => { e.target.src = `${UNSPLASH_IMG_BASE}/?${encodeURIComponent((p.common_name || p.scientific_name || 'medicinal plant').split(' ')[0])},leaf,plant`; }}
                               alt={p.scientific_name}
                               className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-700 opacity-60 group-hover:opacity-100"
                           />

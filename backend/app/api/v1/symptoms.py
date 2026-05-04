@@ -1,8 +1,9 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 import os, json, logging, traceback
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+from app.limiter import limiter
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _BACKEND = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
@@ -138,7 +139,8 @@ def _find_plants_for_symptoms(symptoms_text: str):
 
 
 @router.post("/symptom-search")
-async def symptom_search(payload: dict):
+@limiter.limit("60/hour")
+async def symptom_search(request: Request, payload: dict):
     symptoms = payload.get("symptoms", "").strip()
     if not symptoms or len(symptoms) < 5:
         return {"error": "Please describe your symptoms in more detail (at least 5 characters)."}

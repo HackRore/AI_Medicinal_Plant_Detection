@@ -5,9 +5,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
-# Import Routers
 from app.api.v1 import predict, plants, stats, symptoms, auth, feedback
+from app.limiter import limiter
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +38,16 @@ app = FastAPI(
     description="Professional Medicinal Plant Identification & Ayurvedic Intelligence",
     lifespan=lifespan
 )
+
+app.state.limiter = limiter
+
+def rate_limit_custom_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={"message": "Rate limit exceeded. Please wait before making another request."}
+    )
+
+app.add_exception_handler(RateLimitExceeded, rate_limit_custom_handler)
 
 # CORS Configuration - Hardened for G9 Production
 origins = [

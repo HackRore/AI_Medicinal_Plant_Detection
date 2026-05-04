@@ -170,7 +170,7 @@ export default function SymptomSearchPage() {
             transition={{ delay: 0.2 }}
             className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto italic"
           >
-            Our AI Botanical Guide analyzes your condition against thousands of verified Ayurvedic monographs. Describe your symptoms.
+            Our AI analyzes your symptoms to suggest Ayurvedic plants. Always verify recommendations with a qualified Ayurvedic practitioner.
           </motion.p>
         </div>
 
@@ -182,38 +182,61 @@ export default function SymptomSearchPage() {
           className="max-w-3xl mx-auto"
         >
           <div className="relative group">
+            {/* Example Chips */}
+            <div className="flex flex-wrap gap-3 mb-6 justify-center">
+              {[
+                "I have joint pain and swelling",
+                "Fever with digestive issues",
+                "Skin rash and itching",
+                "Chronic fatigue and low immunity"
+              ].map((chip, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSymptoms(chip)}
+                  className="px-4 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-teal-500/10 hover:text-teal-400 hover:border-teal-500/30 text-[10px] text-gray-400 transition-all uppercase tracking-widest"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+            
             <div className="absolute -inset-1 bg-gradient-to-r from-teal-500 via-primary-500 to-teal-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200 animate-pulse" />
-            <div className="relative glass-card p-4 rounded-[2.5rem] bg-black/60 backdrop-blur-2xl border border-white/10 flex gap-4">
-              <div className="relative flex-1">
+            <div className="relative glass-card p-4 rounded-[2.5rem] bg-black/60 backdrop-blur-2xl border border-white/10 flex flex-col gap-4">
+              <div className="relative flex-1 flex items-center">
                 <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
                   <MessageSquare className="h-6 w-6 text-gray-500 group-focus-within:text-teal-400 transition-colors" />
                 </div>
-                <input
-                  type="text"
-                  placeholder="e.g., severe migraine, joint pain, or persistent dry cough..."
+                <textarea
+                  placeholder="Describe your symptoms in detail, e.g. 'I have joint inflammation and digestive problems...'"
                   value={symptoms}
                   onChange={(e) => setSymptoms(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter" && symptoms.trim() && !searchMutation.isPending) {
-                      searchMutation.mutate(symptoms)
+                    if (e.key === "Enter" && !e.shiftKey && symptoms.length >= 30 && !searchMutation.isPending) {
+                      e.preventDefault();
+                      searchMutation.mutate(symptoms);
                     }
                   }}
-                  className="w-full bg-transparent border-none text-white text-xl placeholder:text-gray-600 focus:ring-0 pl-16 pr-6 h-16 font-medium italic"
+                  className="w-full bg-transparent border-none text-white text-xl placeholder:text-gray-600 focus:ring-0 pl-16 pr-6 py-6 min-h-[100px] font-medium italic resize-none"
                   disabled={searchMutation.isPending}
                 />
               </div>
-              <Button
-                onClick={() => searchMutation.mutate(symptoms)}
-                disabled={!symptoms.trim() || searchMutation.isPending}
-                className="h-16 px-10 rounded-[2rem] bg-teal-500 text-black font-black uppercase tracking-[0.2em] hover:bg-teal-400 shadow-[0_0_30px_rgba(20,184,166,0.3)] transition-all flex items-center gap-3 shrink-0"
-              >
-                {searchMutation.isPending ? "Analyzing..." : (
-                  <>
-                    Initiate
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </Button>
+              <div className="flex justify-between items-center px-6 pb-2">
+                <div className={`text-xs font-bold uppercase tracking-widest ${symptoms.length < 30 ? 'text-amber-500' : 'text-emerald-400'}`}>
+                  {symptoms.length} / 30 min chars
+                </div>
+                <Button
+                  onClick={() => searchMutation.mutate(symptoms)}
+                  disabled={symptoms.length < 30 || searchMutation.isPending}
+                  className="h-14 px-10 rounded-[2rem] bg-teal-500 text-black font-black uppercase tracking-[0.2em] hover:bg-teal-400 shadow-[0_0_30px_rgba(20,184,166,0.3)] transition-all flex items-center gap-3 shrink-0"
+                >
+                  {searchMutation.isPending ? "Analyzing..." : (
+                    <>
+                      Initiate
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -233,7 +256,14 @@ export default function SymptomSearchPage() {
           >
             <div className="text-center mb-10">
               <h2 className="text-2xl font-bold text-emerald-400 mb-2">Recommended Remedies</h2>
-              <div className="h-1 w-20 bg-emerald-500 mx-auto rounded-full" />
+              <div className="h-1 w-20 bg-emerald-500 mx-auto rounded-full mb-6" />
+              
+              <div className="max-w-2xl mx-auto p-4 bg-orange-500/10 border border-orange-500/30 rounded-xl flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-orange-400 shrink-0" />
+                <p className="text-sm text-orange-200 text-left">
+                  <strong className="text-orange-400">Disclaimer:</strong> This is for educational purposes only. Not medical advice. Consult a qualified practitioner before use.
+                </p>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

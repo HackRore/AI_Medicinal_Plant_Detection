@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 from app.services.ml_service import ml_service
 from app.services.gemini_service import gemini_service
@@ -10,16 +10,19 @@ import requests
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+from app.limiter import limiter
 
 @router.post("")
-async def predict(file: UploadFile = File(...), scale_reference: bool = Form(False)):
+@limiter.limit("10/minute")
+async def predict(request: Request, file: UploadFile = File(...), scale_reference: bool = Form(False)):
     if not file.content_type or not file.content_type.startswith("image/"):
         raise HTTPException(400, "Invalid file type. Please upload a botanical image (JPG/PNG).")
     raw = await file.read()
     return await _process_prediction(raw, scale_reference)
 
 @router.post("-url")
-async def predict_url(url: str = Form(...), scale_reference: bool = Form(False)):
+@limiter.limit("10/minute")
+async def predict_url(request: Request, url: str = Form(...), scale_reference: bool = Form(False)):
     try:
         r = requests.get(url, timeout=15)
         r.raise_for_status()

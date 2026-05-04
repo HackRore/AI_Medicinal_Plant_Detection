@@ -8,7 +8,7 @@ export const StatsSection = () => {
     const [stats, setStats] = useState({
         species: "88",
         accuracy: "99.6%",
-        speed: "< 2s",
+        speed: "< 2s (warm)",
         models: "G9 Monolith",
         status: "Live"
     });
@@ -20,7 +20,7 @@ export const StatsSection = () => {
                 setStats({
                     species: data.species_count ?? "—",
                     accuracy: data.top1_accuracy ? `${data.top1_accuracy}%` : "—",
-                    speed: "< 2s",
+                    speed: "< 2s (warm)",
                     models: "Ensemble-V2",
                     status: "Live"
                 });
@@ -49,8 +49,9 @@ export const StatsSection = () => {
                                 transition={{ delay: idx * 0.1 }}
                                 viewport={{ once: true }}
                                 className="text-center px-4"
+                                title={stat.label === "Latency" ? "First request after inactivity may take 30-60s while the server wakes up (Render free tier)" : undefined}
                             >
-                                <div className="text-4xl md:text-5xl font-black text-white mb-2 tracking-tighter">
+                                <div className={`font-black text-white mb-2 tracking-tighter ${stat.label === 'Latency' ? 'text-3xl md:text-4xl' : 'text-4xl md:text-5xl'}`}>
                                     {stat.value}
                                 </div>
                                 <div className="text-primary-500 font-black uppercase tracking-[0.4em] text-[8px] whitespace-nowrap opacity-60">

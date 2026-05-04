@@ -22,9 +22,12 @@ import {
   History
 } from "lucide-react";
 
+const KAGGLE_DATASET_URL = "https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset";
+
 export default function PredictResult({ result, imageUrl }: { result: any; imageUrl: string }) {
   const [heatmap, setHeatmap] = useState(false);
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [showAlternatives, setShowAlternatives] = useState(false);
 
   if (!result) return null;
 
@@ -39,6 +42,10 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
   const name       = (plant?.name || result?.class_name || result?.predicted_class || "Unknown Species").toString().replace(/_/g, ' ');
   const sciName    = (plant?.scientific_name || result?.scientific_name || "").toString();
   const family     = (plant?.family || "Botanical Registry").toString();
+  
+  let confidenceTier = "Low — manual verification recommended";
+  if (confidence >= 90) confidenceTier = "High confidence";
+  else if (confidence >= 70) confidenceTier = "Moderate — verify visually";
   
   const medicinalProperties = result?.botanical_intelligence?.medicinal_properties ?? 
                               result?.medicinal_properties ?? 
@@ -142,7 +149,7 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
 
               <div className="absolute top-12 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
                 <a 
-                  href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" 
+                  href={KAGGLE_DATASET_URL} 
                   target="_blank" 
                   className="px-4 py-2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-full text-[8px] font-black text-gray-500 uppercase tracking-[0.3em] flex items-center gap-2 hover:text-primary-400 transition-colors pointer-events-auto"
                 >
@@ -160,29 +167,77 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
             </div>
             
             <div className="grid gap-4">
-                {(prediction.top3 || []).map((cand: any, idx: number) => (
+                {/* Primary Match */}
+                {prediction.top3 && prediction.top3.length > 0 && (
                     <motion.div 
-                        key={idx}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl flex items-center gap-6 group hover:bg-white/5 transition-all"
+                        className="p-6 bg-white/[0.04] border border-primary-500/30 rounded-2xl flex flex-col gap-4 shadow-[0_0_20px_rgba(16,185,129,0.1)] relative overflow-hidden"
                     >
-                        <div className="text-[10px] font-black text-gray-600 group-hover:text-primary-500 transition-colors w-6">0{idx+1}</div>
-                        <div className="flex-1">
-                            <div className="flex justify-between items-end mb-2">
-                                <span className="text-sm font-black text-white uppercase tracking-tighter">{cand.name}</span>
-                                <span className="text-[10px] font-bold text-primary-400">{Math.round(cand.confidence * 100)}%</span>
-                            </div>
-                            <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                <motion.div 
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${cand.confidence * 100}%` }}
-                                    className={`h-full ${idx === 0 ? 'bg-primary-500' : 'bg-primary-500/40'}`}
-                                />
+                        <div className="absolute top-0 right-0 px-4 py-1 bg-primary-500/20 text-primary-400 text-[9px] font-black uppercase tracking-widest rounded-bl-xl">
+                            {confidenceTier}
+                        </div>
+                        <div className="flex items-center gap-6">
+                            <div className="flex-1 mt-2">
+                                <div className="flex justify-between items-end mb-2">
+                                    <span className="text-sm font-black text-white uppercase tracking-tighter">{prediction.top3[0].name}</span>
+                                    <span className="text-[10px] font-bold text-primary-400">{Math.round(prediction.top3[0].confidence * 100)}%</span>
+                                </div>
+                                <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                    <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${prediction.top3[0].confidence * 100}%` }}
+                                        className="h-full bg-primary-500"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </motion.div>
-                ))}
+                )}
+
+                {/* Alternative Matches Collapsible */}
+                {prediction.top3 && prediction.top3.length > 1 && (
+                    <div className="mt-2">
+                        <button 
+                            onClick={() => setShowAlternatives(!showAlternatives)}
+                            className="text-[10px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2"
+                        >
+                            {showAlternatives ? "− Hide" : "+ Show"} Alternative matches
+                        </button>
+                        
+                        <AnimatePresence>
+                            {showAlternatives && (
+                                <motion.div 
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="grid gap-3 mt-4">
+                                        {prediction.top3.slice(1).map((cand: any, idx: number) => (
+                                            <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl flex items-center gap-4">
+                                                <div className="text-[9px] font-black text-gray-600 w-4">0{idx+2}</div>
+                                                <div className="flex-1">
+                                                    <div className="flex justify-between items-end mb-1.5">
+                                                        <span className="text-xs font-bold text-gray-300 uppercase tracking-tighter">{cand.name}</span>
+                                                        <span className="text-[9px] font-bold text-gray-500">{Math.round(cand.confidence * 100)}%</span>
+                                                    </div>
+                                                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                                                        <motion.div 
+                                                            initial={{ width: 0 }}
+                                                            animate={{ width: `${cand.confidence * 100}%` }}
+                                                            className="h-full bg-primary-500/40"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                )}
             </div>
         </div>
 

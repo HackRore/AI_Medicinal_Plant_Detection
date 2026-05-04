@@ -115,15 +115,30 @@ class MLService:
 
             input_name = self.sess.get_inputs()[0].name
             
-            # --- SINGLE PASS INFERENCE (Render-Safe) ---
-            # We use a single 384px pass to stay within 512MB RAM limit
-            input_tensor = preprocess(img_main)
-            outputs = self.sess.run(None, {input_name: input_tensor})
-            raw_preds = outputs[0][0]
+            # --- TTA PASSES ---
+            passes = []
+            # 1. Original
+            passes.append(img_main)
+            # 2. Horizontal Flip
+            passes.append(img_main.transpose(Image.FLIP_LEFT_RIGHT))
+            # 3. +10 rotation
+            passes.append(img_main.rotate(10))
+            # 4. -10 rotation
+            passes.append(img_main.rotate(-10))
+            # 5. Center crop 90%
+            w, h = img_main.size
+            cw, ch = int(w * 0.9), int(h * 0.9)
+            passes.append(img_main.crop(((w-cw)//2, (h-ch)//2, w-(w-cw)//2, h-(h-ch)//2)).resize((384, 384)))
             
-            # Standard Softmax (no artificial sharpening - it destroys probability distributions)
-            exp_preds = np.exp(raw_preds - np.max(raw_preds))
-            preds = exp_preds / exp_preds.sum()
+            all_preds = []
+            for p_img in passes:
+                input_tensor = preprocess(p_img)
+                outputs = self.sess.run(None, {input_name: input_tensor})
+                raw_preds = outputs[0][0]
+                exp_preds = np.exp(raw_preds - np.max(raw_preds))
+                all_preds.append(exp_preds / exp_preds.sum())
+            
+            preds = np.mean(all_preds, axis=0)
             
             idx = int(np.argmax(preds))
             conf = float(preds[idx])

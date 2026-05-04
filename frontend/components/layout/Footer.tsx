@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { Leaf, Github, Twitter, Linkedin, Heart } from "lucide-react";
+import { APP_VERSION } from "@/lib/constants";
 
 export const Footer = () => {
     return (
@@ -55,7 +56,7 @@ export const Footer = () => {
                         <h4 className="font-bold text-white mb-6">Project Info</h4>
                         <div className="p-6 bg-white/5 rounded-2xl border border-white/10 relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-2 bg-emerald-500/20 text-[8px] text-emerald-400 font-bold uppercase tracking-widest border-b border-l border-emerald-500/30 rounded-bl-xl">
-                                SPEC v3.1 (OUTSTANDING)
+                                SPEC {APP_VERSION} (OUTSTANDING)
                             </div>
                             <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Developed By</p>
                             <p className="text-white font-black mb-1">Neural Architects Collective</p>
