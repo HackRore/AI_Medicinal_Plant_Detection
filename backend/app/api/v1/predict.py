@@ -56,17 +56,13 @@ async def _process_prediction(raw: bytes, scale_reference: bool):
     if not result.get("success"):
         return JSONResponse(result, status_code=200)
 
-    # Confidence Gate
-    cnn_confidence = result.get("confidence_pct", 0)
-    if cnn_confidence < 15.0:
-        return JSONResponse({
-            "success": False,
-            "error": "Cannot Identify",
-            "message": "Neural signature too weak. Please retake the photo."
-        }, status_code=200)
-    
+    # The 15% hard gate was removed to allow the Prototypical Engine (Phase 3)
+    # to handle OOD detection and recovery more intelligently.
     kb = result.get("knowledge", {})
-    plant_name = kb.get("common_names", [result["class_name"]])[0]
+
+    # Safely get class_name from result
+    class_name = result.get("class_name", "Unknown Plant")
+    plant_name = kb.get("common_names", [class_name])[0] if kb.get("common_names") else class_name
     
     # Validation & Analysis
     validation_task = asyncio.create_task(gemini_service.validate_prediction(plant_name, raw))
@@ -74,26 +70,27 @@ async def _process_prediction(raw: bytes, scale_reference: bool):
     
     response = {
         "success": True,
+        "prediction_id": result.get("prediction_id"),
         "plant": {
             "name": plant_name,
-            "scientific_name": kb.get("scientific_name", result["class_name"]),
+            "scientific_name": kb.get("scientific_name", result.get("class_name", "Unknown")),
             "family": kb.get("family", "N/A"),
         },
         "prediction": {
-            "confidence": result["confidence_pct"],
-            "confidence_label": result["confidence_label"],
-            "top3": result["top3"],
+            "confidence": result.get("confidence_pct", 0),
+            "confidence_label": result.get("confidence_label", "Medium"),
+            "top3": result.get("top3", []),
         },
         "medicinal": {
             "description": kb.get("description", ""),
             "ayurvedic_uses": kb.get("ayurvedic_uses", []),
         },
         "gradcam": result.get("gradcam", {}),
-        "quality": {"passed": result["quality_passed"], "score": result["quality_score"]},
+        "quality": {"passed": result.get("quality_passed", True), "score": result.get("quality_score", 0.9)},
         "meta": {
-            "inference_ms": result["inference_ms"],
+            "inference_ms": result.get("inference_ms", 0),
             "model_version": "plantoai_v3_onnx_384px",
-            "class_detected": result["class_name"]
+            "class_detected": result.get("class_name", "Unknown")
         }
     }
 

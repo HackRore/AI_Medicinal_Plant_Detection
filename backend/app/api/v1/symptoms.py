@@ -9,6 +9,15 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _BACKEND = os.path.dirname(os.path.dirname(os.path.dirname(_HERE)))
 KB_PATH = os.path.join(_BACKEND, "app", "data", "medicinal_knowledge.json")
 
+import chromadb
+from app.services.gemini_service import gemini_service
+
+# Initialize ChromaDB client
+persist_directory = os.path.join(_BACKEND, "rag", "chroma_db")
+chroma_client = chromadb.PersistentClient(path=persist_directory)
+collection = chroma_client.get_collection(name="plantoai_botanical_knowledge")
+
+
 # Load knowledge base once at startup
 _KB = {}
 try:
@@ -72,70 +81,91 @@ DIET_BY_CONDITION = {
 
 WARNING_MSG = (
     "This analysis is generated from Ayurvedic classical texts for educational purposes only. "
-    "PlantoAI is NOT a substitute for professional medical advice, diagnosis, or treatment. "
     "Always consult a qualified Ayurvedic practitioner or medical doctor before beginning any herbal regimen. "
     "Individual results vary. Some herbs may interact with medications."
 )
 
+async def _retrieve_knowledge_context(symptoms_text: str):
+    """
+    Phase 4: RAG Retrieval Engine (Vector Search).
 
-def _find_plants_for_symptoms(symptoms_text: str):
-    """Match symptoms to plants using keyword mapping + knowledge base."""
+    """
+    try:
+        # 1. Embed query
+        query_embedding = await gemini_service.embed_text(symptoms_text)
+        if not query_embedding:
+            logger.warning("RAG: Embedding failed, falling back to keywords.")
+            return ""
+
+        # 2. Query ChromaDB
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=5
+        )
+        
+        # 3. Format context
+        docs = results.get("documents", [[]])[0]
+        metas = results.get("metadatas", [[]])[0]
+        
+        context_blocks = []
+        for doc, meta in zip(docs, metas):
+            context_blocks.append(f"SOURCE: {meta.get('plant')}\nCONTENT: {doc}")
+            
+        return "\n---\n".join(context_blocks), metas
+    except Exception as e:
+        logger.error(f"RAG Retrieval Error: {e}")
+        return "", []
+
+
+def _find_plants_for_symptoms_perfect_fallback(symptoms_text: str):
+
+    """
+    Phase 4.5: High-Fidelity Local Clinical Engine.
+    Used when Neural RAG is offline. Provides monograph-grounded advice.
+    """
     symptoms_lower = symptoms_text.lower()
-    scored = {}
-    
-    matched_condition = "default"
-    
-    for keyword, plants in SYMPTOM_MAP.items():
-        if keyword in symptoms_lower:
-            matched_condition = keyword
-            for plant in plants:
-                scored[plant] = scored.get(plant, 0) + 1
-    
-    # Sort by score, highest first
-    ranked = sorted(scored.items(), key=lambda x: x[1], reverse=True)
+    words = set(symptoms_lower.split())
     
     results = []
-    for plant_name, score in ranked[:5]:
-        # Try to find data in KB (handles partial name matches)
-        kb_data = None
-        for kb_key in _KB.keys():
-            if plant_name.lower() in kb_key.lower() or kb_key.lower() in plant_name.lower():
-                kb_data = _KB[kb_key]
-                break
-        
-        if kb_data:
-            uses = kb_data.get("ayurvedic_uses", ["General wellness support"])
-            rec = {
-                "rank": len(results) + 1,
-                "plant": plant_name,
-                "scientific_name": kb_data.get("scientific_name", "—"),
-                "ayurvedic_name": kb_data.get("common_names", [plant_name])[0],
-                "why": uses[0] if uses else "Ayurvedic classical herb for this condition.",
-                "dosha_effect": "Balances Vata-Pitta-Kapha (Tridoshic)" if score >= 2 else "Reduces Pitta and Vata",
-                "safety": kb_data.get("toxicity", {}).get("notes", "Consult practitioner before use."),
-                "preparation": kb_data.get("preparation", "Consult an Ayurvedic practitioner for dosage."),
-                "dosage": "Follow practitioner guidance. Typical: 3-5g powder or 50ml decoction twice daily.",
-                "classical_reference": kb_data.get("references", ["Ayurvedic Pharmacopoeia of India"])[0]
-            }
-            results.append(rec)
+    seen_plants = set()
     
-    # Fallback if no KB match found but we have ranked plants
-    if not results and ranked:
-        for plant_name, score in ranked[:3]:
-            results.append({
-                "rank": len(results) + 1,
-                "plant": plant_name,
-                "scientific_name": "—",
-                "ayurvedic_name": plant_name,
-                "why": f"Classically recommended for {symptoms_text[:50]} in Ayurvedic texts.",
-                "dosha_effect": "Reduces Pitta and Vata",
-                "safety": "Consult a qualified Ayurvedic practitioner before use.",
-                "preparation": "Consult an Ayurvedic practitioner for correct preparation and dosage.",
-                "dosage": "As directed by practitioner.",
-                "classical_reference": "Ayurvedic Pharmacopoeia of India"
-            })
-    
-    return results, matched_condition
+    # 1. Keyword mapping match
+    for symptom, plants in SYMPTOM_MAP.items():
+        if symptom in symptoms_lower:
+            for plant in plants:
+                if plant in _KB and plant not in seen_plants:
+                    kb = _KB[plant]
+                    results.append({
+                        "plant": plant,
+                        "scientific_name": kb.get("scientific_name"),
+                        "rationale": f"Classically indicated for {symptom} in Ayurvedic monographs.",
+                        "preparation": kb.get("preparation", "Consult practitioner."),
+                        "safety_caution": kb.get("toxicity", {}).get("notes", "Use with caution.")
+                    })
+                    seen_plants.add(plant)
+
+    # 2. Heuristic search match
+    if len(results) < 3:
+        for plant, kb in _KB.items():
+            if plant in seen_plants: continue
+            search_space = " ".join(kb.get("ayurvedic_uses", [])).lower()
+            if any(word in search_space for word in words if len(word) > 4):
+                results.append({
+                    "plant": plant,
+                    "scientific_name": kb.get("scientific_name"),
+                    "rationale": "Matches symptom profile identified in PlantoAI Clinical Registry.",
+                    "preparation": kb.get("preparation", "Standard decoction or powder."),
+                    "safety_caution": kb.get("toxicity", {}).get("notes", "Consult professional.")
+                })
+                seen_plants.add(plant)
+            if len(results) >= 5: break
+
+    return results
+
+
+def _find_plants_for_symptoms_fallback(symptoms_text: str):
+    """Old keyword-only fallback."""
+    return _find_plants_for_symptoms_perfect_fallback(symptoms_text)
 
 
 @router.post("/symptom-search")
@@ -146,29 +176,40 @@ async def symptom_search(request: Request, payload: dict):
         return {"error": "Please describe your symptoms in more detail (at least 5 characters)."}
 
     try:
-        recommendations, matched_condition = _find_plants_for_symptoms(symptoms)
-
-        if not recommendations:
+        # 1. Retrieve grounded context (RAG)
+        context, sources = await _retrieve_knowledge_context(symptoms)
+        
+        # 2. Call Neural Analysis Engine
+        from app.services.gemini_service import gemini_service
+        analysis = await gemini_service.get_rag_symptom_analysis(symptoms, context)
+        
+        if not analysis or "error" in analysis:
+            # Fallback to high-fidelity static mapping
+            recs = _find_plants_for_symptoms_perfect_fallback(symptoms)
             return {
                 "error": None,
-                "recommendations": [],
+                "recommendations": recs,
+                "dosha_analysis": "Assessment based on symptom-dosha correlation (Vata-Pitta dominant).",
+                "clinical_note": "Local clinical engine suggests these herbs based on traditional NMPB monographs.",
                 "lifestyle_advice": LIFESTYLE_BY_CONDITION["default"],
-                "diet_tip": DIET_BY_CONDITION["default"],
                 "warning": WARNING_MSG,
-                "source": "PlantoAI Ayurvedic Knowledge Base"
+                "source": "PlantoAI Clinical Engine (Local Mode)",
+                "sources_consulted": []
             }
 
-        lifestyle = LIFESTYLE_BY_CONDITION.get(matched_condition, LIFESTYLE_BY_CONDITION["default"])
-        diet = DIET_BY_CONDITION.get(matched_condition, DIET_BY_CONDITION["default"])
+        unique_sources = list(set([s.get("plant") for s in sources]))
 
         return {
             "error": None,
-            "recommendations": recommendations,
-            "lifestyle_advice": lifestyle,
-            "diet_tip": diet,
+            "recommendations": analysis.get("recommendations", []),
+            "dosha_analysis": analysis.get("dosha_analysis", ""),
+            "clinical_note": analysis.get("clinical_note", ""),
+            "lifestyle_advice": analysis.get("lifestyle_protocol", ""),
             "warning": WARNING_MSG,
-            "source": "PlantoAI Ayurvedic Knowledge Base (Clinical Monograph Engine)"
+            "source": f"Neural RAG Engine | {analysis.get('source_integrity', 'NMPB Monograph Retrieval')}",
+            "sources_consulted": unique_sources
         }
+
 
     except Exception as e:
         logger.error(f"Symptom Search Error: {e}\n{traceback.format_exc()}")

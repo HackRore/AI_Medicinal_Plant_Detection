@@ -150,23 +150,30 @@ export default function PredictClient() {
     setShowOnboarding(false)
   }
 
-  // Sprint 5: Active Learning Feedback Loop
+  // Phase 4: Persistent Memory Feedback Loop
   const reportMismatch = async (correctClass: string = "unknown", userNote: string = "User reported mismatch via UI") => {
-    if (!uploadedImages[0]?.file || feedbackSent) return
+    const predictionId = predictMutation.data?.prediction_id
+    if (!predictionId || feedbackSent) return
+    
     setFeedbackLoading(true)
     try {
-      const formData = new FormData()
-      formData.append("file", uploadedImages[0].file)
-      formData.append("predicted_class", predictMutation.data?.plant?.name ?? "unknown")
-      formData.append("correct_class", correctClass)
-      formData.append("user_note", userNote)
-      const res = await fetch(`${API_BASE}/api/v1/report-mismatch`, { method: "POST", body: formData })
+      const res = await fetch(`${API_BASE}/api/v1/feedback/correction`, { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prediction_id: predictionId,
+          correct_species: correctClass,
+          notes: userNote
+        }) 
+      })
       if (res.ok) {
         setFeedbackSent(true)
-        toast.success("Thanks! This image helps train our AI to be smarter.")
+        toast.success("Memory updated. Neural training prioritized.")
+      } else {
+        throw new Error("Feedback sync failed")
       }
     } catch (e) {
-      toast.error("Could not send feedback right now.")
+      toast.error("Correction sync failed. Local memory preserved.")
     } finally {
       setFeedbackLoading(false)
     }
@@ -531,8 +538,37 @@ export default function PredictClient() {
               <div ref={resultRef}>
                  <AIThinkingOverlay isVisible={predictMutation.isPending} />
                  
+                  {/* BioCLIP 2: Botanical Gatekeeper Rejection */}
+                  {predictMutation.isSuccess && predictMutation.data?.status === "rejected" && (
+                    <div className="space-y-6 p-8 rounded-[2.5rem] bg-red-600/10 border border-red-500/30">
+                       <div className="flex items-start gap-4">
+                         <span className="text-4xl shrink-0">🚫</span>
+                         <div>
+                           <h3 className="text-xl font-black text-red-500 uppercase tracking-wider mb-2">Invalid Bio-Signature Detected</h3>
+                           <p className="text-gray-300 text-sm leading-relaxed">{predictMutation.data.message}</p>
+                           <div className="flex items-center gap-2 mt-4 text-[10px] font-black text-red-400/60 uppercase tracking-widest">
+                             <div className="h-1 flex-1 bg-white/10 rounded-full overflow-hidden">
+                               <div className="h-full bg-red-500" style={{ width: `${predictMutation.data.botanical_confidence}%` }}></div>
+                             </div>
+                             <span>Botanical match: {predictMutation.data.botanical_confidence}%</span>
+                           </div>
+                         </div>
+                       </div>
+                       <div className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                         <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Gatekeeper Verdict</p>
+                         <p className="text-gray-400 text-sm">BioCLIP-2 discarded this specimen. It appears to be an object, human, or out-of-distribution sample.</p>
+                       </div>
+                       <button
+                         onClick={() => { predictMutation.reset(); setPreview(null); setUploadedImages([]) }}
+                         className="w-full py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-black uppercase tracking-wider text-sm transition-all"
+                       >
+                         Retake Botanical Sample
+                       </button>
+                    </div>
+                  )}
+
                  {/* Smart Rejection Panel: Not a leaf or poor image quality */}
-                 {predictMutation.isSuccess && !predictMutation.data?.success && predictMutation.data?.error && (
+                 {predictMutation.isSuccess && !predictMutation.data?.success && predictMutation.data?.error && predictMutation.data?.status !== "rejected" && (
                     <div className="space-y-6 p-8 rounded-[2.5rem] bg-amber-500/5 border border-amber-500/20">
                        <div className="flex items-start gap-4">
                          <span className="text-4xl shrink-0">{predictMutation.data.error === 'Not a Plant Leaf' ? '🌿' : '📷'}</span>

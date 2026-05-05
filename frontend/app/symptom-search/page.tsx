@@ -367,6 +367,28 @@ export default function SymptomSearchPage() {
                   </CardContent>
                 </Card>
               </div>
+              
+              {/* Sources Consulted (Phase 4 RAG) */}
+              {results.sources_consulted && results.sources_consulted.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="mt-8 p-6 rounded-2xl bg-white/5 border border-white/10"
+                >
+                  <div className="flex items-center gap-2 mb-4 text-emerald-400">
+                    <BookOpen className="w-4 h-4" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Botanical Sources Consulted</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {results.sources_consulted.map((source: string, idx: number) => (
+                      <span key={idx} className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] text-emerald-300 font-medium">
+                        NMPB Monograph: {source}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
 
               {/* Warning */}
               <motion.div

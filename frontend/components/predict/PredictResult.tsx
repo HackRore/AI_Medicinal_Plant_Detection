@@ -77,9 +77,17 @@ export default function PredictResult({
   const sciName    = (plant?.scientific_name || result?.scientific_name || "").toString();
   const family     = (plant?.family || "Botanical Registry").toString();
   
-  let confidenceTier = "Low — manual verification recommended";
-  if (confidence >= 90) confidenceTier = "High confidence";
-  else if (confidence >= 70) confidenceTier = "Moderate — verify visually";
+  const confidenceTier = result?.confidence_tier || (
+    confidence >= 90 ? "High confidence" : 
+    confidence >= 70 ? "Moderate — verify visually" : 
+    "Low — manual verification recommended"
+  );
+  
+  const confidenceColor = result?.confidence_color || (
+    confidence >= 90 ? "emerald" : 
+    confidence >= 70 ? "amber" : 
+    "rose"
+  );
   
   const medicinalProperties = result?.botanical_intelligence?.medicinal_properties ?? 
                               result?.medicinal_properties ?? 
@@ -209,68 +217,53 @@ export default function PredictResult({
                         className="p-6 bg-white/[0.04] border border-primary-500/30 rounded-2xl flex flex-col gap-4 shadow-[0_0_20px_rgba(16,185,129,0.1)] relative overflow-hidden"
                     >
                         <div className="absolute top-0 right-0 px-4 py-1 bg-primary-500/20 text-primary-400 text-[9px] font-black uppercase tracking-widest rounded-bl-xl">
-                            {confidenceTier}
-                        </div>
-                        <div className="flex items-center gap-6">
-                            <div className="flex-1 mt-2">
-                                <div className="flex justify-between items-end mb-2">
-                                    <span className="text-sm font-black text-white uppercase tracking-tighter">{prediction.top3[0].name}</span>
-                                    <span className="text-[10px] font-bold text-primary-400">{Math.round(prediction.top3[0].confidence * 100)}%</span>
-                                </div>
-                                <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                    <motion.div 
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${prediction.top3[0].confidence * 100}%` }}
-                                        className="h-full bg-primary-500"
-                                    />
-                                </div>
+                    <div className="p-6 bg-white/[0.04] border border-primary-500/30 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(16,185,129,0.1)]">
+                        <div className="flex-1 space-y-4">
+                        <div className="flex flex-wrap items-center gap-4">
+                            <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter capitalize">{name}</h2>
+                            <div className={`px-4 py-1.5 rounded-full bg-${confidenceColor}-500/10 border border-${confidenceColor}-500/20 flex items-center gap-2`}>
+                                <div className={`w-1.5 h-1.5 rounded-full bg-${confidenceColor}-500 animate-pulse`} />
+                                <span className={`text-[10px] font-black text-${confidenceColor}-400 uppercase tracking-widest`}>
+                                    {confidenceTier}
+                                </span>
                             </div>
                         </div>
-                    </motion.div>
+                        <p className="text-primary-400 text-lg font-bold tracking-tight italic opacity-80">{sciName}</p>
+                    </div>
+
+                    <div className="flex gap-2">
+                        <button 
+                          onClick={() => onReportFeedback?.(result.predicted_class, "Verified Correct")}
+                          className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all group"
+                          title="Correct Identification"
+                        >
+                          <CheckCircle2 className="w-6 h-6" />
+                        </button>
+                        <button 
+                          onClick={() => setIsCorrectionOpen(true)}
+                          className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                          title="Wrong Identification"
+                        >
+                          <XCircle className="w-6 h-6" />
+                        </button>
+                    </div>
+                </div>
                 )}
 
-                {/* Alternative Matches Collapsible */}
-                {prediction.top3 && prediction.top3.length > 1 && (
-                    <div className="mt-2">
-                        <button 
-                            onClick={() => setShowAlternatives(!showAlternatives)}
-                            className="text-[10px] font-bold text-gray-400 hover:text-white transition-colors uppercase tracking-widest flex items-center gap-2"
-                        >
-                            {showAlternatives ? "− Hide" : "+ Show"} Alternative matches
-                        </button>
-                        
-                        <AnimatePresence>
-                            {showAlternatives && (
-                                <motion.div 
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="overflow-hidden"
-                                >
-                                    <div className="grid gap-3 mt-4">
-                                        {prediction.top3.slice(1).map((cand: any, idx: number) => (
-                                            <div key={idx} className="p-4 bg-white/[0.02] border border-white/5 rounded-xl flex items-center gap-4">
-                                                <div className="text-[9px] font-black text-gray-600 w-4">0{idx+2}</div>
-                                                <div className="flex-1">
-                                                    <div className="flex justify-between items-end mb-1.5">
-                                                        <span className="text-xs font-bold text-gray-300 uppercase tracking-tighter">{cand.name}</span>
-                                                        <span className="text-[9px] font-bold text-gray-500">{Math.round(cand.confidence * 100)}%</span>
-                                                    </div>
-                                                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-                                                        <motion.div 
-                                                            initial={{ width: 0 }}
-                                                            animate={{ width: `${cand.confidence * 100}%` }}
-                                                            className="h-full bg-primary-500/40"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                {result.ambiguous && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    className="mt-6 p-5 bg-amber-500/10 border border-amber-500/20 rounded-[2.5rem] flex items-center gap-4"
+                  >
+                    <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0" />
+                    <div>
+                      <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.2em]">Visual Similarity Alert</p>
+                      <p className="text-[11px] text-amber-200/60 font-medium leading-relaxed">
+                        The Neural Engine detected high similarity with another species. {result.note || "Please compare with alternative matches below."}
+                      </p>
                     </div>
+                  </motion.div>
                 )}
             </div>
         </div>
@@ -284,7 +277,53 @@ export default function PredictResult({
                           {name}
                       </h2>
                   </div>
-                  <div className="flex flex-wrap gap-4">
+                  {/* Phase 3: Prototypical Alternative Matches */}
+            {result.proto_top3 && result.proto_top3.length > 1 && (
+              <div className="mt-8 border-t border-white/5 pt-8">
+                <button 
+                  onClick={() => setShowAlternatives(!showAlternatives)}
+                  className="flex items-center gap-2 text-xs font-black text-gray-500 uppercase tracking-widest hover:text-primary-400 transition-colors"
+                >
+                  Alternative Matches Detected 
+                  {showAlternatives ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+                
+                <AnimatePresence>
+                  {showAlternatives && (
+                    <motion.div 
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                        {result.proto_top3.map((alt: any, idx: number) => (
+                          <div 
+                            key={idx}
+                            className={`p-4 rounded-2xl border ${idx === 0 ? 'bg-primary-500/10 border-primary-500/20' : 'bg-white/5 border-white/10'} flex items-center justify-between group cursor-help`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-lg ${idx === 0 ? 'bg-primary-500/20' : 'bg-white/5'} flex items-center justify-center text-[10px] font-black text-white`}>
+                                {idx + 1}
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-black text-white uppercase tracking-tight">{alt.species.replace(/_/g, ' ')}</p>
+                                <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Similarity Score</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-black text-white">{Math.round(alt.confidence * 100)}%</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
+
+            <div className="mt-12 flex flex-wrap gap-4">
                       <span className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-primary-400 uppercase tracking-widest">{family}</span>
                       <span className="px-6 py-2 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black text-gray-400 uppercase tracking-widest italic">{sciName}</span>
                   </div>

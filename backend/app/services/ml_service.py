@@ -7,6 +7,9 @@ import time
 import os
 import logging
 from io import BytesIO
+import tempfile
+from botanical_gate import gate
+from prototypical_inference import PrototypicalClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +78,14 @@ class MLService:
                 providers=['CPUExecutionProvider']
             )
             self.model_loaded = True
-            logger.info("Neural Engine: ONLINE (Render-Optimized)")
+            
+            # --- Phase 3: Prototypical Engine Initialization ---
+            self.proto_engine = PrototypicalClassifier(
+                prototypes_path=os.path.join(_BACKEND, 'ml_models', 'prototypes.npy'),
+                index_path=os.path.join(_BACKEND, 'ml_models', 'species_index.json')
+            )
+            
+            logger.info("Neural Engine: ONLINE (Render-Optimized + Prototypical Core)")
         except Exception as e:
             self.model_loaded = False
             self.class_names = []
@@ -89,6 +99,22 @@ class MLService:
             
             img = Image.open(BytesIO(image_bytes)).convert('RGB')
             
+            # --- Phase 1: BioCLIP 2 Botanical Gatekeeper ---
+            with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+                tmp.write(image_bytes)
+                tmp_path = tmp.name
+            
+            gate_result = gate.verify(tmp_path)
+            if not gate_result.get("is_leaf", True):
+                return {
+                    "status": "rejected",
+                    "success": False,
+                    "error": "Invalid Bio-Signature Detected",
+                    "message": gate_result.get("reason", "Not a leaf."),
+                    "botanical_confidence": round(gate_result.get("confidence", 0) * 100, 2),
+                    "species": None
+                }
+
             # --- Stage 1: YOLOv8 Segmentation ---
             segmentation_status = "Bypassed"
             if YOLO_AVAILABLE and leaf_detector:
@@ -177,7 +203,38 @@ class MLService:
             else:
                 conf_label = "High" if conf > 0.75 else "Medium" if conf > 0.45 else "Low"
                 is_quality_passed = conf > 0.30
+
+            # --- Phase 3: Prototypical Path ---
+            proto_result = self.proto_engine.predict(gate.get_bioclip_embedding(tmp_path))
+            proto_top1 = proto_result.get("top1_species", "Unknown")
+            proto_conf = proto_result.get("top1_confidence", 0)
             
+            # --- Decision Combination (Ensemble) ---
+            onnx_top1 = name
+            final_confidence = conf
+            final_tier = conf_label
+            is_ambiguous = proto_result.get("ambiguous", False)
+            
+            # ENSEMBLE DECISION: Sharp Boundaries Logic (Phase 3)
+            # Trust the Prototypical Engine if it's more confident than ONNX, or if ONNX is weak
+            if proto_conf > conf or (conf < 0.30 or entropy > 3.2):
+                logger.info(f"Neural Shift: Prioritizing Prototypical Engine ({proto_top1}) [Conf: {proto_conf:.2f}] over ONNX ({onnx_top1}) [Conf: {conf:.2f}]")
+                name = proto_top1
+                final_confidence = proto_conf
+                final_tier = proto_result.get("confidence_tier")
+                is_quality_passed = proto_conf > 0.40
+            else:
+                # Trust ONNX but calibrate with Proto
+                name = onnx_top1
+                final_confidence = conf
+                final_tier = conf_label
+                is_quality_passed = conf > 0.30
+
+            # Conflict Detection
+            if onnx_top1 != proto_top1 and proto_conf > 0.50:
+                is_ambiguous = True
+                final_tier = "AMBIGUOUS — Cross-verification required"
+
             from app.services.explainability_service import explainability_service
             img_array = np.array(img_main).astype(np.float32)
             heatmap = explainability_service._generate_mock_heatmap(img_array)
@@ -185,27 +242,52 @@ class MLService:
             overlay_b64 = explainability_service._image_to_base64(overlay)
             
             processing_time = time.time() - start_time
+            
+            # --- Phase 4: Persistent Memory (Log Prediction) ---
+            from app.services.feedback_service import feedback_service
+            import hashlib
+            img_hash = hashlib.md5(image_bytes).hexdigest()
+            prediction_id = feedback_service.log_prediction(
+                image_hash=img_hash,
+                predicted_species=name,
+                confidence=float(final_confidence),
+                gate_score=round(float(1.0 - (entropy / 5.0)), 2),
+                meta={"model": "plantoai_v3_onnx_384px", "ensemble": "prototypical"}
+            )
+
             return {
                 "success": True,
+                "prediction_id": prediction_id,
+
                 "class_name": name,
                 "predicted_class": name,
-                "confidence": conf,
-                "confidence_pct": round(conf * 100, 2),
-                "confidence_label": conf_label,
+                "confidence": float(final_confidence),
+                "confidence_pct": round(float(final_confidence) * 100, 2),
+                "confidence_label": final_tier,
+                "confidence_tier": final_tier,
                 "top3": top3,
+                "proto_top3": proto_result.get("top3", []),
+                "ambiguous": is_ambiguous,
                 "processing_time": processing_time,
                 "inference_ms": round(processing_time * 1000, 1),
                 "knowledge": kb_data,
                 "quality_passed": is_quality_passed,
-                "quality_score": round(float(1.0 - (entropy / 5.0)), 2), # Mock quality score based on certainty
+                "quality_score": round(float(1.0 - (entropy / 5.0)), 2),
                 "gradcam": {
                     "overlay_base64": overlay_b64,
                     "explanation": f"[{segmentation_status}] " + explainability_service.get_botanical_reasoning(name),
-                    "method": "Neural Forge Forensic TTA v5.2 + YOLOv8 Seg"
+                    "method": "Neural Forge v5.5 (TTA + Prototypical Calibration)"
                 }
             }
         except Exception as e:
+            logger.error(f"Inference critical failure: {e}")
             return {"success": False, "error": "Inference Error", "details": str(e)}
+        finally:
+            if 'tmp_path' in locals() and os.path.exists(tmp_path):
+                try:
+                    os.remove(tmp_path)
+                except:
+                    pass
 
 ml_service = MLService()
 def get_ml_service(): return ml_service

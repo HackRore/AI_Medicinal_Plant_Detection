@@ -1,14 +1,14 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Form, HTTPException, Request
 from fastapi.responses import JSONResponse
 from app.database import SessionLocal
 import os, json, base64, time, logging
 from datetime import datetime
 
+from app.services.feedback_service import feedback_service
+
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-FEEDBACK_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 
-                             "..", "..", "..", "ml_models", "feedback_queue")
 
 @router.post("/report-mismatch")
 async def report_mismatch(
@@ -59,38 +59,28 @@ async def report_mismatch(
         logger.error(f"Feedback logging error: {e}")
         raise HTTPException(500, f"Failed to log feedback: {str(e)}")
 
-@router.get("/feedback-stats")
-async def get_feedback_stats():
-    """Returns statistics on accumulated hard negatives for the retraining queue."""
-    try:
-        os.makedirs(FEEDBACK_DIR, exist_ok=True)
-        meta_path = os.path.join(FEEDBACK_DIR, "mismatch_log.jsonl")
-        
-        if not os.path.exists(meta_path):
-            return {"total_reports": 0, "queue_ready": False, "message": "No feedback collected yet."}
-        
-        entries = []
-        with open(meta_path, "r", encoding="utf-8") as f:
-            for line in f:
-                try:
-                    entries.append(json.loads(line.strip()))
-                except:
-                    pass
-        
-        # Group by predicted class to identify confusion pairs
-        confusion_pairs = {}
-        for e in entries:
-            key = f"{e.get('predicted_class')} → {e.get('correct_class')}"
-            confusion_pairs[key] = confusion_pairs.get(key, 0) + 1
-        
-        top_confusions = sorted(confusion_pairs.items(), key=lambda x: x[1], reverse=True)[:5]
-        
-        return {
-            "total_reports": len(entries),
-            "queue_ready": len(entries) >= 50,  # Trigger retrain at 50+ reports
-            "top_confusion_pairs": [{"pair": k, "count": v} for k, v in top_confusions],
-            "message": f"Retraining queue: {len(entries)} samples collected." + 
-                       (" Ready for next retrain cycle!" if len(entries) >= 50 else f" {50 - len(entries)} more needed to trigger retrain.")
-        }
-    except Exception as e:
-        return {"error": str(e), "total_reports": 0}
+@router.post("/correction")
+async def log_correction(payload: dict):
+    """Log a user correction for a prediction."""
+    pred_id = payload.get("prediction_id")
+    correct_species = payload.get("correct_species")
+    
+    if not pred_id or not correct_species:
+        raise HTTPException(400, "prediction_id and correct_species are required")
+    
+    success = feedback_service.log_correction(pred_id, correct_species)
+    if success:
+        return {"success": True, "message": "Thank you! Your correction helps improve PlantoAI."}
+    else:
+        raise HTTPException(500, "Failed to log correction")
+
+@router.get("/stats")
+async def get_stats(request: Request):
+    """Get correction stats (Admin only)."""
+    admin_key = request.headers.get("X-Admin-Key")
+    if admin_key != os.environ.get("SECRET_KEY"):
+        raise HTTPException(403, "Unauthorized access")
+    
+    stats = feedback_service.get_correction_stats()
+    return {"success": True, "stats": stats}
+
