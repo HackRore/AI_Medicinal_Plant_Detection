@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShieldCheck, 
@@ -19,15 +19,49 @@ import {
   Wand2,
   Leaf,
   Database,
-  History
+  History,
+  AlertCircle,
+  Search,
+  MessageSquare,
+  Send,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 const KAGGLE_DATASET_URL = "https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset";
 
-export default function PredictResult({ result, imageUrl }: { result: any; imageUrl: string }) {
+const PLANT_CLASSES = [
+  "aloevera", "amla", "amruta_balli", "arali", "ashoka", "ashwagandha", "astma_weed", "avacado", "badipala", "balloon_vine", 
+  "bamboo", "basale", "beans", "betel", "betel_nut", "bhringraj", "brahmi", "camphor", "caricature", "castor", "catharanthus", 
+  "chakte", "chilly", "citron_lime_(herelikai)", "coffee", "common_rue(naagdalli)", "coriender", "curry", "curry_leaf", 
+  "doddapatre", "drumstick", "ekka", "eucalyptus", "ganigale", "ganike", "gasagase", "geranium", "ginger", "globe_amarnath", 
+  "guava", "henna", "hibiscus", "honge", "insulin", "jackfruit", "jasmine", "kamakasturi", "kambajala", "kasambruga", "kepala", 
+  "kohlrabi", "lantana", "lemon", "lemon_grass", "malabar_nut", "mango", "marigold", "mint", "nagadali", "neem", "nelavembu", 
+  "nerale", "nithyapushpa", "nooni", "onion", "padri", "palak(spinach)", "papaya", "parijatha", "pea", "pepper", "pomegranate", 
+  "pumpkin", "raddish", "raktachandini", "rose", "sampige", "sapota", "seethapala", "spinach1", "tamarind", "taro", "tecoma", 
+  "thumbe", "tomato", "tulsi", "wood_sorel"
+];
+
+export default function PredictResult({ 
+  result, 
+  imageUrl, 
+  onReportFeedback, 
+  feedbackLoading, 
+  feedbackSent: externalFeedbackSent 
+}: { 
+  result: any; 
+  imageUrl: string;
+  onReportFeedback?: (correctClass: string, userNote: string) => void;
+  feedbackLoading?: boolean;
+  feedbackSent?: boolean;
+}) {
   const [heatmap, setHeatmap] = useState(false);
-  const [feedbackSent, setFeedbackSent] = useState(false);
+  const feedbackSent = externalFeedbackSent;
   const [showAlternatives, setShowAlternatives] = useState(false);
+  const [isCorrectionOpen, setIsCorrectionOpen] = useState(false);
+  const [correctionSearch, setCorrectionSearch] = useState("");
+  const [selectedCorrection, setSelectedCorrection] = useState("unknown");
+  const [userNote, setUserNote] = useState("");
 
   if (!result) return null;
 
@@ -355,21 +389,103 @@ export default function PredictResult({ result, imageUrl }: { result: any; image
                </div>
             </div>
             <div className="flex items-center gap-6">
-                <button 
-                  onClick={() => setFeedbackSent(true)} 
-                  className="group relative h-16 px-12 bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] active:scale-95 overflow-hidden"
-                >
-                  <div className="absolute inset-0 glass-reflection" />
-                  Accurate
-                </button>
-                <button 
-                  onClick={() => setFeedbackSent(true)}
-                  className="h-16 px-12 bg-white/5 border border-white/10 text-white/30 text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl hover:text-white transition-all active:scale-95"
-                >
-                  Recalibrate
-                </button>
+                {!feedbackSent ? (
+                  <>
+                    <button 
+                      onClick={() => onReportFeedback?.(result.plant.name.toLowerCase().replace(" ", "_"), "User verified as accurate")} 
+                      className="group relative h-16 px-12 bg-primary-500 text-black text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all shadow-[0_0_40px_rgba(16,185,129,0.2)] active:scale-95 overflow-hidden disabled:opacity-50"
+                      disabled={feedbackLoading}
+                    >
+                      <div className="absolute inset-0 glass-reflection" />
+                      {feedbackLoading ? 'Processing...' : 'Accurate'}
+                    </button>
+                    <button 
+                      onClick={() => setIsCorrectionOpen(!isCorrectionOpen)}
+                      className={`h-16 px-12 border text-[10px] font-black uppercase tracking-[0.3em] rounded-2xl transition-all active:scale-95 flex items-center gap-2 ${
+                        isCorrectionOpen ? 'bg-rose-500/20 border-rose-500/50 text-rose-400' : 'bg-white/5 border-white/10 text-white/30 hover:text-white'
+                      }`}
+                    >
+                      {isCorrectionOpen ? 'Cancel' : 'Recalibrate'}
+                    </button>
+                  </>
+                ) : (
+                  <div className="h-16 px-12 flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-400 text-[10px] font-black uppercase tracking-[0.3em]">
+                    <CheckCircle2 className="w-4 h-4" /> Feedback Synced
+                  </div>
+                )}
             </div>
         </div>
+
+        <AnimatePresence>
+          {isCorrectionOpen && !feedbackSent && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="px-12 pb-12 overflow-hidden"
+            >
+              <div className="p-8 bg-black/40 border border-rose-500/20 rounded-[2.5rem] space-y-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/10">
+                    <AlertCircle className="w-5 h-5 text-rose-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-black text-sm uppercase tracking-widest leading-none mb-1">Active Correction Protocol</h4>
+                    <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest">Provide accurate data to improve neural memory</p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-2">Identify Correct Species</label>
+                    <div className="relative">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-600" />
+                      <input 
+                        list="species-list"
+                        value={correctionSearch}
+                        onChange={(e) => {
+                          setCorrectionSearch(e.target.value);
+                          if (PLANT_CLASSES.includes(e.target.value)) {
+                            setSelectedCorrection(e.target.value);
+                          }
+                        }}
+                        placeholder="Search botanical registry..."
+                        className="w-full bg-black/60 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-xs text-white placeholder-gray-700 focus:border-rose-500/50 outline-none transition-all"
+                      />
+                      <datalist id="species-list">
+                        {PLANT_CLASSES.map(cls => (
+                          <option key={cls} value={cls} />
+                        ))}
+                      </datalist>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 ml-2">Clinical Notes (Optional)</label>
+                    <div className="relative">
+                      <MessageSquare className="absolute left-4 top-5 w-4 h-4 text-gray-600" />
+                      <textarea 
+                        value={userNote}
+                        onChange={(e) => setUserNote(e.target.value)}
+                        placeholder="E.g. This is actually Neem but with drought stress..."
+                        className="w-full bg-black/60 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-xs text-white placeholder-gray-700 focus:border-rose-500/50 outline-none transition-all min-h-[56px] h-14 resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button 
+                  onClick={() => onReportFeedback?.(selectedCorrection, userNote || "User reported mismatch via correction panel")}
+                  disabled={feedbackLoading || selectedCorrection === "unknown" && !correctionSearch}
+                  className="w-full h-16 bg-rose-500 hover:bg-rose-400 disabled:opacity-50 disabled:bg-gray-800 text-black text-[10px] font-black uppercase tracking-[0.4em] rounded-2xl transition-all flex items-center justify-center gap-3 active:scale-95"
+                >
+                  <Send className="w-4 h-4" />
+                  {feedbackLoading ? 'Synchronizing with Retraining Queue...' : 'Inject Correction into Neural Memory'}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
     </motion.div>
   );
 }

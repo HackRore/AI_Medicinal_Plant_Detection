@@ -150,16 +150,16 @@ export default function PredictClient() {
     setShowOnboarding(false)
   }
 
-  // Sprint 5: Report Mismatch — Active Learning Feedback Loop
-  const reportMismatch = async () => {
+  // Sprint 5: Active Learning Feedback Loop
+  const reportMismatch = async (correctClass: string = "unknown", userNote: string = "User reported mismatch via UI") => {
     if (!uploadedImages[0]?.file || feedbackSent) return
     setFeedbackLoading(true)
     try {
       const formData = new FormData()
       formData.append("file", uploadedImages[0].file)
       formData.append("predicted_class", predictMutation.data?.plant?.name ?? "unknown")
-      formData.append("correct_class", "unknown")
-      formData.append("user_note", "User reported mismatch via UI")
+      formData.append("correct_class", correctClass)
+      formData.append("user_note", userNote)
       const res = await fetch(`${API_BASE}/api/v1/report-mismatch`, { method: "POST", body: formData })
       if (res.ok) {
         setFeedbackSent(true)
@@ -574,6 +574,9 @@ export default function PredictClient() {
                     <PredictResult 
                       result={predictMutation.data} 
                       imageUrl={uploadedImages[0]?.preview || preview || ""} 
+                      onReportFeedback={reportMismatch}
+                      feedbackLoading={feedbackLoading}
+                      feedbackSent={feedbackSent}
                     />
                  )}
                  
