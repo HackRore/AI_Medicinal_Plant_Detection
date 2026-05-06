@@ -10,3 +10,9 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: MODEL_PATH
+        value: artifacts/checkpoints
+      - key: PROTOTYPE_PATH
+        value: artifacts/prototypes
+      - key: ONNX_PATH
+        value: artifacts/onnx

@@ -181,7 +181,7 @@ class MLService:
             if entropy > 3.8 and conf < 0.12:
                 name = "Unknown / Not in Database"
                 kb_data = {
-                    "description": "This plant does not strongly match any of our verified medicinal species. It may be a weed, a non-medicinal plant, or an out-of-focus image.",
+                    "description": "This plant does not strongly match any of our verified medicinal species. It may be a weed, a non-medicinal plant, or an out-of-focus image.\n\nPHOTO TIPS: For best results, place a single leaf on a flat surface in natural light, and take the photo from ~15cm away.",
                     "medicinal_properties": [
                         {
                             "ailment": "SAFETY WARNING",

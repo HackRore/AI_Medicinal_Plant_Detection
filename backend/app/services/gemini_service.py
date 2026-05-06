@@ -109,8 +109,9 @@ Return a valid JSON object ONLY:
     }}
   ],
   "lifestyle_protocol": "habits",
-  "source_integrity": "Verified NMPB"
-}}"""
+  "source_integrity": "Verified NMPB. Consult a certified Vaidya before use."
+}}
+Make sure to append ' - Consult a certified Vaidya before use.' to the clinical_note as well."""
         try:
             response = await self.reasoning_engine.generate_content_async(prompt)
             return self._parse_structured_output(response.text)
