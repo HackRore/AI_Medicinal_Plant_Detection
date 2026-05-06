@@ -3,78 +3,80 @@ import json
 import asyncio
 import logging
 import httpx
-import base64
-from typing import Optional, Dict
+import google.generativeai as genai
+from typing import Dict, Any, Optional
 from app.utils.json_utils import safe_parse_gemini_json
 
 logger = logging.getLogger(__name__)
 
 class GeminiService:
-    """Bulletproof REST-based AI Service for Botanical Reasoning and Symptom Analysis."""
-    
+    """Orchestrates VLM-based leaf verification and clinical grounding."""
     def __init__(self):
-        # Using v1/gemini-pro for maximum compatibility across project regions
-        self.base_url = "https://generativelanguage.googleapis.com/v1/models"
-
-    def _get_api_key(self) -> str:
-        return os.environ.get("GEMINI_API_KEY", "")
-
-    async def _call_rest_api(self, payload: Dict) -> str:
-        """Execute a direct REST call to Gemini bypasses library conflicts."""
-        api_key = self._get_api_key()
+        api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
-            logger.error("Gemini API Key missing")
-            return ""
-        
-        url = f"{self.base_url}/gemini-pro:generateContent?key={api_key}"
-        headers = {"Content-Type": "application/json"}
-        
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload, headers=headers, timeout=25.0)
-                if response.status_code == 429:
-                    logger.warning("Gemini rate limit (429) hit — failing open")
-                    return ""
-                if response.status_code != 200:
-                    logger.error(f"Gemini REST Error {response.status_code}: {response.text}")
-                    return ""
-                
-                data = response.json()
-                if 'candidates' in data and len(data['candidates']) > 0:
-                    return data['candidates'][0]['content']['parts'][0]['text']
-                return ""
-        except Exception as e:
-            logger.error(f"Gemini Connection Failed: {e}")
-            return ""
+            logger.error("GEMINI_API_KEY missing from environment.")
+            return
 
-    async def embed_text(self, text: str) -> list:
-        """Generate vector embeddings using gemini-embedding-2."""
-        api_key = self._get_api_key()
-        if not api_key: return []
-        
-        # v1beta is required for modern embedding models
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-2:embedContent?key={api_key}"
-        payload = {
-            "model": "models/gemini-embedding-2",
-            "content": {"parts": [{"text": text}]}
+        genai.configure(api_key=api_key)
+        # Standardize on Flash for real-time verification; Pro for analytical grounding
+        self.vlm = genai.GenerativeModel('gemini-1.5-flash')
+        self.reasoning_engine = genai.GenerativeModel('gemini-1.5-pro')
+
+    async def verify_is_leaf(self, image_bytes: bytes) -> Dict[str, Any]:
+        """Binary classification of input: Botanical leaf vs OOD."""
+        prompt = """
+        Analyze image. Output JSON:
+        {
+            "is_leaf": boolean,
+            "confidence": "high"|"medium"|"low",
+            "rejection_reason": "if is_leaf is false"
         }
-
-
-        
+        Only return valid JSON.
+        """
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(url, json=payload, timeout=10.0)
-                if response.status_code == 200:
-                    return response.json().get("embedding", {}).get("values", [])
-                logger.error(f"Embedding Error {response.status_code}: {response.text}")
-                return []
+            response = await self.vlm.generate_content_async([
+                prompt,
+                {"mime_type": "image/jpeg", "data": image_bytes}
+            ])
+            return self._parse_structured_output(response.text)
         except Exception as e:
-            logger.error(f"Embedding Connection Failed: {e}")
-            return []
+            logger.error(f"VLM verification failure: {str(e)}")
+            return {"is_leaf": True, "confidence": "low"}
+
+    async def validate_prediction(self, class_name: str, image_bytes: bytes) -> Dict[str, Any]:
+        """Cross-verifies ML output against VLM visual features."""
+        prompt = f"Verify if image shows {class_name}. Output JSON: {{'matches': boolean, 'confidence': 0.0-1.0}}. JSON only."
+        try:
+            response = await self.vlm.generate_content_async([
+                prompt,
+                {"mime_type": "image/jpeg", "data": image_bytes}
+            ])
+            return self._parse_structured_output(response.text)
+        except Exception as e:
+            logger.error(f"Prediction cross-check failed: {str(e)}")
+            return {"matches": True}
+
+    async def get_plant_analysis(self, plant_name: str, confidence: float, image_bytes: bytes, scale_ref: bool) -> Dict[str, Any]:
+        """Generates grounded Ayurvedic analysis with visual context."""
+        prompt = f"""
+        Analyze {plant_name} (ML Confidence: {confidence}%). 
+        Include:
+        - Vision note on leaf morphology
+        - Confirmed botanical name
+        - Traditional Ayurvedic utility
+        JSON output: {{'confirmed_name': str, 'vision_note': str, 'utility': [str]}}.
+        """
+        try:
+            response = await self.reasoning_engine.generate_content_async([
+                prompt,
+                {"mime_type": "image/jpeg", "data": image_bytes}
+            ])
+            return self._parse_structured_output(response.text)
+        except Exception as e:
+            logger.error(f"Grounding engine failed: {str(e)}")
+            return {"vision_note": "Post-inference analysis unavailable."}
 
     async def get_rag_symptom_analysis(self, symptoms: str, context: str) -> Dict:
-        """
-        Phase 4: RAG-based Analytical Engine.
         """
         prompt = f"""You are the PlantoAI Botanical Intelligence Engine.
         
