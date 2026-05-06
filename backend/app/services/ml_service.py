@@ -59,33 +59,24 @@ CLASS_PATH = _find('class_names.json',    ['app/data'])
 KB_PATH    = _find('medicinal_knowledge.json', ['app/data'])
 
 class MLService:
+    """Orchestrates neural inference and knowledge base mapping."""
     def __init__(self):
+        self.config = ModelConfig()
+        self.engine = PrototypicalEngine(self.config)
+        self.session = None
+        
         try:
-            with open(CLASS_PATH, encoding='utf-8') as f:
-                self.class_names = json.load(f)
-            with open(KB_PATH, encoding='utf-8') as f:
-                self.kb = json.load(f)
-            
-            # --- Memory Optimization for Render Free Tier (512MB RAM) ---
+            # CPU-optimized execution provider for containerized environments
             options = ort.SessionOptions()
             options.intra_op_num_threads = 1
             options.inter_op_num_threads = 1
-            options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
             
-            self.sess = ort.InferenceSession(
-                MODEL_PATH, 
+            self.session = ort.InferenceSession(
+                self.config.ONNX_MODEL, 
                 sess_options=options,
                 providers=['CPUExecutionProvider']
             )
-            self.model_loaded = True
-            
-            # --- Phase 3: Prototypical Engine Initialization ---
-            self.proto_engine = PrototypicalClassifier(
-                prototypes_path=os.path.join(_BACKEND, 'ml_models', 'prototypes.npy'),
-                index_path=os.path.join(_BACKEND, 'ml_models', 'species_index.json')
-            )
-            
-            logger.info("Neural Engine: ONLINE (Render-Optimized + Prototypical Core)")
         except Exception as e:
             self.model_loaded = False
             self.class_names = []
