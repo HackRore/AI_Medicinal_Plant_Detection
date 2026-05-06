@@ -1,43 +1,15 @@
 import os
+import json
 import logging
+from datetime import datetime
+from typing import Dict, Any
 from supabase import create_client, Client
-from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
 class FeedbackService:
+    """Manages prediction corrections and user feedback persistence."""
     def __init__(self):
-        url = os.environ.get("SUPABASE_URL")
-        key = os.environ.get("SUPABASE_KEY")
-        if not url or not key:
-            logger.error("Supabase credentials missing")
-            self.client = None
-        else:
-            self.client: Client = create_client(url, key)
-
-    def log_prediction(self, image_hash: str, predicted_species: str, confidence: float, gate_score: float, meta: Optional[Dict] = None) -> str:
-        """Log a new prediction to the database."""
-        if not self.client: return ""
-        try:
-            data = {
-                "image_hash": image_hash,
-                "predicted_species": predicted_species,
-                "confidence": confidence,
-                "gate_score": gate_score,
-                "meta": meta or {}
-            }
-            result = self.client.table("predictions").insert(data).execute()
-            if result.data:
-                return result.data[0]["id"]
-        except Exception as e:
-            logger.error(f"Failed to log prediction: {e}")
-        return ""
-
-    def log_correction(self, prediction_id: str, correct_species: str) -> bool:
-        """Log a user correction for a specific prediction."""
-        if not self.client: return False
-        try:
-            data = {
                 "prediction_id": prediction_id,
                 "correct_species": correct_species
             }
