@@ -10,31 +10,43 @@ logger = logging.getLogger(__name__)
 class FeedbackService:
     """Manages prediction corrections and user feedback persistence."""
     def __init__(self):
-                "prediction_id": prediction_id,
-                "correct_species": correct_species
-            }
-            self.client.table("corrections").insert(data).execute()
-            return True
-        except Exception as e:
-            logger.error(f"Failed to log correction: {e}")
-        return False
+        url = os.getenv("SUPABASE_URL")
+        key = os.getenv("SUPABASE_KEY")
+        self.client: Client = None
+        
+        if url and key:
+            try:
+                self.client = create_client(url, key)
+            except Exception as e:
+                logger.error(f"Supabase connection failed: {str(e)}")
+        
+        # Local persistence for scheduled model fine-tuning
+        self.local_log = "backend/data/corrections_active_learning.jsonl"
+        os.makedirs(os.path.dirname(self.local_log), exist_ok=True)
 
-    def get_correction_stats(self) -> List[Dict]:
-        """Get stats on corrections per species for retraining focus."""
-        if not self.client: return []
+    async def log_correction(self, feedback_payload: Dict[str, Any]):
+        """Persists user-provided corrections to Supabase and local active-learning buffer."""
         try:
-            # Simple aggregation via query
-            result = self.client.table("corrections").select("correct_species").execute()
-            if not result.data: return []
-            
-            stats = {}
-            for row in result.data:
-                species = row["correct_species"]
-                stats[species] = stats.get(species, 0) + 1
-            
-            return [{"species": k, "corrections": v} for k, v in sorted(stats.items(), key=lambda x: x[1], reverse=True)]
+            entry = {
+                "prediction_id": feedback_payload.get("prediction_id"),
+                "observed_species": feedback_payload.get("correct_species"),
+                "predicted_species": feedback_payload.get("predicted_species"),
+                "confidence_score": feedback_payload.get("confidence"),
+                "user_note": feedback_payload.get("note"),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+
+            # Remote persistence for real-time monitoring
+            if self.client:
+                self.client.table("prediction_corrections").insert(entry).execute()
+
+            # Local persistence
+            with open(self.local_log, "a") as f:
+                f.write(json.dumps(entry) + "\n")
+
+            logger.info(f"Correction logged: {feedback_payload.get('prediction_id')}")
+
         except Exception as e:
-            logger.error(f"Failed to get stats: {e}")
-            return []
+            logger.error(f"Feedback persistence failed: {str(e)}")
 
 feedback_service = FeedbackService()
