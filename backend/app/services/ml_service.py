@@ -61,26 +61,45 @@ KB_PATH    = _find('medicinal_knowledge.json', ['app/data'])
 class MLService:
     """Orchestrates neural inference and knowledge base mapping."""
     def __init__(self):
-        self.config = ModelConfig()
-        self.engine = PrototypicalEngine(self.config)
         self.session = None
+        self.model_loaded = False
+        self.class_names = []
+        self.kb = {}
         
         try:
+            if os.path.exists(CLASS_PATH):
+                with open(CLASS_PATH, 'r', encoding='utf-8') as f:
+                    self.class_names = json.load(f)
+            if os.path.exists(KB_PATH):
+                with open(KB_PATH, 'r', encoding='utf-8') as f:
+                    self.kb = json.load(f)
+                    
             # CPU-optimized execution provider for containerized environments
             options = ort.SessionOptions()
             options.intra_op_num_threads = 1
             options.inter_op_num_threads = 1
             options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
             
+            onnx_path = os.path.join(_BACKEND, os.environ.get("ONNX_PATH", "artifacts/onnx"), "plantoai_model.onnx")
+            if not os.path.exists(onnx_path):
+                onnx_path = MODEL_PATH # fallback
+                
             self.session = ort.InferenceSession(
-                self.config.ONNX_MODEL, 
+                onnx_path, 
                 sess_options=options,
                 providers=['CPUExecutionProvider']
             )
+            self.model_loaded = True
+            
+            proto_dir = os.path.join(_BACKEND, os.environ.get("PROTOTYPE_PATH", "artifacts/prototypes"))
+            self.proto_engine = PrototypicalClassifier(
+                prototypes_path=os.path.join(proto_dir, 'prototypes.npy'),
+                index_path=os.path.join(proto_dir, 'species_index.json')
+            )
+            
+            logger.info("Neural Engine: ONLINE (Render-Optimized + Prototypical Core)")
         except Exception as e:
             self.model_loaded = False
-            self.class_names = []
-            self.kb = {}
             logger.error(f"Neural Engine: OFFLINE - {e}")
 
     def predict(self, image_bytes):
