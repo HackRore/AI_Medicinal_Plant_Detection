@@ -8,7 +8,7 @@ import os
 import logging
 from io import BytesIO
 import tempfile
-from botanical_gate import gate
+from botanical_gate import get_gate
 from prototypical_inference import PrototypicalClassifier
 
 logger = logging.getLogger(__name__)
@@ -62,6 +62,7 @@ class MLService:
     """Orchestrates neural inference and knowledge base mapping."""
     def __init__(self):
         self.session = None
+        self.proto_engine = None
         self.model_loaded = False
         self.class_names = []
         self.kb = {}
@@ -73,12 +74,19 @@ class MLService:
             if os.path.exists(KB_PATH):
                 with open(KB_PATH, 'r', encoding='utf-8') as f:
                     self.kb = json.load(f)
-                    
+        except Exception as e:
+            logger.error(f"Failed to load KB or class names: {e}")
+
+    def _load_models(self):
+        if self.session is not None and self.proto_engine is not None:
+            return
+            
+        try:
             # CPU-optimized execution provider for containerized environments
             options = ort.SessionOptions()
             options.intra_op_num_threads = 1
             options.inter_op_num_threads = 1
-            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_BASIC
             
             onnx_path = os.path.join(_BACKEND, os.environ.get("ONNX_PATH", "artifacts/onnx"), "plantoai_model.onnx")
             if not os.path.exists(onnx_path):
@@ -103,6 +111,7 @@ class MLService:
             logger.error(f"Neural Engine: OFFLINE - {e}")
 
     def predict(self, image_bytes):
+        self._load_models()
         try:
             from PIL import Image, ImageOps, ImageEnhance
             start_time = time.time()
@@ -114,7 +123,7 @@ class MLService:
                 tmp.write(image_bytes)
                 tmp_path = tmp.name
             
-            gate_result = gate.verify(tmp_path)
+            gate_result = get_gate().verify(tmp_path)
             if not gate_result.get("is_leaf", True):
                 return {
                     "status": "rejected",
@@ -215,7 +224,7 @@ class MLService:
                 is_quality_passed = conf > 0.30
 
             # --- Phase 3: Prototypical Path ---
-            proto_result = self.proto_engine.predict(gate.get_bioclip_embedding(tmp_path))
+            proto_result = self.proto_engine.predict(get_gate().get_bioclip_embedding(tmp_path)) if self.proto_engine else {}
             proto_top1 = proto_result.get("top1_species", "Unknown")
             proto_conf = proto_result.get("top1_confidence", 0)
             

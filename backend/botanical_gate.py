@@ -25,12 +25,12 @@ class BotanicalGate:
         if self._initialized:
             return
         
-        logger.info("Initializing BioCLIP 2 Gatekeeper...")
+        logger.info("Initializing CLIP-base Gatekeeper...")
         try:
             self.model, _, self.preprocess = open_clip.create_model_and_transforms(
-                'hf-hub:imageomics/bioclip-2'
+                'hf-hub:openai/clip-vit-base-patch32'
             )
-            self.tokenizer = open_clip.get_tokenizer('hf-hub:imageomics/bioclip-2')
+            self.tokenizer = open_clip.get_tokenizer('hf-hub:openai/clip-vit-base-patch32')
             
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             self.model = self.model.to(self.device)
@@ -61,9 +61,9 @@ class BotanicalGate:
                 self.neg_features /= self.neg_features.norm(dim=-1, keepdim=True)
             
             self._initialized = True
-            logger.info("BioCLIP 2 Gatekeeper: ONLINE")
+            logger.info("CLIP-base Gatekeeper: ONLINE")
         except Exception as e:
-            logger.error(f"BioCLIP 2 Initialization Failed: {e}")
+            logger.error(f"CLIP-base Initialization Failed: {e}")
             self.model = None
             self._initialized = False
 
@@ -114,7 +114,7 @@ class BotanicalGate:
 
     def get_bioclip_embedding(self, image_path: str) -> np.ndarray:
         if not self._initialized or self.model is None:
-            return np.zeros(768)
+            return np.zeros(512) # clip-base has 512 embedding dim, not 768 like bioclip
 
         try:
             image = Image.open(image_path).convert("RGB")
@@ -125,7 +125,11 @@ class BotanicalGate:
                 return image_features.cpu().numpy()[0]
         except Exception as e:
             logger.error(f"Embedding Extraction Error: {e}")
-            return np.zeros(768)
+            return np.zeros(512)
 
-# Singleton instance
-gate = BotanicalGate()
+_gate = None
+def get_gate():
+    global _gate
+    if _gate is None:
+        _gate = BotanicalGate()
+    return _gate

@@ -1,3 +1,4 @@
+# Memory budget: ONNX ~80MB, CLIP-base ~150MB, ChromaDB ~50MB, FastAPI ~30MB = ~310MB total
 import os
 import sys
 import logging
