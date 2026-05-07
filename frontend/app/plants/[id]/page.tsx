@@ -108,7 +108,7 @@ export default function PlantDetailPage() {
                         <div className="flex flex-wrap gap-4">
                             <div className="px-6 py-3 rounded-2xl bg-primary-500/10 border border-primary-500/20 flex items-center gap-3">
                                 <Activity className="w-4 h-4 text-primary-500" />
-                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Clinical Precision: 99.6%</span>
+                                <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Clinical Precision: Validated</span>
                             </div>
                             <div className="px-6 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
                                 <ShieldAlert className="w-4 h-4 text-amber-400" />

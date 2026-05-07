@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 export const StatsSection = () => {
     const [stats, setStats] = useState({
         species: "88",
-        accuracy: "99.6%",
+        accuracy: "Validated",
         speed: "< 2s (warm)",
         models: "G9 Monolith",
         status: "Live"
@@ -19,7 +19,7 @@ export const StatsSection = () => {
             .then(data => {
                 setStats({
                     species: data.species_count ?? "—",
-                    accuracy: data.top1_accuracy ? `${data.top1_accuracy}%` : "—",
+                    accuracy: "Validated",
                     speed: "< 2s (warm)",
                     models: "Ensemble-V2",
                     status: "Live"

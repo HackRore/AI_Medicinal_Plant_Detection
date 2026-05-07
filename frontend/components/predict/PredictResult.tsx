@@ -177,12 +177,11 @@ export default function PredictResult({
                       <div className="w-12 h-12 border-b-2 border-l-2 border-primary-500/50" />
                       <div className="flex gap-4 pointer-events-auto">
                         <button 
-                          onClick={() => setHeatmap(!heatmap)}
-                          className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${
-                            heatmap ? 'bg-primary-500 border-primary-400 text-black' : 'bg-black/60 border-white/10 text-primary-500'
-                          }`}
+                          onClick={() => {}}
+                          title="Grad-CAM Heatmaps (Coming in V4)"
+                          className="w-14 h-14 rounded-2xl flex items-center justify-center border transition-all bg-black/60 border-white/10 text-gray-500 cursor-not-allowed"
                         >
-                          <Maximize2 className="w-6 h-6" />
+                          <Maximize2 className="w-6 h-6 opacity-50" />
                         </button>
                       </div>
                       <div className="w-12 h-12 border-b-2 border-r-2 border-primary-500/50" />

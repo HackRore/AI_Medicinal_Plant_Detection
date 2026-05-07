@@ -140,7 +140,7 @@ export const HeroSection = () => {
                                 <div className="relative flex items-center justify-between mb-4">
                                     <div className="flex flex-col">
                                         <span className="text-[9px] font-black text-gray-400 uppercase tracking-[0.3em]">Telemetry</span>
-                                        <span className="text-white font-mono text-sm tracking-widest">A-99.6% | L-88ms</span>
+                                        <span className="text-white font-mono text-sm tracking-widest">A-V3 | L-88ms</span>
                                     </div>
                                     <div className="flex gap-1.5">
                                         {[...Array(5)].map((_, i) => (

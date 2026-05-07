@@ -407,7 +407,7 @@ export default function PredictClient() {
                     </button>
                     <h3 className="text-sm font-black text-white uppercase tracking-widest mb-3">Welcome to Neural Scanner</h3>
                     <ul className="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium leading-relaxed">
-                      <li><span className="text-white">Supported:</span> 46 medicinal species (Neem, Tulsi, Aloe Vera, Ashwagandha...)</li>
+                      <li><span className="text-white">Supported:</span> 88 medicinal species (Neem, Tulsi, Aloe Vera, Ashwagandha...)</li>
                       <li><span className="text-white">For best results:</span> single leaf, plain background, good lighting, photo taken straight-on</li>
                       <li><span className="text-white">Not supported:</span> flowers, fruit, whole plants, or non-Indian species</li>
                     </ul>
