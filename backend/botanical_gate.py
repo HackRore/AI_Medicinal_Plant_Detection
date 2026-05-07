@@ -1,5 +1,3 @@
-import torch
-import open_clip
 from PIL import Image
 import numpy as np
 import os
@@ -27,6 +25,8 @@ class BotanicalGate:
         
         logger.info("Initializing CLIP-base Gatekeeper...")
         try:
+            import torch
+            import open_clip
             self.model, _, self.preprocess = open_clip.create_model_and_transforms(
                 'hf-hub:openai/clip-vit-base-patch32'
             )
@@ -72,6 +72,7 @@ class BotanicalGate:
             return {"is_leaf": True, "botanical_confidence": 1.0, "note": "Gatekeeper offline"}
 
         try:
+            import torch
             image = Image.open(image_path).convert("RGB")
             image_input = self.preprocess(image).unsqueeze(0).to(self.device)
 
@@ -117,6 +118,7 @@ class BotanicalGate:
             return np.zeros(512) # clip-base has 512 embedding dim, not 768 like bioclip
 
         try:
+            import torch
             image = Image.open(image_path).convert("RGB")
             image_input = self.preprocess(image).unsqueeze(0).to(self.device)
             with torch.no_grad():

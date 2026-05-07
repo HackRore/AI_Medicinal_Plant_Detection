@@ -1,6 +1,4 @@
-import onnxruntime as ort
 import numpy as np
-import cv2
 import base64
 import json
 import time
@@ -82,6 +80,7 @@ class MLService:
             return
             
         try:
+            import onnxruntime as ort
             # CPU-optimized execution provider for containerized environments
             options = ort.SessionOptions()
             options.intra_op_num_threads = 1
