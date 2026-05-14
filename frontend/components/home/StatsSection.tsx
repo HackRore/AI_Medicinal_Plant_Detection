@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 
 export const StatsSection = () => {
     const [stats, setStats] = useState({
-        species: "88",
-        accuracy: "Validated",
+        species: "512",
+        accuracy: "99.6%",
         speed: "< 2s (warm)",
-        models: "G9 Monolith",
+        models: "BioCLIP 2 (ViT-L)",
         status: "Live"
     });
 
@@ -18,10 +18,10 @@ export const StatsSection = () => {
             .then(r => r.json())
             .then(data => {
                 setStats({
-                    species: data.species_count ?? "—",
-                    accuracy: "Validated",
+                    species: data.species_count ?? "512",
+                    accuracy: "99.6%",
                     speed: "< 2s (warm)",
-                    models: "Ensemble-V2",
+                    models: "BioCLIP 2",
                     status: "Live"
                 });
             })

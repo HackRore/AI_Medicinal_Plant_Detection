@@ -160,7 +160,7 @@ export default function SymptomSearchPage() {
             transition={{ delay: 0.1 }}
             className="text-6xl md:text-[7rem] font-black tracking-tighter uppercase mb-8 leading-[0.85] text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           >
-            Diagnostic <br />
+            Botanical <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-primary-500 drop-shadow-[0_0_60px_rgba(20,184,166,0.4)]">Synthesis</span>
           </motion.h1>
           
@@ -170,7 +170,7 @@ export default function SymptomSearchPage() {
             transition={{ delay: 0.2 }}
             className="text-xl md:text-2xl text-gray-400 font-medium max-w-2xl mx-auto italic"
           >
-            Our AI analyzes your symptoms to suggest Ayurvedic plants. Always verify recommendations with a qualified Ayurvedic practitioner.
+            Our AI analyzes your symptoms to identify matching botanical taxa from our clinical database.
           </motion.p>
         </div>
 

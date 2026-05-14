@@ -47,7 +47,7 @@ export const Footer = () => {
                         <h4 className="font-bold text-white mb-6">Resources</h4>
                         <ul className="space-y-4 text-sm text-gray-400">
                             <li><a href="https://github.com/HackRore/AI_Medicinal_Plant_Detection" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Neural Forge Specs</a></li>
-                            <li><a href="https://www.kaggle.com/datasets/mdfahimbinalam/leaf-dataset" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Training Dataset</a></li>
+                            <li><a href="https://www.inaturalist.org" target="_blank" rel="noopener noreferrer" className="hover:text-primary-400 transition-colors">Taxonomic Registry</a></li>
                             <li><Link href="/about#team" className="hover:text-primary-400 transition-colors">Team & Research</Link></li>
                         </ul>
                     </div>

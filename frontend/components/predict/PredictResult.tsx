@@ -177,11 +177,11 @@ export default function PredictResult({
                       <div className="w-12 h-12 border-b-2 border-l-2 border-primary-500/50" />
                       <div className="flex gap-4 pointer-events-auto">
                         <button 
-                          onClick={() => {}}
-                          title="Grad-CAM Heatmaps (Coming in V4)"
-                          className="w-14 h-14 rounded-2xl flex items-center justify-center border transition-all bg-black/60 border-white/10 text-gray-500 cursor-not-allowed"
+                          onClick={() => setHeatmap(!heatmap)}
+                          title="Toggle Botanical Saliency Map"
+                          className={`w-14 h-14 rounded-2xl flex items-center justify-center border transition-all ${heatmap ? 'bg-primary-500 text-black border-primary-400 shadow-[0_0_20px_rgba(16,185,129,0.4)]' : 'bg-black/60 border-white/10 text-gray-500 hover:text-white'}`}
                         >
-                          <Maximize2 className="w-6 h-6 opacity-50" />
+                          <Maximize2 className={`w-6 h-6 ${heatmap ? 'opacity-100' : 'opacity-50'}`} />
                         </button>
                       </div>
                       <div className="w-12 h-12 border-b-2 border-r-2 border-primary-500/50" />
@@ -209,21 +209,22 @@ export default function PredictResult({
             
             <div className="grid gap-4">
                 {/* Primary Match */}
-                {prediction.top3 && prediction.top3.length > 0 && (
-                    <motion.div 
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="p-6 bg-white/[0.04] border border-primary-500/30 rounded-2xl flex flex-col gap-4 shadow-[0_0_20px_rgba(16,185,129,0.1)] relative overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 px-4 py-1 bg-primary-500/20 text-primary-400 text-[9px] font-black uppercase tracking-widest rounded-bl-xl">
-                    <div className="p-6 bg-white/[0.04] border border-primary-500/30 rounded-2xl flex items-center justify-between shadow-[0_0_20px_rgba(16,185,129,0.1)]">
-                        <div className="flex-1 space-y-4">
+                <motion.div 
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="p-8 bg-white/[0.04] border border-primary-500/30 rounded-[2.5rem] flex flex-col sm:flex-row items-center justify-between shadow-[0_0_40px_rgba(16,185,129,0.1)] relative overflow-hidden group"
+                >
+                    <div className="absolute top-0 right-0 px-6 py-2 bg-primary-500/20 text-primary-400 text-[9px] font-black uppercase tracking-[0.2em] rounded-bl-2xl">
+                        Primary Neural Match
+                    </div>
+                    
+                    <div className="flex-1 space-y-4">
                         <div className="flex flex-wrap items-center gap-4">
                             <h2 className="text-4xl sm:text-5xl font-black text-white tracking-tighter capitalize">{name}</h2>
                             <div className={`px-4 py-1.5 rounded-full bg-${confidenceColor}-500/10 border border-${confidenceColor}-500/20 flex items-center gap-2`}>
                                 <div className={`w-1.5 h-1.5 rounded-full bg-${confidenceColor}-500 animate-pulse`} />
                                 <span className={`text-[10px] font-black text-${confidenceColor}-400 uppercase tracking-widest`}>
-                                    {confidenceTier}
+                                    {confidenceTier} ({confidence}%)
                                 </span>
                             </div>
                         </div>
@@ -246,8 +247,7 @@ export default function PredictResult({
                           <XCircle className="w-6 h-6" />
                         </button>
                     </div>
-                </div>
-                )}
+                </motion.div>
 
                 {result.ambiguous && (
                   <motion.div 
@@ -276,8 +276,8 @@ export default function PredictResult({
                           {name}
                       </h2>
                   </div>
-                  {/* Phase 3: Prototypical Alternative Matches */}
-            {result.proto_top3 && result.proto_top3.length > 1 && (
+            {/* Phase 3: Alternative Matches */}
+            {prediction.top3 && prediction.top3.length > 1 && (
               <div className="mt-8 border-t border-white/5 pt-8">
                 <button 
                   onClick={() => setShowAlternatives(!showAlternatives)}
@@ -296,7 +296,7 @@ export default function PredictResult({
                       className="overflow-hidden"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                        {result.proto_top3.map((alt: any, idx: number) => (
+                        {prediction.top3.map((alt: any, idx: number) => (
                           <div 
                             key={idx}
                             className={`p-4 rounded-2xl border ${idx === 0 ? 'bg-primary-500/10 border-primary-500/20' : 'bg-white/5 border-white/10'} flex items-center justify-between group cursor-help`}

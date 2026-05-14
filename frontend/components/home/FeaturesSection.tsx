@@ -9,7 +9,7 @@ export const FeaturesSection = () => {
     const FEATURES = [
         { 
             title: 'Neural Explainability', 
-            desc: 'High-resolution Neural Lens analysis identifies microscopic leaf features for clinical identification.', 
+            desc: 'Botanical Feature Saliency Maps show exactly which leaf features the AI used for clinical identification.', 
             icon: <Microscope className="w-8 h-8" />,
         },
         { 

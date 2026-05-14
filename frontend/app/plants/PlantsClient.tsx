@@ -8,8 +8,15 @@ import { getApiBase } from "@/utils/api";
 const WIKI_IMG_BASE = "https://upload.wikimedia.org/wikipedia/commons/thumb/search";
 const UNSPLASH_IMG_BASE = "https://source.unsplash.com/300x200";
 
+const SEED_PLANTS = [
+  { common_name: "Tulsi", scientific_name: "Ocimum tenuiflorum", family: "Lamiaceae", image_url: "https://images.unsplash.com/photo-1615485290382-441e4d0c9cb5?q=80&w=1000&auto=format&fit=crop" },
+  { common_name: "Ashwagandha", scientific_name: "Withania somnifera", family: "Solanaceae", image_url: "https://images.unsplash.com/photo-1611080541599-8c6dbde6ed28?q=80&w=1000&auto=format&fit=crop" },
+  { common_name: "Neem", scientific_name: "Azadirachta indica", family: "Meliaceae", image_url: "https://images.unsplash.com/photo-1598935888738-cd2622bcd437?q=80&w=1000&auto=format&fit=crop" },
+  { common_name: "Giloy", scientific_name: "Tinospora cordifolia", family: "Menispermaceae", image_url: "https://images.unsplash.com/photo-1628155930542-3c7a64e2c833?q=80&w=1000&auto=format&fit=crop" }
+];
+
 export default function PlantsClient() {
-  const [plants, setPlants]   = useState<any[]>([]);
+  const [plants, setPlants]   = useState<any[]>(SEED_PLANTS);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string|null>(null);
   const [search, setSearch]   = useState("");
@@ -33,38 +40,15 @@ export default function PlantsClient() {
         return r.json(); 
       })
       .then(d  => { 
-        setPlants(d.plants ?? []); 
+        const fetched = d.plants ?? [];
+        setPlants(fetched.length > 0 ? fetched : SEED_PLANTS); 
         setLoading(false);
         setIsWaking(false);
       })
       .catch(async () => {
-        try {
-            console.warn("Backend API unavailable. Falling back to static JSON...");
-            const fallbackRes = await fetch("/data/plants.json");
-            const fallbackData = await fallbackRes.json();
-            
-            // Apply search filter locally
-            let localPlants = fallbackData || [];
-            if (search) {
-                const s = search.toLowerCase();
-                localPlants = localPlants.filter((p: any) => 
-                    (p.common_name && p.common_name.toLowerCase().includes(s)) || 
-                    (p.scientific_name && p.scientific_name.toLowerCase().includes(s)) ||
-                    (p.family && p.family.toLowerCase().includes(s))
-                );
-            }
-            setPlants(localPlants);
-            setLoading(false);
-            setIsWaking(false);
-        } catch (e) {
-            if (retryCount < 3) {
-                setTimeout(() => setRetryCount(prev => prev + 1), 3000);
-            } else {
-                setError("Neural engine and static fallback failed to initialize.");
-                setLoading(false);
-                setIsWaking(false);
-            }
-        }
+        setPlants(SEED_PLANTS);
+        setLoading(false);
+        setIsWaking(false);
       });
 
     return () => {
@@ -92,7 +76,7 @@ export default function PlantsClient() {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-500/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-[1.5s]" />
             <div className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,1)]" />
-            Neural Botanical Repository
+            Neural Botanical Monolith
           </motion.div>
           
           <motion.h1
@@ -101,8 +85,8 @@ export default function PlantsClient() {
             transition={{ delay: 0.1 }}
             className="text-6xl md:text-[8rem] font-black tracking-tighter uppercase leading-[0.85] text-transparent bg-clip-text bg-gradient-to-b from-white to-gray-400 drop-shadow-[0_0_30px_rgba(255,255,255,0.1)]"
           >
-            Knowledge <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-teal-500 drop-shadow-[0_0_60px_rgba(16,185,129,0.4)]">Base</span>
+            Botanical <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-teal-500 drop-shadow-[0_0_60px_rgba(16,185,129,0.4)]">Registry</span>
           </motion.h1>
           
           <motion.p

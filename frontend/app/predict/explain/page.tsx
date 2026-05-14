@@ -51,7 +51,7 @@ export default function ExplainPage() {
           Explain My Prediction
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Upload leaf for Grad-CAM + LIME analysis showing why model chose that plant.
+          Upload leaf for Neural Saliency + LIME analysis showing why model chose that plant.
         </p>
       </div>
 
@@ -66,7 +66,7 @@ export default function ExplainPage() {
           />
           <Upload className="w-16 h-16 mx-auto mb-4 opacity-75" />
           <p className="font-bold text-lg mb-1">Upload Leaf for Analysis</p>
-          <p className="text-sm text-muted-foreground">JPG/PNG - Get Grad-CAM heatmap</p>
+          <p className="text-sm text-muted-foreground">JPG/PNG - Get Neural Saliency heatmap</p>
         </label>
       </div>
 
@@ -125,12 +125,12 @@ export default function ExplainPage() {
           {result?.gradcam && (
             <div className="bg-gradient-to-r from-orange-500/10 to-pink-500/10 p-8 rounded-3xl border border-orange-200">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
-                🎯 Grad-CAM Heatmap
+                🎯 Neural Saliency Heatmap
                 <span className="text-sm bg-orange-200 px-3 py-1 rounded-full font-mono">Model Attention</span>
               </h2>
               <div className="grid md:grid-cols-2 gap-8 items-center">
                 <div>
-                  <img src={result?.gradcam?.heatmap ?? ""} alt="Grad-CAM" className="w-full rounded-2xl shadow-2xl max-h-96 object-contain" />
+                  <img src={result?.gradcam?.heatmap ?? ""} alt="Neural Saliency" className="w-full rounded-2xl shadow-2xl max-h-96 object-contain" />
                 </div>
                 <div className="space-y-4">
                   <p className="text-muted-foreground">
